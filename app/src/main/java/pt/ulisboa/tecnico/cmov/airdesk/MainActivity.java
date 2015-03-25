@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +16,23 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        EditText et_user = (EditText) findViewById(R.id.et_username);
+        et_user.setOnKeyListener(new EditText.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_CENTER)) {
+                    EditText et_username = (EditText) findViewById(R.id.et_username);
+                    String username = et_username.getText().toString();
+                    //Toast.makeText(ListNotesActivity.this, "Title: " + noteTitle + "\nText: " + noteText, Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(MainActivity.this, WorkspaceActivity.class);
+                    intent.putExtra("LOCAL_USERNAME", username);
+                    startActivity(intent);
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
 
@@ -40,11 +58,11 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void login(View view){
+    public void login(View view) {
 
         EditText et_username = (EditText) findViewById(R.id.et_username);
         String username = et_username.getText().toString();
-                //Toast.makeText(ListNotesActivity.this, "Title: " + noteTitle + "\nText: " + noteText, Toast.LENGTH_LONG).show();
+        //Toast.makeText(ListNotesActivity.this, "Title: " + noteTitle + "\nText: " + noteText, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(MainActivity.this, WorkspaceActivity.class);
         intent.putExtra("LOCAL_USERNAME", username);
         startActivity(intent);

@@ -88,10 +88,12 @@ public class WorkspaceActivity extends ActionBarActivity {
         ows.add("Private");
         ows.add("Shared");
         ows.add("Published");
+        ows.add("All");
 
         ArrayList<String> nowShowing = new ArrayList<String>();
         nowShowing.add("Shared");
         nowShowing.add("Subscribed");
+        nowShowing.add("All");
 
         _mapChildTitles.put(_listGroupTitles.get(0), ows); // Header, Child data
         _mapChildTitles.put(_listGroupTitles.get(1), nowShowing);
