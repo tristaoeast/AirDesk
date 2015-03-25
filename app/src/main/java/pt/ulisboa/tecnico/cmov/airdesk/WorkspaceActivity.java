@@ -6,9 +6,8 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
-import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,11 +21,11 @@ public class WorkspaceActivity extends ActionBarActivity {
     private ExpandableListView _expListView;
     private HashMap<String, ArrayList<String>> _mapChildTitles;
     private ArrayList<String> _listGroupTitles;
+    private ArrayList<String> ows;
+    private ArrayList<String> fws;
 
-    private ArrayList<String> _workspaceTopItems;
     private DrawerLayout _drawerLayout;
-    private ListView _drawerGroupList;
-    private ArrayAdapter<String> _workspacesAdapter;
+
     private String _localUsername;
 
     @Override
@@ -44,6 +43,7 @@ public class WorkspaceActivity extends ActionBarActivity {
         prepareListData();
 
         _expListAdapter = new ExpandableListAdapter(this, _listGroupTitles, _mapChildTitles);
+        _drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         // setting list adapter
         _expListView.setAdapter(_expListAdapter);
@@ -67,9 +67,13 @@ public class WorkspaceActivity extends ActionBarActivity {
 //                _drawerGroupList.setItemChecked(childPosition, true);
                 _expListView.setItemChecked(childPosition,true);
 
-                setTitle(_mapChildTitles.get(groupPosition).get(childPosition));
-                _drawerLayout.closeDrawer(_drawerGroupList);
-
+                setTitle(_mapChildTitles.get(_listGroupTitles.get(groupPosition)).get(childPosition));
+                if(null == _drawerLayout){
+                    Toast.makeText(WorkspaceActivity.this, "DRAWER LAYOUT IS NULL!!",Toast.LENGTH_LONG).show();
+                } else if(null == _expListView) {
+                    Toast.makeText(WorkspaceActivity.this, "EXTLISTVIEW IS NULL!!",Toast.LENGTH_LONG).show();
+                }
+                _drawerLayout.closeDrawer(_expListView);
                 return false;
             }
         });
@@ -84,18 +88,18 @@ public class WorkspaceActivity extends ActionBarActivity {
         _listGroupTitles.add("Foreign Workspaces");
 
         // Adding child data
-        ArrayList<String> ows = new ArrayList<String>();
+        ows = new ArrayList<String>();
         ows.add("Private");
         ows.add("Shared");
         ows.add("Published");
         ows.add("All");
 
-        ArrayList<String> nowShowing = new ArrayList<String>();
-        nowShowing.add("Shared");
-        nowShowing.add("Subscribed");
-        nowShowing.add("All");
+        fws = new ArrayList<String>();
+        fws.add("Shared");
+        fws.add("Subscribed");
+        fws.add("All");
 
         _mapChildTitles.put(_listGroupTitles.get(0), ows); // Header, Child data
-        _mapChildTitles.put(_listGroupTitles.get(1), nowShowing);
+        _mapChildTitles.put(_listGroupTitles.get(1), fws);
     }
 }
