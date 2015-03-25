@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
@@ -19,15 +18,16 @@ import java.util.HashMap;
  */
 public class WorkspaceActivity extends ActionBarActivity {
 
-    private ExpandableListAdapter mExpListAdapter;
-    private ExpandableListView mExpListView;
-    private HashMap<String, ArrayList<String>> mListDataChild;
+    private ExpandableListAdapter _expListAdapter;
+    private ExpandableListView _expListView;
+    private HashMap<String, ArrayList<String>> _mapChildTitles;
+    private ArrayList<String> _listGroupTitles;
 
-    private ArrayList<String> mWorkspaceTopItems;
-    private DrawerLayout mDrawerLayout;
-    private ListView mDrawerTopList;
-    private ArrayAdapter<String> mWorkspacesAdapter;
-    private String localUsername;
+    private ArrayList<String> _workspaceTopItems;
+    private DrawerLayout _drawerLayout;
+    private ListView _drawerGroupList;
+    private ArrayAdapter<String> _workspacesAdapter;
+    private String _localUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,52 +35,65 @@ public class WorkspaceActivity extends ActionBarActivity {
         setContentView(R.layout.activity_workspaces);
 
         Intent intent = getIntent();
-        localUsername = intent.getExtras().getString("LOCAL_USERNAME");
+        _localUsername = intent.getExtras().getString("LOCAL_USERNAME");
 
+        // get the listview
+        _expListView = (ExpandableListView) findViewById(R.id.elv_left_drawer);
 
+        // preparing list data
+        prepareListData();
 
-//        mWorkspaceTopItems = new ArrayList<>();
-//        mWorkspaceTopItems.add("Owned Workspaces");
-//        mWorkspaceTopItems.add("Foreign Workspaces");
-//
-//        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        mDrawerTopList = (ListView) findViewById(R.id.left_drawer);
-//
-//        mWorkspacesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, mWorkspaceTopItems);
-//
-//        // Set the adapter for the list view
-//        mDrawerTopList.setAdapter(mWorkspacesAdapter);
-//        mWorkspacesAdapter.notifyDataSetChanged();
-//
-//        // Set the list's click listener
-//        mDrawerTopList.setOnItemClickListener(new DrawerTopItemClickListener());
+        _expListAdapter = new ExpandableListAdapter(this, _listGroupTitles, _mapChildTitles);
 
+        // setting list adapter
+        _expListView.setAdapter(_expListAdapter);
+        _expListAdapter.notifyDataSetChanged();
+
+        _expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                // Create a new fragment and specify the planet to show based on position
+                WorkspaceFragment fragment = new WorkspaceFragment();
+                Bundle args = new Bundle();
+                args.putInt(WorkspaceFragment.GROUP_POSITION, groupPosition);
+                args.putInt(WorkspaceFragment.CHILD_POSITION, childPosition);
+                fragment.setArguments(args);
+
+                // Insert the fragment by replacing any existing fragment
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+
+                // Highlight the selected item, update the title, and close the drawer
+//                _drawerGroupList.setItemChecked(childPosition, true);
+                _expListView.setItemChecked(childPosition,true);
+
+                setTitle(_mapChildTitles.get(groupPosition).get(childPosition));
+                _drawerLayout.closeDrawer(_drawerGroupList);
+
+                return false;
+            }
+        });
     }
 
-    private class DrawerTopItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            expandTopItem(position);
-        }
-    }
+    private void prepareListData() {
+        _listGroupTitles = new ArrayList<String>();
+        _mapChildTitles = new HashMap<String, ArrayList<String>>();
 
-    /**
-     * Swaps fragments in the main content view
-     */
-    private void expandTopItem(int position) {
-        // Create a new fragment and specify the planet to show based on position
-        WorkspaceFragment fragment = new WorkspaceFragment();
-        Bundle args = new Bundle();
-        args.putInt(WorkspaceFragment.ARG_WORKSPACE_NUMBER, position);
-        fragment.setArguments(args);
+        // Adding group data
+        _listGroupTitles.add("Owned Workspaces");
+        _listGroupTitles.add("Foreign Workspaces");
 
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        // Adding child data
+        ArrayList<String> ows = new ArrayList<String>();
+        ows.add("Private");
+        ows.add("Shared");
+        ows.add("Published");
 
-        // Highlight the selected item, update the title, and close the drawer
-        mDrawerTopList.setItemChecked(position, true);
-        setTitle(mWorkspaceTopItems.get(position));
-        mDrawerLayout.closeDrawer(mDrawerTopList);
+        ArrayList<String> nowShowing = new ArrayList<String>();
+        nowShowing.add("Shared");
+        nowShowing.add("Subscribed");
+
+        _mapChildTitles.put(_listGroupTitles.get(0), ows); // Header, Child data
+        _mapChildTitles.put(_listGroupTitles.get(1), nowShowing);
     }
 }

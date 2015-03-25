@@ -7,7 +7,8 @@ import android.app.Fragment;
  */
 public class WorkspaceFragment extends Fragment {
 
-    public static String ARG_WORKSPACE_NUMBER = "WORKSPACE_NO";
+    public static String GROUP_POSITION = "GROUP POSITION";
+    public static String CHILD_POSITION = "CHILD POSITION";
 
 
 }
