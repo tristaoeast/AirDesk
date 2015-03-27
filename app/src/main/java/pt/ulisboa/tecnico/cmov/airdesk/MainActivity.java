@@ -25,7 +25,7 @@ public class MainActivity extends ActionBarActivity {
                     EditText et_username = (EditText) findViewById(R.id.et_username);
                     String username = et_username.getText().toString();
                     //Toast.makeText(ListNotesActivity.this, "Title: " + noteTitle + "\nText: " + noteText, Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(MainActivity.this, WorkspaceActivity.class);
+                    Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
                     intent.putExtra("LOCAL_USERNAME", username);
                     startActivity(intent);
                     return true;
@@ -63,7 +63,7 @@ public class MainActivity extends ActionBarActivity {
         EditText et_username = (EditText) findViewById(R.id.et_username);
         String username = et_username.getText().toString();
         //Toast.makeText(ListNotesActivity.this, "Title: " + noteTitle + "\nText: " + noteText, Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(MainActivity.this, WorkspaceActivity.class);
+        Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
         intent.putExtra("LOCAL_USERNAME", username);
         startActivity(intent);
     }

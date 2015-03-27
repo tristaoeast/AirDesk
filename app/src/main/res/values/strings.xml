@@ -19,5 +19,6 @@
     <string name="action_example">Example action</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="activity_own_private_workspaces_list">Own Private Workspaces</string>
 
 </resources>
