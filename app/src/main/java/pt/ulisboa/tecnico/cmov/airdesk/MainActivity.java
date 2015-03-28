@@ -27,6 +27,7 @@ public class MainActivity extends ActionBarActivity {
                     //Toast.makeText(ListNotesActivity.this, "Title: " + noteTitle + "\nText: " + noteText, Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
                     intent.putExtra("LOCAL_USERNAME", username);
+                    intent.putExtra("LIST_SELECTED","OPrWS");
                     startActivity(intent);
                     return true;
                 }
