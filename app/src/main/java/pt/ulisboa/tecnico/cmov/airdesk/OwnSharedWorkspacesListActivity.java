@@ -23,6 +23,7 @@ import java.util.HashMap;
  */
 public class OwnSharedWorkspacesListActivity extends ActionBarActivity {
 
+    // NavDrawer Variables
     private ExpandableListAdapter _expListAdapter;
     private ExpandableListView _expListView;
     private HashMap<String, ArrayList<String>> _mapChildTitles;
