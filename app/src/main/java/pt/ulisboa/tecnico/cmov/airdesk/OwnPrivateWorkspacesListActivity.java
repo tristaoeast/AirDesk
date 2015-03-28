@@ -57,15 +57,15 @@ public class OwnPrivateWorkspacesListActivity extends ActionBarActivity {
         Intent intent = getIntent();
         _localUsername = intent.getExtras().getString("LOCAL_USERNAME");
         _listSelected = intent.getExtras().getString("LIST_SELECTED");
-        if(_listSelected.equals("OPrWS")){
+        if (_listSelected.equals("OPrWS")) {
             setContentView(R.layout.activity_own_private_workspaces_list);
-        }else if(_listSelected.equals("OSWS")){
+        } else if (_listSelected.equals("OSWS")) {
             setContentView(R.layout.activity_own_shared_workspaces_list);
-        }else if(_listSelected.equals("OPuWS")){
+        } else if (_listSelected.equals("OPuWS")) {
             setContentView(R.layout.activity_own_published_workspaces_list);
-        }else if(_listSelected.equals("FSuWS")){
+        } else if (_listSelected.equals("FSuWS")) {
             setContentView(R.layout.activity_foreign_subscribed_workspaces_list);
-        }else if(_listSelected.equals("FShWS")){
+        } else if (_listSelected.equals("FShWS")) {
             setContentView(R.layout.activity_foreign_shared_workspaces_list);
         }
         Toast.makeText(this, _listSelected, Toast.LENGTH_LONG).show();
@@ -157,7 +157,6 @@ public class OwnPrivateWorkspacesListActivity extends ActionBarActivity {
                     }
                 } else if (1 == groupPosition) {
                     if (0 == childPosition) {
-                    } else if (0 == childPosition) {
 //                        intent = new Intent(OwnPrivateWorkspacesListActivity.this, ForeignSharedWorkspacesListActivity.class);
 //                        intent.putExtra("LOCAL_USERNAME", _localUsername);
                         intent.putExtra("LIST_SELECTED", "FShWS");
