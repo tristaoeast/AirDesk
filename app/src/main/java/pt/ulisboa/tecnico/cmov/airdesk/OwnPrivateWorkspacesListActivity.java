@@ -59,16 +59,20 @@ public class OwnPrivateWorkspacesListActivity extends ActionBarActivity {
         _listSelected = intent.getExtras().getString("LIST_SELECTED");
         if (_listSelected.equals("OPrWS")) {
             setContentView(R.layout.activity_own_private_workspaces_list);
+            getSupportActionBar().setTitle("Own Public Workspaces");
         } else if (_listSelected.equals("OSWS")) {
             setContentView(R.layout.activity_own_shared_workspaces_list);
+            getSupportActionBar().setTitle("Own Shared Workspaces");
         } else if (_listSelected.equals("OPuWS")) {
             setContentView(R.layout.activity_own_published_workspaces_list);
+            getSupportActionBar().setTitle("Own Published Workspaces");
         } else if (_listSelected.equals("FSuWS")) {
             setContentView(R.layout.activity_foreign_subscribed_workspaces_list);
+            getSupportActionBar().setTitle("Foreign Subscribed Workspaces");
         } else if (_listSelected.equals("FShWS")) {
             setContentView(R.layout.activity_foreign_shared_workspaces_list);
+            getSupportActionBar().setTitle("Foreign Shared Workspaces");
         }
-        Toast.makeText(this, _listSelected, Toast.LENGTH_LONG).show();
         prepareNavigationDrawerListData();
         setupDrawer();
         setupWsList();
@@ -171,11 +175,11 @@ public class OwnPrivateWorkspacesListActivity extends ActionBarActivity {
                 // Highlight the selected item, update the title, and close the drawer
                 _expListView.setItemChecked(childPosition, true);
 
-                if (0 == groupPosition) {
-                    getSupportActionBar().setTitle("Own " + _mapChildTitles.get(_listGroupTitles.get(groupPosition)).get(childPosition) + " Workspaces");
-                } else if (1 == groupPosition) {
-                    getSupportActionBar().setTitle("Foreign " + _mapChildTitles.get(_listGroupTitles.get(groupPosition)).get(childPosition) + " Workspaces");
-                }
+//                if (0 == groupPosition) {
+//                    getSupportActionBar().setTitle("Own " + _mapChildTitles.get(_listGroupTitles.get(groupPosition)).get(childPosition) + " Workspaces");
+//                } else if (1 == groupPosition) {
+//                    getSupportActionBar().setTitle("Foreign " + _mapChildTitles.get(_listGroupTitles.get(groupPosition)).get(childPosition) + " Workspaces");
+//                }
 
 
                 _drawerLayout.closeDrawer(_expListView);
