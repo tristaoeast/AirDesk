@@ -18,7 +18,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LOGIN"
+        android:text="@string/activity_main_login_button_text"
         android:id="@+id/bt_login"
         android:layout_centerHorizontal="true"
         android:onClick="login"

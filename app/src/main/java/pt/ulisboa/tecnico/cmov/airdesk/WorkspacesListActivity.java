@@ -1,16 +1,21 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -21,9 +26,9 @@ import java.util.HashMap;
 /**
  * Created by ist167092 on 24-03-2015.
  */
-public class OwnSharedWorkspacesListActivity extends ActionBarActivity {
+public class WorkspacesListActivity extends ActionBarActivity {
 
-    // NavDrawer Variables
+    // NavDrawer related variables
     private ExpandableListAdapter _expListAdapter;
     private ExpandableListView _expListView;
     private HashMap<String, ArrayList<String>> _mapChildTitles;
@@ -34,31 +39,53 @@ public class OwnSharedWorkspacesListActivity extends ActionBarActivity {
     private String _currentTitle;
     private boolean _itemSelected = false;
     private DrawerLayout _drawerLayout;
+    private String _listSelected;
 
     private ArrayList<String> _wsNamesList;
     private ArrayList<String> _notesTextList;
     private ArrayAdapter<String> _wsNamesAdapter;
     private ListView _listView;
 
+    private SharedPreferences _prefs;
 
     private String _localUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_own_private_workspaces_list);
-
+//        setContentView(R.layout.activity_own_private_workspaces_list);
 //        navigationDrawer = new NavigationDrawerSetup(mDrawerView, mDrawerLayout, mDrawerList, actionBar, mNavOptions, currentActivity);
 //        navigationDrawer.setupDrawer();
-
         Intent intent = getIntent();
         _localUsername = intent.getExtras().getString("LOCAL_USERNAME");
-        Toast.makeText(this, _localUsername, Toast.LENGTH_LONG).show();
+        _listSelected = intent.getExtras().getString("LIST_SELECTED");
+        if (_listSelected.equals("OPrWS")) {
+            setContentView(R.layout.activity_own_private_workspaces_list);
+            getSupportActionBar().setTitle("Own Public Workspaces");
+        } else if (_listSelected.equals("OSWS")) {
+            setContentView(R.layout.activity_own_shared_workspaces_list);
+            getSupportActionBar().setTitle("Own Shared Workspaces");
+        } else if (_listSelected.equals("OPuWS")) {
+            setContentView(R.layout.activity_own_published_workspaces_list);
+            getSupportActionBar().setTitle("Own Published Workspaces");
+        } else if (_listSelected.equals("FSuWS")) {
+            setContentView(R.layout.activity_foreign_subscribed_workspaces_list);
+            getSupportActionBar().setTitle("Foreign Subscribed Workspaces");
+        } else if (_listSelected.equals("FShWS")) {
+            setContentView(R.layout.activity_foreign_shared_workspaces_list);
+            getSupportActionBar().setTitle("Foreign Shared Workspaces");
+        }
         prepareNavigationDrawerListData();
         setupDrawer();
         setupWsList();
+        _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
+    }
 
-
+    @Override
+    public void onBackPressed(){
+//        Toast.makeText(this, "Back button pressed", Toast.LENGTH_LONG).show();
+        _prefs.edit().putBoolean(getString(R.string.event_back_button_pressed),true).commit();
+        super.onBackPressed();
     }
 
     protected void setupWsList() {
@@ -67,8 +94,6 @@ public class OwnSharedWorkspacesListActivity extends ActionBarActivity {
         // Get ListView object from xml
         _listView = (ListView) findViewById(R.id.lv_opwslist);
         _listView.setAdapter(_wsNamesAdapter);
-//        _wsNamesList.add("OPrivWS 1");
-//        _wsNamesList.add("OSharewdWS 2");
         _wsNamesAdapter.notifyDataSetChanged();
 
 
@@ -76,8 +101,7 @@ public class OwnSharedWorkspacesListActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String wsName = _wsNamesList.get(position);
-                //Toast.makeText(ListNotesActivity.this, "Title: " + noteTitle + "\nText: " + noteText, Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(OwnSharedWorkspacesListActivity.this, OwnSharedWorkspacesListActivity.class);
+                Intent intent = new Intent(WorkspacesListActivity.this, WorkspacesListActivity.class);
                 intent.putExtra("LOCAL_USERNAME", _localUsername);
                 startActivity(intent);
             }
@@ -128,44 +152,37 @@ public class OwnSharedWorkspacesListActivity extends ActionBarActivity {
                 _itemSelected = true;
 //                OwnPrivateWorkspacesListFragment wsListFragment;
 //                Toast.makeText(WorkspacesActivity.this,groupPosition+" "+childPosition,Toast.LENGTH_LONG).show();
-                Intent intent;
+                Intent intent = new Intent(WorkspacesListActivity.this, WorkspacesListActivity.class);
+                intent.putExtra("LOCAL_USERNAME", _localUsername);
                 if (0 == groupPosition) {
                     if (0 == childPosition) {
-                        intent = new Intent(OwnSharedWorkspacesListActivity.this, OwnPrivateWorkspacesListActivity.class);
-                        intent.putExtra("LOCAL_USERNAME", _localUsername);
-                        startActivity(intent);
+//                        intent = new Intent(OwnPrivateWorkspacesListActivity.this, OwnPrivateWorkspacesListActivity.class);
+//                        intent.putExtra("LOCAL_USERNAME", _localUsername);
+                        intent.putExtra("LIST_SELECTED", "OPrWS");
                     } else if (1 == childPosition) {
-                        intent = new Intent(OwnSharedWorkspacesListActivity.this, OwnSharedWorkspacesListActivity.class);
-                        intent.putExtra("LOCAL_USERNAME", _localUsername);
-                        startActivity(intent);
+//                        intent = new Intent(OwnPrivateWorkspacesListActivity.this, OwnSharedWorkspacesListActivity.class);
+//                        intent.putExtra("LOCAL_USERNAME", _localUsername);
+                        intent.putExtra("LIST_SELECTED", "OSWS");
                     } else if (2 == childPosition) {
-                        intent = new Intent(OwnSharedWorkspacesListActivity.this, OwnPublishedWorkspacesListActivity.class);
-                        intent.putExtra("LOCAL_USERNAME", _localUsername);
-                        startActivity(intent);
+//                        intent = new Intent(OwnPrivateWorkspacesListActivity.this, OwnPublishedWorkspacesListActivity.class);
+//                        intent.putExtra("LOCAL_USERNAME", _localUsername);
+                        intent.putExtra("LIST_SELECTED", "OPuWS");
                     }
                 } else if (1 == groupPosition) {
                     if (0 == childPosition) {
-                    } else if (0 == childPosition) {
-                        intent = new Intent(OwnSharedWorkspacesListActivity.this, ForeignSharedWorkspacesListActivity.class);
-                        intent.putExtra("LOCAL_USERNAME", _localUsername);
-                        startActivity(intent);
+//                        intent = new Intent(OwnPrivateWorkspacesListActivity.this, ForeignSharedWorkspacesListActivity.class);
+//                        intent.putExtra("LOCAL_USERNAME", _localUsername);
+                        intent.putExtra("LIST_SELECTED", "FShWS");
                     } else if (1 == childPosition) {
-                        intent = new Intent(OwnSharedWorkspacesListActivity.this, ForeignSubscribedWorkspacesListActivity.class);
-                        intent.putExtra("LOCAL_USERNAME", _localUsername);
-                        startActivity(intent);
+//                        intent = new Intent(OwnPrivateWorkspacesListActivity.this, ForeignSubscribedWorkspacesListActivity.class);
+//                        intent.putExtra("LOCAL_USERNAME", _localUsername);
+                        intent.putExtra("LIST_SELECTED", "FSuWS");
                     }
                 }
+                startActivity(intent);
 
                 // Highlight the selected item, update the title, and close the drawer
                 _expListView.setItemChecked(childPosition, true);
-
-                if (0 == groupPosition) {
-                    getSupportActionBar().setTitle("Own " + _mapChildTitles.get(_listGroupTitles.get(groupPosition)).get(childPosition) + " Workspaces");
-                } else if (1 == groupPosition) {
-                    getSupportActionBar().setTitle("Foreign " + _mapChildTitles.get(_listGroupTitles.get(groupPosition)).get(childPosition) + " Workspaces");
-                }
-
-
                 _drawerLayout.closeDrawer(_expListView);
                 return false;
             }
@@ -235,5 +252,43 @@ public class OwnSharedWorkspacesListActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void newOwnPrivateWorkspace(final View view) {
+
+        final String[] wsName = new String[1];
+        final String[] wsQuota = new String[1];
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        final View yourCustomView = inflater.inflate(R.layout.dialog_new_private_workspace, null);
+
+        final EditText etName = (EditText) yourCustomView.findViewById(R.id.et_ws_name);
+        final EditText etQuota = (EditText) yourCustomView.findViewById(R.id.et_ws_quota);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Create New Workspace")
+                .setView(yourCustomView)
+                .setPositiveButton("Create", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        wsName[0] = etName.getText().toString();
+                        wsQuota[0] = etQuota.getText().toString();
+                        int quota = 0;
+                        try {
+                            quota = Integer.parseInt(wsQuota[0]);
+
+                        } catch (NumberFormatException e) {
+                            Toast.makeText(WorkspacesListActivity.this, "Invalid Quota format. Must be a number (MB)", Toast.LENGTH_LONG).show();
+                            newOwnPrivateWorkspace(view);
+                            return;
+                        }
+                        if (quota > new MemoryHelper().getAvailableInternalMemorySizeLong()) {
+                            Toast.makeText(WorkspacesListActivity.this, "Quota higher than available memory. Available memory is of " + new MemoryHelper().getAvailableInternalMemorySize(), Toast.LENGTH_LONG).show();
+                            newOwnPrivateWorkspace(view);
+                            return;
+                        }
+
+                    }
+                })
+                .setNegativeButton("Cancel", null).create();
+        dialog.show();
     }
 }

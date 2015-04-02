@@ -16,7 +16,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".OwnPrivateWorkspacesListActivity"
+            android:name=".WorkspacesListActivity"
             android:label="@string/activity_own_private_workspaces_list"
             android:parentActivityName=".MainActivity" >
             <meta-data
