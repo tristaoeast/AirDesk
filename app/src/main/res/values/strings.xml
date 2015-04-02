@@ -23,5 +23,9 @@
     <string name="activity_main_login_button_text">LOGIN</string>
     <string name="activity_login_shared_preferences">pt.ulisboa.tecnico.cmov.airdesk</string>
     <string name="event_back_button_pressed">onBackPressed</string>
+    <string name="activity_own_published_workspaces_list">Own Published Workspaces</string>
+    <string name="activity_own_shared_workspaces_list">Own Shared Workspaces</string>
+    <string name="activity_foreign_subscribed_workspaces_list">Foreign Subscribed Workspaces</string>
+    <string name="activity_foreign_shared_workspaces_list">Foreign Shared Workspaces</string>
 
 </resources>

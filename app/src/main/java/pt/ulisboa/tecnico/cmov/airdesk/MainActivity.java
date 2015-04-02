@@ -49,7 +49,7 @@ public class MainActivity extends ActionBarActivity {
             } else {
                 String username = _prefs.getString("username", "inavlid_username");
                 Toast.makeText(MainActivity.this, "Logged in as " + username, Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(MainActivity.this, WorkspacesListActivity.class);
+                Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
                 intent.putExtra("LOCAL_USERNAME", username);
                 intent.putExtra("LIST_SELECTED", "OPrWS");
                 startActivity(intent);
@@ -85,7 +85,7 @@ public class MainActivity extends ActionBarActivity {
         _prefs.edit().putString("username", username).commit();
         _prefs.edit().putBoolean("firstRun", false).commit();
         //Toast.makeText(ListNotesActivity.this, "Title: " + noteTitle + "\nText: " + noteText, Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(MainActivity.this, WorkspacesListActivity.class);
+        Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
         intent.putExtra("LOCAL_USERNAME", username);
         intent.putExtra("LIST_SELECTED", "OPrWS");
         startActivity(intent);
