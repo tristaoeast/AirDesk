@@ -18,7 +18,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -39,18 +41,23 @@ public class OwnPrivateWorkspacesListActivity extends ActionBarActivity {
 
     private String _localUsername;
 
+    private File _subDir;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_own_private_workspaces_list);
-
+        _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
         setupWsList();
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(this, this);
         _drawerToggle = nh.setup();
-        _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
+        File appDir = getApplicationContext().getFilesDir();
+        _subDir = new File(appDir, getString(R.string.own_private_workspaces_dir));
     }
 
+    // A Hack done in order to ensure the correct behaviour of the back button,
+    // since the main activity automatically redirects to this one
     @Override
     public void onBackPressed() {
 //        Toast.makeText(this, "Back button pressed", Toast.LENGTH_LONG).show();
@@ -64,8 +71,11 @@ public class OwnPrivateWorkspacesListActivity extends ActionBarActivity {
         // Get ListView object from xml
         _listView = (ListView) findViewById(R.id.lv_opwslist);
         _listView.setAdapter(_wsNamesAdapter);
+        Set<String> wsNames = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
+        for (String wsName : wsNames) {
+            _wsNamesList.add(wsName);
+        }
         _wsNamesAdapter.notifyDataSetChanged();
-
 
         _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -133,7 +143,7 @@ public class OwnPrivateWorkspacesListActivity extends ActionBarActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         wsName[0] = etName.getText().toString();
                         wsQuota[0] = etQuota.getText().toString();
-                        int quota = 0;
+                        int quota;
                         try {
                             quota = Integer.parseInt(wsQuota[0]);
 
@@ -147,13 +157,31 @@ public class OwnPrivateWorkspacesListActivity extends ActionBarActivity {
                             newOwnPrivateWorkspace(view);
                             return;
                         }
-                        _prefs.edit().putInt(wsName[0] + "_quota", quota);
-                        Set<String> oprivws = _prefs.getStringSet("own_private_workspaces", null);
-                        oprivws.add(wsName[0]);
-                        _prefs.edit().putStringSet("own_private_workspaces", oprivws);
-                        _prefs.edit().commit();
+                        String name = wsName[0];
+                        _prefs.edit().putInt(name + "_quota", quota).commit();
+                        Set<String> oprivws = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
+                        if (oprivws.contains(name)) {
+                            Toast.makeText(OwnPrivateWorkspacesListActivity.this, "Workspace with same name already exists. Choose different name", Toast.LENGTH_LONG).show();
+                            newOwnPrivateWorkspace(view);
+                            return;
+                        } else {
+                            oprivws.add(name);
+                            _prefs.edit().putStringSet(getString(R.string.activity_own_shared_workspaces_list), oprivws).commit();
+                            _wsNamesList.add(name);
+                            _wsNamesAdapter.notifyDataSetChanged();
+                            //TODO create the actual directory
+//                        File subdir = getDir(getString(R.string.own_private_workspaces_dir), MODE_PRIVATE);
 
-
+                            if (!_subDir.exists()) {
+                                Toast.makeText(OwnPrivateWorkspacesListActivity.this, "subdir doesn't exist", Toast.LENGTH_LONG).show();
+                                _subDir.mkdir();
+                            }
+                            File wsDir = new File(_subDir, name);
+                            if (!wsDir.exists()) {
+                                Toast.makeText(OwnPrivateWorkspacesListActivity.this, "wsdir doesn't exist", Toast.LENGTH_LONG).show();
+                                wsDir.mkdir();
+                            }
+                        }
                     }
                 })
                 .setNegativeButton("Cancel", null).create();

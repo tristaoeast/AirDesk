@@ -27,5 +27,6 @@
     <string name="activity_own_shared_workspaces_list">Own Shared Workspaces</string>
     <string name="activity_foreign_subscribed_workspaces_list">Foreign Subscribed Workspaces</string>
     <string name="activity_foreign_shared_workspaces_list">Foreign Shared Workspaces</string>
+    <string name="own_private_workspaces_dir">own_private_workspaces</string>
 
 </resources>
