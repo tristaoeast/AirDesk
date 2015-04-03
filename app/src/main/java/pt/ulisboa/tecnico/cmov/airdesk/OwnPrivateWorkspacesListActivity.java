@@ -81,7 +81,7 @@ public class OwnPrivateWorkspacesListActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String wsName = _wsNamesList.get(position);
-                Intent intent = new Intent(OwnPrivateWorkspacesListActivity.this, OwnPrivateWorkspacesListActivity.class);
+                Intent intent = new Intent(OwnPrivateWorkspacesListActivity.this, OwnPrivateWorkspaceActivity.class);
                 intent.putExtra("LOCAL_USERNAME", _localUsername);
                 startActivity(intent);
             }
@@ -169,16 +169,13 @@ public class OwnPrivateWorkspacesListActivity extends ActionBarActivity {
                             _prefs.edit().putStringSet(getString(R.string.activity_own_shared_workspaces_list), oprivws).commit();
                             _wsNamesList.add(name);
                             _wsNamesAdapter.notifyDataSetChanged();
-                            //TODO create the actual directory
-//                        File subdir = getDir(getString(R.string.own_private_workspaces_dir), MODE_PRIVATE);
-
                             if (!_subDir.exists()) {
-                                Toast.makeText(OwnPrivateWorkspacesListActivity.this, "subdir doesn't exist", Toast.LENGTH_LONG).show();
+//                                Toast.makeText(OwnSharedWorkspacesListActivity.this, "subdir doesn't exist", Toast.LENGTH_LONG).show();
                                 _subDir.mkdir();
                             }
                             File wsDir = new File(_subDir, name);
                             if (!wsDir.exists()) {
-                                Toast.makeText(OwnPrivateWorkspacesListActivity.this, "wsdir doesn't exist", Toast.LENGTH_LONG).show();
+                                Toast.makeText(OwnPrivateWorkspacesListActivity.this, "Directory " + name + " created.", Toast.LENGTH_LONG).show();
                                 wsDir.mkdir();
                             }
                         }
