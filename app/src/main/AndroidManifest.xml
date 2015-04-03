@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="pt.ulisboa.tecnico.cmov.airdesk" >
+    package="pt.ulisboa.tecnico.cmov.airdesk">
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,9 +17,17 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".OwnWorkspacesListActivity"
+            android:label="@string/activity_own_private_workspaces_list"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
+        </activity>
+        <activity
             android:name=".OwnPrivateWorkspacesListActivity"
             android:label="@string/activity_own_private_workspaces_list"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
@@ -27,7 +35,7 @@
         <activity
             android:name=".OwnPublishedWorkspacesListActivity"
             android:label="@string/activity_own_published_workspaces_list"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
@@ -35,7 +43,7 @@
         <activity
             android:name=".OwnSharedWorkspacesListActivity"
             android:label="@string/activity_own_shared_workspaces_list"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
@@ -43,7 +51,7 @@
         <activity
             android:name=".ForeignSharedWorkspacesListActivity"
             android:label="@string/activity_foreign_shared_workspaces_list"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
@@ -51,19 +59,17 @@
         <activity
             android:name=".ForeignSubscribedWorkspacesListActivity"
             android:label="@string/activity_foreign_subscribed_workspaces_list"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
         </activity>
         <activity
             android:name=".OwnPrivateWorkspaceActivity"
-            android:label="@string/title_activity_own_private_workspace" >
-        </activity>
+            android:label="@string/title_activity_own_private_workspace"></activity>
         <activity
             android:name=".OwnSharedWorkspaceActivity"
-            android:label="@string/title_activity_own_shared_workspace" >
-        </activity>
+            android:label="@string/title_activity_own_shared_workspace"></activity>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,34 +27,52 @@ import java.util.Set;
 /**
  * Created by ist167092 on 24-03-2015.
  */
-public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
+public class OwnWorkspacesListActivity extends ActionBarActivity {
 
     // NavDrawer related variables
 
-    private ActionBarDrawerToggle _drawerToggle;
+    protected ActionBarDrawerToggle _drawerToggle;
 
-    private ArrayList<String> _wsNamesList;
+    protected ArrayList<String> _wsNamesList;
 
-    private ArrayAdapter<String> _wsNamesAdapter;
-    private ListView _listView;
+    protected ArrayAdapter<String> _wsNamesAdapter;
+    protected ListView _listView;
 
-    private SharedPreferences _prefs;
+    protected SharedPreferences _prefs;
 
-    private String _localUsername;
+    protected String _localUsername;
 
-    private File _subDir;
+    protected File _subDir;
+
+    private int OWN_WORKSPACE_LIST_LAYOUT;
+    private int OWN_WORKSPACE_DIR;
+    private int OWN_WORKSPACES_LIST;
+    private int NEW_WORKSPACE_DIALOG_LAYOUT;
+    private ActionBarActivity SUBCLASS_LIST_ACTIVITY;
+    private Class SUBCLASS_ACTIVITY_CLASS;
+    private Context SUBCLASS_CONTEXT;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_own_private_workspaces_list);
+        setContentView(OWN_WORKSPACE_LIST_LAYOUT);
         _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
         setupWsList();
-        NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(this, this);
+        NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(SUBCLASS_LIST_ACTIVITY, SUBCLASS_CONTEXT);
         _drawerToggle = nh.setup();
-        File appDir = getApplicationContext().getFilesDir();
-        _subDir = new File(appDir, getString(R.string.own_private_workspaces_dir));
+
+    }
+
+    protected void setupSuper(int wsListLayout, int wsDir, int wsList, int wsDL, ActionBarActivity subClassListActivity, Class subClassActivity, Context subClassContext) {
+        OWN_WORKSPACE_LIST_LAYOUT = wsListLayout;
+        OWN_WORKSPACE_DIR = wsDir;
+        OWN_WORKSPACES_LIST = wsList;
+        NEW_WORKSPACE_DIALOG_LAYOUT = wsDL;
+        SUBCLASS_LIST_ACTIVITY = subClassListActivity;
+        SUBCLASS_ACTIVITY_CLASS = subClassActivity;
+        SUBCLASS_CONTEXT = subClassContext;
+
     }
 
     // A Hack done in order to ensure the correct behaviour of the back button,
@@ -71,8 +90,10 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
         // Get ListView object from xml
         _listView = (ListView) findViewById(R.id.lv_wsList);
         _listView.setAdapter(_wsNamesAdapter);
-        Set<String> wsNames = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
+        Toast.makeText(SUBCLASS_CONTEXT,"OWN_WORKSPACES_LIST: "+getString(OWN_WORKSPACES_LIST),Toast.LENGTH_LONG).show();;
+        Set<String> wsNames = _prefs.getStringSet(getString(OWN_WORKSPACES_LIST), new HashSet<String>());
         for (String wsName : wsNames) {
+            Toast.makeText(SUBCLASS_CONTEXT,"ws Name added: "+wsName,Toast.LENGTH_LONG).show();;
             _wsNamesList.add(wsName);
         }
         _wsNamesAdapter.notifyDataSetChanged();
@@ -81,8 +102,7 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String wsName = _wsNamesList.get(position);
-                Intent intent = new Intent(ForeignSharedWorkspacesListActivity.this, ForeignSharedWorkspaceActivity.class);
-                intent.putExtra("LOCAL_USERNAME", _localUsername);
+                Intent intent = new Intent(SUBCLASS_CONTEXT, SUBCLASS_ACTIVITY_CLASS);
                 startActivity(intent);
             }
         });
@@ -126,13 +146,13 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void newForeignSharedWorkspace(final View view) {
+    public void newOwnWorkspace(final View view) {
 
         final String[] wsName = new String[1];
         final String[] wsQuota = new String[1];
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        final View yourCustomView = inflater.inflate(R.layout.dialog_new_private_workspace, null);
+        final View yourCustomView = inflater.inflate(NEW_WORKSPACE_DIALOG_LAYOUT, null);
 
         final EditText etName = (EditText) yourCustomView.findViewById(R.id.et_ws_name);
         final EditText etQuota = (EditText) yourCustomView.findViewById(R.id.et_ws_quota);
@@ -143,39 +163,50 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         wsName[0] = etName.getText().toString();
                         wsQuota[0] = etQuota.getText().toString();
-                        int quota;
-                        try {
-                            quota = Integer.parseInt(wsQuota[0]);
-
-                        } catch (NumberFormatException e) {
-                            Toast.makeText(ForeignSharedWorkspacesListActivity.this, "Invalid Quota format. Must be a number (MB)", Toast.LENGTH_LONG).show();
-                            newForeignSharedWorkspace(view);
+                        if(wsName[0] == null || wsQuota[0] == null){
+                            Toast.makeText(SUBCLASS_CONTEXT, "All fields must be filled.", Toast.LENGTH_LONG).show();
+                            newOwnWorkspace(view);
                             return;
                         }
+                        int quota;
+                        // Verify if quota is an integer
+                        try {
+                            quota = Integer.parseInt(wsQuota[0]);
+                        } catch (NumberFormatException e) {
+                            Toast.makeText(SUBCLASS_CONTEXT, "Invalid Quota format. Must be a number (MB)", Toast.LENGTH_LONG).show();
+                            newOwnWorkspace(view);
+                            return;
+                        }
+                        // Verify if quota doesn't exceed internal storage capacity
                         if (quota > new MemoryHelper().getAvailableInternalMemorySizeLong()) {
-                            Toast.makeText(ForeignSharedWorkspacesListActivity.this, "Quota higher than available memory. Available memory is of " + new MemoryHelper().getAvailableInternalMemorySize(), Toast.LENGTH_LONG).show();
-                            newForeignSharedWorkspace(view);
+                            Toast.makeText(SUBCLASS_CONTEXT, "Quota higher than available memory. Available memory is of " + new MemoryHelper().getAvailableInternalMemorySize(), Toast.LENGTH_LONG).show();
+                            newOwnWorkspace(view);
                             return;
                         }
                         String name = wsName[0];
                         _prefs.edit().putInt(name + "_quota", quota).commit();
-                        Set<String> oprivws = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
-                        if (oprivws.contains(name)) {
-                            Toast.makeText(ForeignSharedWorkspacesListActivity.this, "Workspace with same name already exists. Choose different name", Toast.LENGTH_LONG).show();
-                            newForeignSharedWorkspace(view);
+                        MiscUtils mu = new MiscUtils();
+                        Set<String> oShWs = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
+                        Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
+                        // Verify if own workspace exists with same name
+                        if (allWs.contains(name)) {
+                            Toast.makeText(SUBCLASS_CONTEXT, "Owned workspace with same name already exists. Choose different name", Toast.LENGTH_LONG).show();
+                            newOwnWorkspace(view);
                             return;
                         } else {
-                            oprivws.add(name);
-                            _prefs.edit().putStringSet(getString(R.string.activity_own_shared_workspaces_list), oprivws).commit();
+                            oShWs.add(name);
+                            allWs.add(name);
+                            _prefs.edit().putStringSet(getString(OWN_WORKSPACES_LIST), oShWs).commit();
+                            _prefs.edit().putStringSet(getString(R.string.all_owned_workspaces_names), allWs).commit();
                             _wsNamesList.add(name);
                             _wsNamesAdapter.notifyDataSetChanged();
+                            // Create the actual directory in the app's private space
                             if (!_subDir.exists()) {
-//                                Toast.makeText(OwnSharedWorkspacesListActivity.this, "subdir doesn't exist", Toast.LENGTH_LONG).show();
                                 _subDir.mkdir();
                             }
                             File wsDir = new File(_subDir, name);
                             if (!wsDir.exists()) {
-                                Toast.makeText(ForeignSharedWorkspacesListActivity.this, "Directory " + name + " created.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(SUBCLASS_CONTEXT, "Directory " + name + " created.", Toast.LENGTH_LONG).show();
                                 wsDir.mkdir();
                             }
                         }

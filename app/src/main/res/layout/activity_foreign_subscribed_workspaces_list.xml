@@ -10,14 +10,13 @@
         android:layout_height="match_parent">
 
         <ListView
-            android:id="@+id/lv_fswslist"
+            android:id="@+id/lv_wsList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/linearLayout">
         </ListView>
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -26,18 +25,11 @@
             android:id="@+id/linearLayout">
 
             <Button
-                android:id="@+id/bt_add_tag"
+                android:id="@+id/bt_new_ws"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Add Tags"
-                android:onClick="addForeignSubscribedWorkspace"/>
-
-            <Button
-                android:id="@+id/bt_rem_tag"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Rem Tags"
-                android:onClick="remForeignSubscribedWorkspace"/>
+                android:text="Add/Remove Tags"
+                android:onClick="newOwnSharedWorkspace"/>
         </LinearLayout>
 
     </RelativeLayout>
