@@ -25,11 +25,18 @@
             android:id="@+id/linearLayout">
 
             <Button
-                android:id="@+id/bt_new_ws"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add/Remove Tags"
-                android:onClick="newOwnSharedWorkspace"/>
+                android:text="Add Tag"
+                android:id="@+id/bt_add"
+                android:onClick="addForeignSubscribedWorkspace"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Remove Tag"
+                android:id="@+id/bt_rem"
+                android:onClick="remForeignSubscribedWorkspace"/>
         </LinearLayout>
 
     </RelativeLayout>
