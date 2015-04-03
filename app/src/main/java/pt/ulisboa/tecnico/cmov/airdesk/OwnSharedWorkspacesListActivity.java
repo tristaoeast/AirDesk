@@ -47,13 +47,13 @@ public class OwnSharedWorkspacesListActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_own_private_workspaces_list);
+        setContentView(R.layout.activity_own_shared_workspaces_list);
         _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
         setupWsList();
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(this, this);
         _drawerToggle = nh.setup();
         File appDir = getApplicationContext().getFilesDir();
-        _subDir = new File(appDir, getString(R.string.own_private_workspaces_dir));
+        _subDir = new File(appDir, getString(R.string.own_shared_workspaces_dir));
     }
 
     // A Hack done in order to ensure the correct behaviour of the back button,
@@ -130,12 +130,14 @@ public class OwnSharedWorkspacesListActivity extends ActionBarActivity {
 
         final String[] wsName = new String[1];
         final String[] wsQuota = new String[1];
+        final String[] wsTagsTemp = new String[1];
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        final View yourCustomView = inflater.inflate(R.layout.dialog_new_private_workspace, null);
+        final View yourCustomView = inflater.inflate(R.layout.dialog_new_shared_workspace, null);
 
         final EditText etName = (EditText) yourCustomView.findViewById(R.id.et_ws_name);
         final EditText etQuota = (EditText) yourCustomView.findViewById(R.id.et_ws_quota);
+        final EditText etTagsTemp = (EditText) yourCustomView.findViewById(R.id.et_tags);
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Create New Workspace")
                 .setView(yourCustomView)
@@ -143,15 +145,17 @@ public class OwnSharedWorkspacesListActivity extends ActionBarActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         wsName[0] = etName.getText().toString();
                         wsQuota[0] = etQuota.getText().toString();
+                        wsTagsTemp[0] = etTagsTemp.getText().toString();
                         int quota;
+                        // Verify if quota is an integer
                         try {
                             quota = Integer.parseInt(wsQuota[0]);
-
                         } catch (NumberFormatException e) {
                             Toast.makeText(OwnSharedWorkspacesListActivity.this, "Invalid Quota format. Must be a number (MB)", Toast.LENGTH_LONG).show();
                             newOwnSharedWorkspace(view);
                             return;
                         }
+                        // Verify if quota doesn't exceed internal storage capacity
                         if (quota > new MemoryHelper().getAvailableInternalMemorySizeLong()) {
                             Toast.makeText(OwnSharedWorkspacesListActivity.this, "Quota higher than available memory. Available memory is of " + new MemoryHelper().getAvailableInternalMemorySize(), Toast.LENGTH_LONG).show();
                             newOwnSharedWorkspace(view);
@@ -159,19 +163,25 @@ public class OwnSharedWorkspacesListActivity extends ActionBarActivity {
                         }
                         String name = wsName[0];
                         _prefs.edit().putInt(name + "_quota", quota).commit();
-                        Set<String> oprivws = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
-                        if (oprivws.contains(name)) {
-                            Toast.makeText(OwnSharedWorkspacesListActivity.this, "Workspace with same name already exists. Choose different name", Toast.LENGTH_LONG).show();
+                        MiscUtils mu = new MiscUtils();
+                        HashSet<String> wsTags = mu.stringToSetTokenzier(wsTagsTemp[0],",");
+                        Set<String> oShWs = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
+                        Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
+                        // Verify if own workspace exists with same name
+                        if (allWs.contains(name)) {
+                            Toast.makeText(OwnSharedWorkspacesListActivity.this, "Owned workspace with same name already exists. Choose different name", Toast.LENGTH_LONG).show();
                             newOwnSharedWorkspace(view);
                             return;
                         } else {
-                            oprivws.add(name);
-                            _prefs.edit().putStringSet(getString(R.string.activity_own_shared_workspaces_list), oprivws).commit();
+                            oShWs.add(name);
+                            allWs.add(name);
+                            _prefs.edit().putStringSet(getString(R.string.activity_own_shared_workspaces_list), oShWs).commit();
+                            _prefs.edit().putStringSet(getString(R.string.all_owned_workspaces_names), allWs).commit();
+                            _prefs.edit().putStringSet(name+"_tags",wsTags).commit();
                             _wsNamesList.add(name);
                             _wsNamesAdapter.notifyDataSetChanged();
-                            //TODO create the actual directory
+                            // Create the actual directory in the app's private space
                             if (!_subDir.exists()) {
-//                                Toast.makeText(OwnSharedWorkspacesListActivity.this, "subdir doesn't exist", Toast.LENGTH_LONG).show();
                                 _subDir.mkdir();
                             }
                             File wsDir = new File(_subDir, name);
