@@ -29,20 +29,14 @@ import java.util.Set;
  */
 public class OwnWorkspacesListActivity extends ActionBarActivity {
 
-    // NavDrawer related variables
-
     protected ActionBarDrawerToggle _drawerToggle;
-
     protected ArrayList<String> _wsNamesList;
-
     protected ArrayAdapter<String> _wsNamesAdapter;
     protected ListView _listView;
-
     protected SharedPreferences _prefs;
-
     protected String _localUsername;
-
-    protected File _subDir;
+    protected File _appDir;
+protected SharedPreferences.Editor _editor;
 
     private int OWN_WORKSPACE_LIST_LAYOUT;
     private int OWN_WORKSPACE_DIR;
@@ -58,9 +52,11 @@ public class OwnWorkspacesListActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(OWN_WORKSPACE_LIST_LAYOUT);
         _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
+        _editor = _prefs.edit();
         setupWsList();
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(SUBCLASS_LIST_ACTIVITY, SUBCLASS_CONTEXT);
         _drawerToggle = nh.setup();
+        _appDir = getApplicationContext().getFilesDir();
 
     }
 
@@ -90,10 +86,11 @@ public class OwnWorkspacesListActivity extends ActionBarActivity {
         // Get ListView object from xml
         _listView = (ListView) findViewById(R.id.lv_wsList);
         _listView.setAdapter(_wsNamesAdapter);
-        Toast.makeText(SUBCLASS_CONTEXT,"OWN_WORKSPACES_LIST: "+getString(OWN_WORKSPACES_LIST),Toast.LENGTH_LONG).show();;
+        Toast.makeText(SUBCLASS_CONTEXT, "OWN_WORKSPACES_LIST: " + getString(OWN_WORKSPACES_LIST), Toast.LENGTH_LONG).show();
+
         Set<String> wsNames = _prefs.getStringSet(getString(OWN_WORKSPACES_LIST), new HashSet<String>());
         for (String wsName : wsNames) {
-            Toast.makeText(SUBCLASS_CONTEXT,"ws Name added: "+wsName,Toast.LENGTH_LONG).show();;
+            Toast.makeText(SUBCLASS_CONTEXT, "ws Name added: " + wsName, Toast.LENGTH_LONG).show();
             _wsNamesList.add(wsName);
         }
         _wsNamesAdapter.notifyDataSetChanged();
@@ -106,6 +103,15 @@ public class OwnWorkspacesListActivity extends ActionBarActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    protected void onResume(){
+        for(String name : _wsNamesList){
+            getSupportActionBar().setTitle(getString(OWN_WORKSPACES_LIST));
+            Toast.makeText(SUBCLASS_CONTEXT, "ws Name in list "+ getString(OWN_WORKSPACES_LIST) +": " + name, Toast.LENGTH_LONG).show();
+        }
+        _wsNamesAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -163,7 +169,7 @@ public class OwnWorkspacesListActivity extends ActionBarActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         wsName[0] = etName.getText().toString();
                         wsQuota[0] = etQuota.getText().toString();
-                        if(wsName[0] == null || wsQuota[0] == null){
+                        if (wsName[0] == null || wsQuota[0] == null) {
                             Toast.makeText(SUBCLASS_CONTEXT, "All fields must be filled.", Toast.LENGTH_LONG).show();
                             newOwnWorkspace(view);
                             return;
@@ -184,9 +190,9 @@ public class OwnWorkspacesListActivity extends ActionBarActivity {
                             return;
                         }
                         String name = wsName[0];
-                        _prefs.edit().putInt(name + "_quota", quota).commit();
+                        _editor.putInt(name + "_quota", quota);
                         MiscUtils mu = new MiscUtils();
-                        Set<String> oShWs = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
+                        Set<String> ownWs = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
                         Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                         // Verify if own workspace exists with same name
                         if (allWs.contains(name)) {
@@ -194,30 +200,32 @@ public class OwnWorkspacesListActivity extends ActionBarActivity {
                             newOwnWorkspace(view);
                             return;
                         } else {
-                            oShWs.add(name);
+                            ownWs.add(name);
                             allWs.add(name);
-                            _prefs.edit().putStringSet(getString(OWN_WORKSPACES_LIST), oShWs).commit();
-                            _prefs.edit().putStringSet(getString(R.string.all_owned_workspaces_names), allWs).commit();
+                            _editor.putStringSet(getString(OWN_WORKSPACES_LIST), ownWs);
+                            _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
                             _wsNamesList.add(name);
                             _wsNamesAdapter.notifyDataSetChanged();
                             // Create the actual directory in the app's private space
-                            if (!_subDir.exists()) {
-                                _subDir.mkdir();
-                            }
-                            File wsDir = new File(_subDir, name);
+                            File wsDir = new File(_appDir, name);
                             if (!wsDir.exists()) {
                                 Toast.makeText(SUBCLASS_CONTEXT, "Directory " + name + " created.", Toast.LENGTH_LONG).show();
                                 wsDir.mkdir();
                             }
                         }
+                        _editor.commit();
                     }
                 })
                 .setNegativeButton("Cancel", null).create();
         dialog.show();
     }
 
+    protected void newFile(View view){
+
+    }
+
     @Override
-    protected void onStop() {
+    protected void onPause() {
         super.onStop();
         _prefs.edit().commit();
     }
