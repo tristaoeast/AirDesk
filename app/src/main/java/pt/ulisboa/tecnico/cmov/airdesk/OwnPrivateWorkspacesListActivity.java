@@ -19,4 +19,9 @@ public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity 
                 this);
         super.onCreate(savedInstanceState);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 }
