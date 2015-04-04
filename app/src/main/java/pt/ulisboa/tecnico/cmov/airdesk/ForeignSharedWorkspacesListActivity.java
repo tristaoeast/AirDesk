@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(this, this);
         _drawerToggle = nh.setup();
         File appDir = getApplicationContext().getFilesDir();
-        _subDir = new File(appDir, getString(R.string.own_private_workspaces_dir));
+        _subDir = new File(appDir, getString(R.string.foreign_shared_workspaces_list));
     }
 
     // A Hack done in order to ensure the correct behaviour of the back button,
@@ -66,8 +67,14 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
         // Get ListView object from xml
         _listView = (ListView) findViewById(R.id.lv_wsList);
         _listView.setAdapter(_wsNamesAdapter);
+
         Set<String> wsNames = _prefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
+
+        if(wsNames.isEmpty())
+            Toast.makeText(this, "Foreign_Shared_WS_LIST: " + "EMPTYYY", Toast.LENGTH_LONG).show();
+
         for (String wsName : wsNames) {
+            Toast.makeText(this, "Foreign Shared WS Name added: " + wsName, Toast.LENGTH_LONG).show();
             _wsNamesList.add(wsName);
         }
         _wsNamesAdapter.notifyDataSetChanged();

@@ -80,6 +80,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
 
                         Set<String> ownSharedWs = _prefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
                         Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
+                        Set<String> foreignSharedWs = _prefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
                         // Verify if own workspace exists with same name
                         if (allWs.contains(name)) {
                             Toast.makeText(OwnSharedWorkspacesListActivity.this, "Owned workspace with same name already exists. Choose different name", Toast.LENGTH_LONG).show();
@@ -88,8 +89,11 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                         } else {
                             ownSharedWs.add(name);
                             allWs.add(name);
+                            foreignSharedWs.add(name);
+
                             _editor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWs);
                             _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
+                            _editor.putStringSet(getString(R.string.foreign_shared_workspaces_list), foreignSharedWs);
                             _editor.putStringSet(name+"_usernames",wsUsernames);
                             _wsNamesList.add(name);
                             _wsNamesAdapter.notifyDataSetChanged();
