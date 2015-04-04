@@ -66,7 +66,7 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
         // Get ListView object from xml
         _listView = (ListView) findViewById(R.id.lv_wsList);
         _listView.setAdapter(_wsNamesAdapter);
-        Set<String> wsNames = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
+        Set<String> wsNames = _prefs.getStringSet(getString(R.string.activity_foreign_shared_workspaces_list), new HashSet<String>());
         for (String wsName : wsNames) {
             _wsNamesList.add(wsName);
         }
