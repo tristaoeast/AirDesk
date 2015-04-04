@@ -28,8 +28,6 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
                 this);
         super.onCreate(savedInstanceState);
 
-        File appDir = getApplicationContext().getFilesDir();
-        _subDir = new File(appDir, getString(R.string.own_published_workspaces_dir));
     }
 
     @Override
@@ -78,7 +76,7 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
                         _prefs.edit().putInt(name + "_quota", quota).commit();
                         MiscUtils mu = new MiscUtils();
                         HashSet<String> wsTags = mu.stringToSetTokenzier(wsTagsTemp[0],",");
-                        Set<String> oShWs = _prefs.getStringSet(getString(R.string.activity_own_published_workspaces_list), new HashSet<String>());
+                        Set<String> ownPublishedWs = _prefs.getStringSet(getString(R.string.activity_own_published_workspaces_list), new HashSet<String>());
                         Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                         // Verify if own workspace exists with same name
                         if (allWs.contains(name)) {
@@ -86,23 +84,21 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
                             newOwnWorkspace(view);
                             return;
                         } else {
-                            oShWs.add(name);
+                            ownPublishedWs.add(name);
                             allWs.add(name);
-                            _prefs.edit().putStringSet(getString(R.string.activity_own_published_workspaces_list), oShWs).commit();
-                            _prefs.edit().putStringSet(getString(R.string.all_owned_workspaces_names), allWs).commit();
-                            _prefs.edit().putStringSet(name+"_tags",wsTags).commit();
+                            _editor.putStringSet(getString(R.string.activity_own_published_workspaces_list), ownPublishedWs);
+                            _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
+                            _editor.putStringSet(name+"_tags",wsTags);
                             _wsNamesList.add(name);
                             _wsNamesAdapter.notifyDataSetChanged();
                             // Create the actual directory in the app's private space
-                            if (!_subDir.exists()) {
-                                _subDir.mkdir();
-                            }
-                            File wsDir = new File(_subDir, name);
+                            File wsDir = new File(_appDir, name);
                             if (!wsDir.exists()) {
                                 Toast.makeText(OwnPublishedWorkspacesListActivity.this, "Directory " + name + " created.", Toast.LENGTH_LONG).show();
                                 wsDir.mkdir();
                             }
                         }
+                        _editor.commit();
                     }
                 })
                 .setNegativeButton("Cancel", null).create();

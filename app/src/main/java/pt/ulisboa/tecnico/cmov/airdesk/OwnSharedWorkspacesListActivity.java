@@ -28,8 +28,6 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                 this);
         super.onCreate(savedInstanceState);
 
-        File appDir = getApplicationContext().getFilesDir();
-        _subDir = new File(appDir, getString(R.string.own_shared_workspaces_dir));
     }
     @Override
     public void newOwnWorkspace(final View view) {
@@ -74,10 +72,10 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                             return;
                         }
                         String name = wsName[0];
-                        _prefs.edit().putInt(name + "_quota", quota).commit();
+                        _editor.putInt(name + "_quota", quota);
                         MiscUtils mu = new MiscUtils();
                         HashSet<String> wsUsernames = mu.stringToSetTokenzier(wsUsernamesTemp[0],",");
-                        Set<String> oShWs = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
+                        Set<String> ownSharedWs = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
                         Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                         // Verify if own workspace exists with same name
                         if (allWs.contains(name)) {
@@ -85,23 +83,21 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                             newOwnWorkspace(view);
                             return;
                         } else {
-                            oShWs.add(name);
+                            ownSharedWs.add(name);
                             allWs.add(name);
-                            _prefs.edit().putStringSet(getString(R.string.activity_own_shared_workspaces_list), oShWs).commit();
-                            _prefs.edit().putStringSet(getString(R.string.all_owned_workspaces_names), allWs).commit();
-                            _prefs.edit().putStringSet(name+"_usernames",wsUsernames).commit();
+                            _editor.putStringSet(getString(R.string.activity_own_shared_workspaces_list), ownSharedWs);
+                            _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
+                            _editor.putStringSet(name+"_usernames",wsUsernames);
                             _wsNamesList.add(name);
                             _wsNamesAdapter.notifyDataSetChanged();
                             // Create the actual directory in the app's private space
-                            if (!_subDir.exists()) {
-                                _subDir.mkdir();
-                            }
-                            File wsDir = new File(_subDir, name);
+                            File wsDir = new File(_appDir, name);
                             if (!wsDir.exists()) {
                                 Toast.makeText(OwnSharedWorkspacesListActivity.this, "Directory " + name + " created.", Toast.LENGTH_LONG).show();
                                 wsDir.mkdir();
                             }
                         }
+                        _editor.commit();
                     }
                 })
                 .setNegativeButton("Cancel", null).create();

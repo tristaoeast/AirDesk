@@ -2,8 +2,6 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.os.Bundle;
 
-import java.io.File;
-
 /**
  * Created by ist167092 on 24-03-2015.
  */
@@ -20,8 +18,5 @@ public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity 
                 OwnPrivateWorkspaceActivity.class,
                 this);
         super.onCreate(savedInstanceState);
-
-        File appDir = getApplicationContext().getFilesDir();
-        _subDir = new File(appDir, getString(R.string.own_private_workspaces_dir));
     }
 }
