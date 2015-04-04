@@ -21,7 +21,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         setupSuper(R.layout.activity_own_shared_workspaces_list,
                 R.string.own_shared_workspaces_dir,
-                R.string.activity_own_shared_workspaces_list,
+                R.string.own_shared_workspaces_list,
                 R.layout.dialog_new_shared_workspace,
                 this,
                 OwnSharedWorkspaceActivity.class,
@@ -78,7 +78,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
 
 
 
-                        Set<String> ownSharedWs = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
+                        Set<String> ownSharedWs = _prefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
                         Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                         // Verify if own workspace exists with same name
                         if (allWs.contains(name)) {
@@ -88,7 +88,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                         } else {
                             ownSharedWs.add(name);
                             allWs.add(name);
-                            _editor.putStringSet(getString(R.string.activity_own_shared_workspaces_list), ownSharedWs);
+                            _editor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWs);
                             _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
                             _editor.putStringSet(name+"_usernames",wsUsernames);
                             _wsNamesList.add(name);

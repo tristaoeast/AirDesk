@@ -27,7 +27,7 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
     protected void onCreate(Bundle savedInstanceState) {
         setupSuper(R.layout.activity_own_published_workspaces_list,
                 R.string.own_published_workspaces_dir,
-                R.string.activity_own_published_workspaces_list,
+                R.string.own_published_workspaces_list,
                 R.layout.dialog_new_published_workspace,
                 this,
                 OwnSharedWorkspaceActivity.class,
@@ -97,8 +97,6 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
             public void onClick(DialogInterface dialog, int whichButton) {
                 wsName[0] = etName.getText().toString().trim();
                 wsQuota[0] = etQuota.getText().toString().trim();
-                wsTagsTemp[0] = etTagsTemp.getText().toString().trim();
-                wsTagsTemp[0].replaceAll("\\s", "");
                 if (wsName[0].isEmpty() || wsQuota[0].isEmpty() || tagsList.isEmpty()) {
                     Toast.makeText(OwnPublishedWorkspacesListActivity.this, "All fields must be filled.", Toast.LENGTH_LONG).show();
                     newOwnWorkspace(view);
@@ -122,8 +120,8 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
                 String name = wsName[0];
                 _prefs.edit().putInt(name + "_quota", quota).commit();
                 MiscUtils mu = new MiscUtils();
-                HashSet<String> wsTags = mu.stringToSetTokenzier(wsTagsTemp[0], ",");
-                Set<String> ownPublishedWs = _prefs.getStringSet(getString(R.string.activity_own_published_workspaces_list), new HashSet<String>());
+                HashSet<String> wsTags = new HashSet<String>(tagsList);
+                Set<String> ownPublishedWs = _prefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
                 Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                 // Verify if own workspace exists with same name
                 if (allWs.contains(name)) {
@@ -133,7 +131,7 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
                 } else {
                     ownPublishedWs.add(name);
                     allWs.add(name);
-                    _editor.putStringSet(getString(R.string.activity_own_published_workspaces_list), ownPublishedWs);
+                    _editor.putStringSet(getString(R.string.own_published_workspaces_list), ownPublishedWs);
                     _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
                     _editor.putStringSet(name + "_tags", wsTags);
                     _wsNamesList.add(name);

@@ -34,7 +34,7 @@
         </activity>
         <activity
             android:name=".OwnPublishedWorkspacesListActivity"
-            android:label="@string/activity_own_published_workspaces_list"
+            android:label="@string/own_published_workspaces_list"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -42,7 +42,7 @@
         </activity>
         <activity
             android:name=".OwnSharedWorkspacesListActivity"
-            android:label="@string/activity_own_shared_workspaces_list"
+            android:label="@string/own_shared_workspaces_list"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -50,7 +50,7 @@
         </activity>
         <activity
             android:name=".ForeignSharedWorkspacesListActivity"
-            android:label="@string/activity_foreign_shared_workspaces_list"
+            android:label="@string/foreign_shared_workspaces_list"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -58,7 +58,7 @@
         </activity>
         <activity
             android:name=".ForeignSubscribedWorkspacesListActivity"
-            android:label="@string/activity_foreign_subscribed_workspaces_list"
+            android:label="@string/foreign_subscribed_workspaces_list"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

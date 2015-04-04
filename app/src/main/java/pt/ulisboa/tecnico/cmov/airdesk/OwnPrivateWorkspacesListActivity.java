@@ -7,7 +7,6 @@ import android.os.Bundle;
  */
 public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity {
 
-    // NavDrawer related variables
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setupSuper(R.layout.activity_own_private_workspaces_list,
@@ -20,8 +19,4 @@ public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity 
         super.onCreate(savedInstanceState);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
 }

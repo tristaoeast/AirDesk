@@ -27,14 +27,13 @@ import java.util.Set;
 /**
  * Created by ist167092 on 24-03-2015.
  */
-public class OwnWorkspacesListActivity extends ActionBarActivity {
+public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
 
     protected ActionBarDrawerToggle _drawerToggle;
     protected ArrayList<String> _wsNamesList;
     protected ArrayAdapter<String> _wsNamesAdapter;
     protected ListView _listView;
     protected SharedPreferences _prefs;
-    protected String _localUsername;
     protected File _appDir;
     protected SharedPreferences.Editor _editor;
 
@@ -100,6 +99,7 @@ public class OwnWorkspacesListActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String wsName = _wsNamesList.get(position);
                 Intent intent = new Intent(SUBCLASS_CONTEXT, SUBCLASS_ACTIVITY_CLASS);
+                intent.putExtra("workspace_name",wsName);
                 startActivity(intent);
             }
         });
@@ -194,7 +194,7 @@ public class OwnWorkspacesListActivity extends ActionBarActivity {
                         String name = wsName[0];
                         _editor.putInt(name + "_quota", quota);
                         MiscUtils mu = new MiscUtils();
-                        Set<String> ownWs = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
+                        Set<String> ownWs = _prefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
                         Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                         // Verify if own workspace exists with same name
                         if (allWs.contains(name)) {
