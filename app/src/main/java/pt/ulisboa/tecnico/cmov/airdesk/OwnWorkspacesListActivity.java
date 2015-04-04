@@ -36,15 +36,15 @@ public class OwnWorkspacesListActivity extends ActionBarActivity {
     protected SharedPreferences _prefs;
     protected String _localUsername;
     protected File _appDir;
-protected SharedPreferences.Editor _editor;
+    protected SharedPreferences.Editor _editor;
 
-    private int OWN_WORKSPACE_LIST_LAYOUT;
-    private int OWN_WORKSPACE_DIR;
-    private int OWN_WORKSPACES_LIST;
-    private int NEW_WORKSPACE_DIALOG_LAYOUT;
-    private ActionBarActivity SUBCLASS_LIST_ACTIVITY;
-    private Class SUBCLASS_ACTIVITY_CLASS;
-    private Context SUBCLASS_CONTEXT;
+    protected int OWN_WORKSPACE_LIST_LAYOUT;
+    protected int OWN_WORKSPACE_DIR;
+    protected int OWN_WORKSPACES_LIST;
+    protected int NEW_WORKSPACE_DIALOG_LAYOUT;
+    protected ActionBarActivity SUBCLASS_LIST_ACTIVITY;
+    protected Class SUBCLASS_ACTIVITY_CLASS;
+    protected Context SUBCLASS_CONTEXT;
 
 
     @Override
@@ -86,11 +86,11 @@ protected SharedPreferences.Editor _editor;
         // Get ListView object from xml
         _listView = (ListView) findViewById(R.id.lv_wsList);
         _listView.setAdapter(_wsNamesAdapter);
-        Toast.makeText(SUBCLASS_CONTEXT, "OWN_WORKSPACES_LIST: " + getString(OWN_WORKSPACES_LIST), Toast.LENGTH_LONG).show();
+//        Toast.makeText(SUBCLASS_CONTEXT, "OWN_WORKSPACES_LIST: " + getString(OWN_WORKSPACES_LIST), Toast.LENGTH_LONG).show();
 
         Set<String> wsNames = _prefs.getStringSet(getString(OWN_WORKSPACES_LIST), new HashSet<String>());
         for (String wsName : wsNames) {
-            Toast.makeText(SUBCLASS_CONTEXT, "ws Name added: " + wsName, Toast.LENGTH_LONG).show();
+//            Toast.makeText(SUBCLASS_CONTEXT, "ws Name added: " + wsName, Toast.LENGTH_LONG).show();
             _wsNamesList.add(wsName);
         }
         _wsNamesAdapter.notifyDataSetChanged();
@@ -106,10 +106,10 @@ protected SharedPreferences.Editor _editor;
     }
 
     @Override
-    protected void onResume(){
-        for(String name : _wsNamesList){
+    protected void onResume() {
+        for (String name : _wsNamesList) {
             getSupportActionBar().setTitle(getString(OWN_WORKSPACES_LIST));
-            Toast.makeText(SUBCLASS_CONTEXT, "ws Name in list "+ getString(OWN_WORKSPACES_LIST) +": " + name, Toast.LENGTH_LONG).show();
+//            Toast.makeText(SUBCLASS_CONTEXT, "ws Name in list " + getString(OWN_WORKSPACES_LIST) + ": " + name, Toast.LENGTH_LONG).show();
         }
         _wsNamesAdapter.notifyDataSetChanged();
     }
@@ -220,7 +220,7 @@ protected SharedPreferences.Editor _editor;
         dialog.show();
     }
 
-    protected void newFile(View view){
+    protected void newFile(View view) {
 
     }
 

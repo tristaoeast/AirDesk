@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="@dimen/abc_action_bar_default_padding_material"
+    tools:context=".OwnPublishedWorkspacesListActivity">
 
     <EditText
         android:id="@+id/et_ws_name"
@@ -16,10 +19,43 @@
         android:layout_height="wrap_content"
         android:hint="Quota (MB)..." />
 
-    <EditText
-        android:id="@+id/et_tags"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Tags, separated by comma..."/>
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/et_tags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tag..."
+            android:layout_toLeftOf="@+id/bt_add_tag" />
+
+        <Button
+            android:id="@+id/bt_add_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Tag"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@+id/et_tags" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@+id/lv_tags"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/tv_hint"
+            android:stackFromBottom="false" />
+
+        <TextView
+            android:id="@+id/tv_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tap the tags to remove them."
+            android:layout_alignParentBottom="true" />
+    </RelativeLayout>
 
 </LinearLayout>

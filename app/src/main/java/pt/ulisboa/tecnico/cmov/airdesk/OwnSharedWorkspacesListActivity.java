@@ -75,6 +75,9 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                         _editor.putInt(name + "_quota", quota);
                         MiscUtils mu = new MiscUtils();
                         HashSet<String> wsUsernames = mu.stringToSetTokenzier(wsUsernamesTemp[0],",");
+
+
+
                         Set<String> ownSharedWs = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
                         Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                         // Verify if own workspace exists with same name

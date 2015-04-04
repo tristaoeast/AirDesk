@@ -1,22 +1,17 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,7 +42,7 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_own_private_workspaces_list);
+        setContentView(R.layout.activity_foreign_shared_workspaces_list);
         _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
         setupWsList();
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(this, this);
@@ -126,64 +121,7 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void newForeignSharedWorkspace(final View view) {
 
-        final String[] wsName = new String[1];
-        final String[] wsQuota = new String[1];
-
-        LayoutInflater inflater = LayoutInflater.from(this);
-        final View yourCustomView = inflater.inflate(R.layout.dialog_new_private_workspace, null);
-
-        final EditText etName = (EditText) yourCustomView.findViewById(R.id.et_ws_name);
-        final EditText etQuota = (EditText) yourCustomView.findViewById(R.id.et_ws_quota);
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("Create New Workspace")
-                .setView(yourCustomView)
-                .setPositiveButton("Create", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        wsName[0] = etName.getText().toString();
-                        wsQuota[0] = etQuota.getText().toString();
-                        int quota;
-                        try {
-                            quota = Integer.parseInt(wsQuota[0]);
-
-                        } catch (NumberFormatException e) {
-                            Toast.makeText(ForeignSharedWorkspacesListActivity.this, "Invalid Quota format. Must be a number (MB)", Toast.LENGTH_LONG).show();
-                            newForeignSharedWorkspace(view);
-                            return;
-                        }
-                        if (quota > new MemoryHelper().getAvailableInternalMemorySizeLong()) {
-                            Toast.makeText(ForeignSharedWorkspacesListActivity.this, "Quota higher than available memory. Available memory is of " + new MemoryHelper().getAvailableInternalMemorySize(), Toast.LENGTH_LONG).show();
-                            newForeignSharedWorkspace(view);
-                            return;
-                        }
-                        String name = wsName[0];
-                        _prefs.edit().putInt(name + "_quota", quota).commit();
-                        Set<String> oprivws = _prefs.getStringSet(getString(R.string.activity_own_shared_workspaces_list), new HashSet<String>());
-                        if (oprivws.contains(name)) {
-                            Toast.makeText(ForeignSharedWorkspacesListActivity.this, "Workspace with same name already exists. Choose different name", Toast.LENGTH_LONG).show();
-                            newForeignSharedWorkspace(view);
-                            return;
-                        } else {
-                            oprivws.add(name);
-                            _prefs.edit().putStringSet(getString(R.string.activity_own_shared_workspaces_list), oprivws).commit();
-                            _wsNamesList.add(name);
-                            _wsNamesAdapter.notifyDataSetChanged();
-                            if (!_subDir.exists()) {
-//                                Toast.makeText(OwnSharedWorkspacesListActivity.this, "subdir doesn't exist", Toast.LENGTH_LONG).show();
-                                _subDir.mkdir();
-                            }
-                            File wsDir = new File(_subDir, name);
-                            if (!wsDir.exists()) {
-                                Toast.makeText(ForeignSharedWorkspacesListActivity.this, "Directory " + name + " created.", Toast.LENGTH_LONG).show();
-                                wsDir.mkdir();
-                            }
-                        }
-                    }
-                })
-                .setNegativeButton("Cancel", null).create();
-        dialog.show();
-    }
 
     @Override
     protected void onStop() {
