@@ -27,17 +27,15 @@
 
             <Button
                 android:id="@+id/bt_subscribe_ws"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/subscribe_foreign_shared_workspace"
-                android:layout_weight="1"/>
+                android:text="@string/subscribe_foreign_shared_workspace"/>
 
             <Button
                 android:id="@+id/bt_unsubscribe_ws"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/unsubscribe_foreign_shared_workspace"
-                android:layout_weight="1"/>
+                android:text="@string/unsubscribe_foreign_shared_workspace"/>
         </LinearLayout>
 
     </RelativeLayout>
