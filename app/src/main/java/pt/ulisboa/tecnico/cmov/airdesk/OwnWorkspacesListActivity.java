@@ -107,11 +107,13 @@ public class OwnWorkspacesListActivity extends ActionBarActivity {
 
     @Override
     protected void onResume() {
+        super.onResume();
         for (String name : _wsNamesList) {
             getSupportActionBar().setTitle(getString(OWN_WORKSPACES_LIST));
 //            Toast.makeText(SUBCLASS_CONTEXT, "ws Name in list " + getString(OWN_WORKSPACES_LIST) + ": " + name, Toast.LENGTH_LONG).show();
         }
         _wsNamesAdapter.notifyDataSetChanged();
+
     }
 
     @Override
