@@ -33,5 +33,7 @@
     <string name="title_activity_own_private_workspace">OwnPrivateWorkspaceActivity</string>
     <string name="title_activity_own_shared_workspace">OwnSharedWorkspaceActivity</string>
     <string name="all_owned_workspaces_names">All Owned Workspaces</string>
+    <string name="subscribe_foreign_shared_workspace">Subscribe Shared Workspace</string>
+    <string name="unsubscribe_foreign_shared_workspace">Unsubscribe Shared Workspace</string>
 
 </resources>
