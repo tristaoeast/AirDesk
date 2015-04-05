@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -92,6 +93,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
 //            Toast.makeText(SUBCLASS_CONTEXT, "ws Name added: " + wsName, Toast.LENGTH_LONG).show();
             _wsNamesList.add(wsName);
         }
+        Collections.sort(_wsNamesList);
         _wsNamesAdapter.notifyDataSetChanged();
 
         _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -99,7 +101,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String wsName = _wsNamesList.get(position);
                 Intent intent = new Intent(SUBCLASS_CONTEXT, SUBCLASS_ACTIVITY_CLASS);
-                intent.putExtra("workspace_name",wsName);
+                intent.putExtra("workspace_name", wsName);
                 startActivity(intent);
             }
         });
@@ -108,10 +110,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        for (String name : _wsNamesList) {
-            getSupportActionBar().setTitle(getString(OWN_WORKSPACES_LIST));
-//            Toast.makeText(SUBCLASS_CONTEXT, "ws Name in list " + getString(OWN_WORKSPACES_LIST) + ": " + name, Toast.LENGTH_LONG).show();
-        }
+        getSupportActionBar().setTitle(getString(OWN_WORKSPACES_LIST));
         _wsNamesAdapter.notifyDataSetChanged();
 
     }
@@ -159,14 +158,14 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         final String[] wsName = new String[1];
         final String[] wsQuota = new String[1];
 
-        LayoutInflater inflater = LayoutInflater.from(this);
-        final View yourCustomView = inflater.inflate(NEW_WORKSPACE_DIALOG_LAYOUT, null);
+        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
+        final View customView = inflater.inflate(NEW_WORKSPACE_DIALOG_LAYOUT, null);
 
-        final EditText etName = (EditText) yourCustomView.findViewById(R.id.et_ws_name);
-        final EditText etQuota = (EditText) yourCustomView.findViewById(R.id.et_ws_quota);
-        AlertDialog dialog = new AlertDialog.Builder(this)
+        final EditText etName = (EditText) customView.findViewById(R.id.et_ws_name);
+        final EditText etQuota = (EditText) customView.findViewById(R.id.et_ws_quota);
+        AlertDialog dialog = new AlertDialog.Builder(SUBCLASS_CONTEXT)
                 .setTitle("Create New Workspace")
-                .setView(yourCustomView)
+                .setView(customView)
                 .setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         wsName[0] = etName.getText().toString();
@@ -193,8 +192,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
                         }
                         String name = wsName[0];
                         _editor.putInt(name + "_quota", quota);
-                        MiscUtils mu = new MiscUtils();
-                        Set<String> ownWs = _prefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
+                        Set<String> ownWs = _prefs.getStringSet(getString(OWN_WORKSPACES_LIST), new HashSet<String>());
                         Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                         // Verify if own workspace exists with same name
                         if (allWs.contains(name)) {
@@ -207,6 +205,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
                             _editor.putStringSet(getString(OWN_WORKSPACES_LIST), ownWs);
                             _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
                             _wsNamesList.add(name);
+                            Collections.sort(_wsNamesList);
                             _wsNamesAdapter.notifyDataSetChanged();
                             // Create the actual directory in the app's private space
                             File wsDir = new File(_appDir, name);
@@ -222,9 +221,6 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         dialog.show();
     }
 
-    protected void newFile(View view) {
-
-    }
 
     @Override
     protected void onPause() {

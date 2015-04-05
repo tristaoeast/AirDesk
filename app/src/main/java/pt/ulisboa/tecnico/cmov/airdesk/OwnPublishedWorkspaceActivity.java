@@ -8,6 +8,7 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setActivityLayout(R.layout.activity_own_published_workspace);
+        setActivityContext(this);
         super.onCreate(savedInstanceState);
     }
 

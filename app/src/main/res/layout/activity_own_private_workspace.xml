@@ -9,6 +9,7 @@
     tools:context="pt.ulisboa.tecnico.cmov.airdesk.OwnPrivateWorkspaceActivity">
 
     <ListView
+        android:id="@+id/lv_filesList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/ll_filesList" />
