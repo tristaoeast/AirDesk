@@ -30,7 +30,7 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
                 R.string.own_published_workspaces_list,
                 R.layout.dialog_new_published_workspace,
                 this,
-                OwnSharedWorkspaceActivity.class,
+                OwnPublishedWorkspaceActivity.class,
                 this);
         super.onCreate(savedInstanceState);
 

@@ -66,10 +66,25 @@
         </activity>
         <activity
             android:name=".OwnPrivateWorkspaceActivity"
-            android:label="@string/title_activity_own_private_workspace"></activity>
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
+        </activity>
+        <activity
+            android:name=".OwnPublishedWorkspaceActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
+        </activity>
         <activity
             android:name=".OwnSharedWorkspaceActivity"
-            android:label="@string/title_activity_own_shared_workspace"></activity>
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
