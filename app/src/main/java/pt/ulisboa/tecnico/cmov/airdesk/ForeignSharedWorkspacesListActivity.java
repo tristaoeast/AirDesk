@@ -74,6 +74,9 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
         Set<String> wsNames = _prefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
         Set<String> wsInvitees;
 
+        if(wsNames.isEmpty())
+            Toast.makeText(this, username + ", you have no workspaces being shared with you at the moment", Toast.LENGTH_LONG).show();
+
         for (String wsName : wsNames) {
             wsInvitees = _prefs.getStringSet(wsName+"_usernames", new HashSet<String>());
             for (String wsInvitee : wsInvitees) {
@@ -81,7 +84,7 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
                 //verify if the logged in user is in the invitees list to choose if the ws should show up
                 if(username.equalsIgnoreCase(wsInvitee)) {
                     _wsNamesList.add(wsName);
-                } else Toast.makeText(this, username + ", you have no workspaces being shared with you at the moment", Toast.LENGTH_LONG).show();
+                }
             }
         }
         _wsNamesAdapter.notifyDataSetChanged();
