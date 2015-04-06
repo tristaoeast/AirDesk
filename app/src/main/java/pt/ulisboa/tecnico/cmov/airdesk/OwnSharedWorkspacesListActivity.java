@@ -94,6 +94,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                             _editor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWs);
                             _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
                             _editor.putStringSet(getString(R.string.foreign_shared_workspaces_list), foreignSharedWs);
+                            _editor.putStringSet("Shared Workspace with:", wsUsernames);
                             _editor.putStringSet(name+"_usernames",wsUsernames);
                             _wsNamesList.add(name);
                             _wsNamesAdapter.notifyDataSetChanged();

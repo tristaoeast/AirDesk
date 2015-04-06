@@ -29,6 +29,7 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
     private ActionBarDrawerToggle _drawerToggle;
 
     private ArrayList<String> _wsNamesList;
+    private ArrayList<String> _wsInviteesList;
 
     private ArrayAdapter<String> _wsNamesAdapter;
     private ListView _listView;
@@ -63,12 +64,14 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
 
     protected void setupWsList() {
         _wsNamesList = new ArrayList<String>();
+        _wsInviteesList = new ArrayList<String>();
         _wsNamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _wsNamesList);
         // Get ListView object from xml
         _listView = (ListView) findViewById(R.id.lv_wsList);
         _listView.setAdapter(_wsNamesAdapter);
 
         Set<String> wsNames = _prefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
+        Set<String> wsInvitees = _prefs.getStringSet("Shared Workspace with:", new HashSet<String>());
 
         if(wsNames.isEmpty())
             Toast.makeText(this, "Foreign_Shared_WS_LIST: " + "EMPTYYY", Toast.LENGTH_LONG).show();
@@ -76,6 +79,10 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
         for (String wsName : wsNames) {
             Toast.makeText(this, "Foreign Shared WS Name added: " + wsName, Toast.LENGTH_LONG).show();
             _wsNamesList.add(wsName);
+            for (String wsInvitee : wsInvitees) {
+                Toast.makeText(this, "Shared with: " + wsInvitee, Toast.LENGTH_LONG).show();
+                _wsInviteesList.add(wsInvitee);
+            }
         }
         _wsNamesAdapter.notifyDataSetChanged();
 
