@@ -63,6 +63,7 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
     }
 
     protected void setupWsList() {
+        String username = _prefs.getString("username", "invalid username");
         _wsNamesList = new ArrayList<String>();
         _wsInviteesList = new ArrayList<String>();
         _wsNamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _wsNamesList);
@@ -73,15 +74,16 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
         Set<String> wsNames = _prefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
         Set<String> wsInvitees = _prefs.getStringSet("Shared Workspace with:", new HashSet<String>());
 
-        if(wsNames.isEmpty())
-            Toast.makeText(this, "Foreign_Shared_WS_LIST: " + "EMPTYYY", Toast.LENGTH_LONG).show();
-
         for (String wsName : wsNames) {
-            Toast.makeText(this, "Foreign Shared WS Name added: " + wsName, Toast.LENGTH_LONG).show();
-            _wsNamesList.add(wsName);
             for (String wsInvitee : wsInvitees) {
-                Toast.makeText(this, "Shared with: " + wsInvitee, Toast.LENGTH_LONG).show();
+               // Toast.makeText(this, "Shared with: " + wsInvitee, Toast.LENGTH_LONG).show();
                 _wsInviteesList.add(wsInvitee);
+                //verify if the logged in user is in the invitees list to choose if the ws should show up
+                if(username.equalsIgnoreCase(wsInvitee)) {
+                    _wsNamesList.add(wsName);
+                    Toast.makeText(this, "Shared WS Name added: " + wsName + "to user: " + wsInvitee, Toast.LENGTH_LONG).show();
+                }
+
             }
         }
         _wsNamesAdapter.notifyDataSetChanged();
