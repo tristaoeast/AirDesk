@@ -11,7 +11,7 @@ public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity 
     protected void onCreate(Bundle savedInstanceState) {
         setupSuper(R.layout.activity_own_private_workspaces_list,
                 R.string.own_private_workspaces_dir,
-                R.string.activity_own_private_workspaces_list,
+                R.string.own_private_workspaces_list,
                 R.layout.dialog_new_private_workspace,
                 this,
                 OwnPrivateWorkspaceActivity.class,

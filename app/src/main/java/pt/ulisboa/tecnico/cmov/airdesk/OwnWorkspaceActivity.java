@@ -32,6 +32,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
     private String WORKSPACE_DIR;
     private String WORKSPACE_NAME;
     private Context SUBCLASS_CONTEXT;
+    private int WORKSPACES_LIST;
 
     private File _appDir;
     private SharedPreferences _prefs;
@@ -125,6 +126,10 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         SUBCLASS_CONTEXT = subclassContext;
     }
 
+    public void setWorkspacesList(int workspacesList) {
+        WORKSPACES_LIST = workspacesList;
+    }
+
     public void newFile(final View view) {
         final File wsDir = new File(_appDir, WORKSPACE_DIR);
         final String[] fName = new String[1];
@@ -138,8 +143,9 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                 .setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         fName[0] = etName.getText().toString();
+                        String filename = fName[0] + ".txt";
                         Set<String> wsFiles = _prefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
-                        if (wsFiles.contains(fName[0])) {
+                        if (wsFiles.contains(filename)) {
                             Toast.makeText(SUBCLASS_CONTEXT, "File with that name already exists.", Toast.LENGTH_LONG).show();
                             newFile(view);
                             return;
@@ -149,7 +155,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                             newFile(view);
                             return;
                         }
-                        File file = new File(wsDir, fName[0] + ".txt");
+                        File file = new File(wsDir, filename);
                         try {
                             file.createNewFile();
                         } catch (IOException e) {
@@ -158,7 +164,6 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                             newFile(view);
                             return;
                         }
-                        String filename = fName[0] + ".txt";
                         _fileNamesList.add(filename);
                         Collections.sort(_fileNamesList);
                         _fileNamesAdapter.notifyDataSetChanged();
@@ -169,7 +174,47 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                 })
                 .setNegativeButton("Cancel", null).create();
         dialog.show();
+    }
 
+    public void deleteWorkspace(View view) {
+
+        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
+        final View customView = inflater.inflate(R.layout.dialog_delete_workspace, null);
+        final EditText etName = (EditText) customView.findViewById(R.id.et_file_name);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Delete " + WORKSPACE_NAME + "?")
+                .setView(customView)
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        File dir = new File(_appDir, WORKSPACE_DIR);
+                        deleteRecursive(dir);
+                        _editor.remove(WORKSPACE_NAME + "_files");
+                        _editor.remove(WORKSPACE_NAME + "_quota");
+                        Set<String> oWs = _prefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
+                        oWs.remove(WORKSPACE_NAME);
+                        _editor.putStringSet(getString(WORKSPACES_LIST), oWs);
+                        Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
+                        allWs.remove(WORKSPACE_NAME);
+                        _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs).commit();
+                        Intent intent = new Intent(SUBCLASS_CONTEXT, OwnPrivateWorkspacesListActivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("Cancel", null).create();
+        dialog.show();
+    }
+
+    public void deleteRecursive(File fileOrDirectory) {
+
+        Log.d("File or dir path", fileOrDirectory.getPath());
+
+        if (fileOrDirectory.isDirectory())
+            for (File child : fileOrDirectory.listFiles())
+                deleteRecursive(child);
+
+        fileOrDirectory.delete();
 
     }
+
 }

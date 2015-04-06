@@ -27,14 +27,15 @@
             android:layout_height="wrap_content"
             android:text="New File"
             android:layout_weight="1"
-            android:onClick="newFile"/>
+            android:onClick="newFile" />
 
         <Button
             android:id="@+id/bt_delete_ws"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Delete"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:onClick="deleteWorkspace" />
 
         <Button
             android:id="@+id/bt_publish_ws"

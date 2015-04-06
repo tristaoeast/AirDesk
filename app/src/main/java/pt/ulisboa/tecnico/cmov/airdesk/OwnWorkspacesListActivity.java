@@ -111,6 +111,13 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
         getSupportActionBar().setTitle(getString(OWN_WORKSPACES_LIST));
+        Set<String> wsNames = _prefs.getStringSet(getString(OWN_WORKSPACES_LIST), new HashSet<String>());
+        _wsNamesList.clear();
+        for (String wsName : wsNames) {
+//            Toast.makeText(SUBCLASS_CONTEXT, "ws Name added: " + wsName, Toast.LENGTH_LONG).show();
+            _wsNamesList.add(wsName);
+        }
+        Collections.sort(_wsNamesList);
         _wsNamesAdapter.notifyDataSetChanged();
 
     }

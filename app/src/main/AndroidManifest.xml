@@ -18,7 +18,7 @@
         </activity>
         <activity
             android:name=".OwnWorkspacesListActivity"
-            android:label="@string/activity_own_private_workspaces_list"
+            android:label="@string/own_private_workspaces_list"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -26,7 +26,7 @@
         </activity>
         <activity
             android:name=".OwnPrivateWorkspacesListActivity"
-            android:label="@string/activity_own_private_workspaces_list"
+            android:label="@string/own_private_workspaces_list"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
