@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -138,7 +139,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         final EditText etName = (EditText) customView.findViewById(R.id.et_file_name);
 
         AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("New Empty Text File")
+                .setTitle("Create Empty Text File?")
                 .setView(customView)
                 .setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -207,15 +208,173 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
     }
 
     public void deleteRecursive(File fileOrDirectory) {
-
         Log.d("File or dir path", fileOrDirectory.getPath());
-
         if (fileOrDirectory.isDirectory())
             for (File child : fileOrDirectory.listFiles())
                 deleteRecursive(child);
-
         fileOrDirectory.delete();
+    }
 
+    public void publishWorkspace(final View view) {
+
+        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
+        final View customView = inflater.inflate(R.layout.dialog_publish_workspace, null);
+        final EditText etName = (EditText) customView.findViewById(R.id.et_file_name);
+        final String[] wsTagsTemp = new String[1];
+
+        final EditText etTagsTemp = (EditText) customView.findViewById(R.id.et_tags);
+
+        // Set tags list and button behaviour
+        final ListView lv_tags = (ListView) customView.findViewById(R.id.lv_tags);
+        final ArrayList<String> tagsList = new ArrayList<String>();
+        final ArrayAdapter<String> tagsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, tagsList);
+
+        lv_tags.setAdapter(tagsAdapter);
+        Button bt_add_tag = (Button) customView.findViewById(R.id.bt_add_tag);
+
+        bt_add_tag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText et_tags = (EditText) customView.findViewById(R.id.et_tags);
+                String tag = et_tags.getText().toString().trim();
+                if (tag.isEmpty())
+                    Toast.makeText(SUBCLASS_CONTEXT, "Insert a tag.", Toast.LENGTH_LONG).show();
+                else if (tagsList.contains(tag))
+                    Toast.makeText(SUBCLASS_CONTEXT, "Tag already exists.", Toast.LENGTH_LONG).show();
+                else {
+                    tagsList.add(et_tags.getText().toString());
+                    Collections.sort(tagsList);
+                    tagsAdapter.notifyDataSetChanged();
+                    et_tags.setText("");
+                }
+            }
+        });
+
+        // This is used to refresh the position of the list
+        lv_tags.post(new Runnable() {
+            @Override
+            public void run() {
+                lv_tags.smoothScrollToPosition(0);
+            }
+        });
+
+        // Event Listener that removes tags when clicked
+        lv_tags.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                tagsList.remove(position);
+                tagsAdapter.notifyDataSetChanged();
+            }
+        });
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Publish Workspace?");
+        builder.setView(customView);
+        builder.setPositiveButton("Publish", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if (tagsList.isEmpty()) {
+                    Toast.makeText(SUBCLASS_CONTEXT, "At least one tag must be added.", Toast.LENGTH_LONG).show();
+                    publishWorkspace(view);
+                    return;
+                }
+                HashSet<String> wsTags = new HashSet<String>(tagsList);
+                Set<String> ownPublishedWsList = _prefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
+                Set<String> currentWsList = _prefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
+                currentWsList.remove(WORKSPACE_NAME);
+                ownPublishedWsList.add(WORKSPACE_NAME);
+                _editor.putStringSet(getString(R.string.own_published_workspaces_list), ownPublishedWsList);
+                _editor.putStringSet(WORKSPACE_NAME + "_tags", wsTags);
+                _editor.commit();
+
+                Intent intent = new Intent(SUBCLASS_CONTEXT, OwnPublishedWorkspaceActivity.class);
+                intent.putExtra("workspace_name", WORKSPACE_NAME);
+                startActivity(intent);
+                finish();
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public void shareWorkspace(final View view) {
+        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
+        final View customView = inflater.inflate(R.layout.dialog_share_workspace, null);
+        final EditText etName = (EditText) customView.findViewById(R.id.et_file_name);
+        final String[] wsUsernamesTemp = new String[1];
+
+        final EditText etUsernamesTemp = (EditText) customView.findViewById(R.id.et_usernames);
+
+        // Set usernames list and button behaviour
+        final ListView lv_usernames = (ListView) customView.findViewById(R.id.lv_usernames);
+        final ArrayList<String> usernamesList = new ArrayList<String>();
+        final ArrayAdapter<String> usernamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, usernamesList);
+
+        lv_usernames.setAdapter(usernamesAdapter);
+        Button bt_add_username = (Button) customView.findViewById(R.id.bt_add_username);
+
+        bt_add_username.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText et_usernames = (EditText) customView.findViewById(R.id.et_usernames);
+                String username = et_usernames.getText().toString().trim();
+                if (username.isEmpty())
+                    Toast.makeText(SUBCLASS_CONTEXT, "Insert a username.", Toast.LENGTH_LONG).show();
+                else if (usernamesList.contains(username))
+                    Toast.makeText(SUBCLASS_CONTEXT, "Username already exists.", Toast.LENGTH_LONG).show();
+                else {
+                    usernamesList.add(et_usernames.getText().toString());
+                    Collections.sort(usernamesList);
+                    usernamesAdapter.notifyDataSetChanged();
+                    et_usernames.setText("");
+                }
+            }
+        });
+
+        // This is used to refresh the position of the list
+        lv_usernames.post(new Runnable() {
+            @Override
+            public void run() {
+                lv_usernames.smoothScrollToPosition(0);
+            }
+        });
+
+        // Event Listener that removes usernames when clicked
+        lv_usernames.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                usernamesList.remove(position);
+                usernamesAdapter.notifyDataSetChanged();
+            }
+        });
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Share Workspace?");
+        builder.setView(customView);
+        builder.setPositiveButton("Share", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if (usernamesList.isEmpty()) {
+                    Toast.makeText(SUBCLASS_CONTEXT, "At least one username must be added.", Toast.LENGTH_LONG).show();
+                    shareWorkspace(view);
+                    return;
+                }
+                HashSet<String> wsUsernames = new HashSet<String>(usernamesList);
+                Set<String> ownSharedWsList = _prefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
+                Set<String> currentWsList = _prefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
+                currentWsList.remove(WORKSPACE_NAME);
+                ownSharedWsList.add(WORKSPACE_NAME);
+                _editor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWsList);
+                _editor.putStringSet(WORKSPACE_NAME + "_usernames", wsUsernames);
+                _editor.commit();
+                Intent intent = new Intent(SUBCLASS_CONTEXT, OwnSharedWorkspaceActivity.class);
+                intent.putExtra("workspace_name", WORKSPACE_NAME);
+                startActivity(intent);
+                finish();
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 }

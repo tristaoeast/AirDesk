@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <EditText
-        android:id="@+id/et_ws_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Name..." />
-
-    <EditText
-        android:id="@+id/et_ws_quota"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Quota (MB)..." />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,7 +11,7 @@
             android:id="@+id/et_usernames"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Username..."
+            android:hint="Tag..."
             android:layout_toLeftOf="@+id/bt_add_username" />
 
         <Button
