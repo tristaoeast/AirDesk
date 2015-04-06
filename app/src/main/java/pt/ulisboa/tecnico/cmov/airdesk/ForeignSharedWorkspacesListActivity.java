@@ -72,9 +72,10 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
         _listView.setAdapter(_wsNamesAdapter);
 
         Set<String> wsNames = _prefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
-        Set<String> wsInvitees = _prefs.getStringSet("Shared Workspace with:", new HashSet<String>());
+        Set<String> wsInvitees;
 
         for (String wsName : wsNames) {
+            wsInvitees = _prefs.getStringSet(wsName+"_usernames", new HashSet<String>());
             for (String wsInvitee : wsInvitees) {
                // Toast.makeText(this, "Shared with: " + wsInvitee, Toast.LENGTH_LONG).show();
                 _wsInviteesList.add(wsInvitee);
