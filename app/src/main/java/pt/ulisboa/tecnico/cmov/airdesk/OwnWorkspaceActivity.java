@@ -199,6 +199,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                         _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs).commit();
                         Intent intent = new Intent(SUBCLASS_CONTEXT, OwnPrivateWorkspacesListActivity.class);
                         startActivity(intent);
+                        finish();
                     }
                 })
                 .setNegativeButton("Cancel", null).create();
