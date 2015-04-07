@@ -47,7 +47,7 @@ public class MainActivity extends ActionBarActivity {
             if (_prefs.getBoolean("firstRun", true)) {
 //                Toast.makeText(MainActivity.this, "First run", Toast.LENGTH_LONG).show();
             } else {
-                String username = _prefs.getString("username", "inavlid_username");
+                String username = _prefs.getString("username", "invalid_username");
                 Toast.makeText(MainActivity.this, "Logged in as " + username, Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
                 intent.putExtra("LOCAL_USERNAME", username);
