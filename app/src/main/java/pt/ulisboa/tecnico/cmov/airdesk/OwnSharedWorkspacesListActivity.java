@@ -40,53 +40,53 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
 
         final String[] wsName = new String[1];
         final String[] wsQuota = new String[1];
-        final String[] wsUsernamesTemp = new String[1];
+        final String[] wsEmailsTemp = new String[1];
 
         LayoutInflater inflater = LayoutInflater.from(this);
         final View customView = inflater.inflate(R.layout.dialog_new_shared_workspace, null);
 
-        final ListView lv_usernames = (ListView) customView.findViewById(R.id.lv_usernames);
-        final ArrayList<String> usernamesList = new ArrayList<String>();
-        final ArrayAdapter<String> usernamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, usernamesList);
-        lv_usernames.setAdapter(usernamesAdapter);
+        final ListView lv_emails = (ListView) customView.findViewById(R.id.lv_emails);
+        final ArrayList<String> emailsList = new ArrayList<String>();
+        final ArrayAdapter<String> emailsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, emailsList);
+        lv_emails.setAdapter(emailsAdapter);
 
-        Button bt_add_username = (Button) customView.findViewById(R.id.bt_add_username);
-        bt_add_username.setOnClickListener(new View.OnClickListener() {
+        Button bt_add_email = (Button) customView.findViewById(R.id.bt_add_email);
+        bt_add_email.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText et_usernames = (EditText) customView.findViewById(R.id.et_usernames);
-                String username = et_usernames.getText().toString().trim();
-                if (username.isEmpty())
-                    Toast.makeText(SUBCLASS_CONTEXT, "Insert username.", Toast.LENGTH_LONG).show();
-                else if (usernamesList.contains(username))
-                    Toast.makeText(SUBCLASS_CONTEXT, "Username already exsits.", Toast.LENGTH_LONG).show();
+                EditText et_emails = (EditText) customView.findViewById(R.id.et_emails);
+                String email = et_emails.getText().toString().trim();
+                if (email.isEmpty())
+                    Toast.makeText(SUBCLASS_CONTEXT, "Insert email.", Toast.LENGTH_LONG).show();
+                else if (emailsList.contains(email))
+                    Toast.makeText(SUBCLASS_CONTEXT, "Email already exsits.", Toast.LENGTH_LONG).show();
                 else {
-                    usernamesList.add(et_usernames.getText().toString());
-                    Collections.sort(usernamesList);
-                    usernamesAdapter.notifyDataSetChanged();
-                    et_usernames.setText("");
+                    emailsList.add(et_emails.getText().toString());
+                    Collections.sort(emailsList);
+                    emailsAdapter.notifyDataSetChanged();
+                    et_emails.setText("");
                 }
             }
         });
 
-        lv_usernames.post(new Runnable() {
+        lv_emails.post(new Runnable() {
             @Override
             public void run() {
-                lv_usernames.smoothScrollToPosition(0);
+                lv_emails.smoothScrollToPosition(0);
             }
         });
 
-        lv_usernames.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        lv_emails.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                usernamesList.remove(position);
-                usernamesAdapter.notifyDataSetChanged();
+                emailsList.remove(position);
+                emailsAdapter.notifyDataSetChanged();
             }
         });
 
         final EditText etName = (EditText) customView.findViewById(R.id.et_ws_name);
         final EditText etQuota = (EditText) customView.findViewById(R.id.et_ws_quota);
-        final EditText etUsernamesTemp = (EditText) customView.findViewById(R.id.et_usernames);
+        final EditText etEmailsTemp = (EditText) customView.findViewById(R.id.et_emails);
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Create New Workspace")
                 .setView(customView)
@@ -94,9 +94,9 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         wsName[0] = etName.getText().toString();
                         wsQuota[0] = etQuota.getText().toString();
-                        wsUsernamesTemp[0] = etUsernamesTemp.getText().toString();
-                        wsUsernamesTemp[0].replaceAll("\\s","");
-                        if(wsName[0] == null || wsQuota[0] == null || wsUsernamesTemp[0] == null){
+                        wsEmailsTemp[0] = etEmailsTemp.getText().toString();
+                        wsEmailsTemp[0].replaceAll("\\s","");
+                        if(wsName[0] == null || wsQuota[0] == null || wsEmailsTemp[0] == null){
                             Toast.makeText(OwnSharedWorkspacesListActivity.this, "All fields must be filled.", Toast.LENGTH_LONG).show();
                             newOwnWorkspace(view);
                             return;
@@ -118,7 +118,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                         }
                         String name = wsName[0];
                         _editor.putInt(name + "_quota", quota);
-                        HashSet<String> wsUsernames = new HashSet<String>(usernamesList);
+                        HashSet<String> wsEmails = new HashSet<String>(emailsList);
                         Set<String> ownSharedWs = _prefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
                         Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                         Set<String> foreignSharedWs = _prefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
@@ -135,7 +135,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                             _editor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWs);
                             _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
                             _editor.putStringSet(getString(R.string.foreign_shared_workspaces_list), foreignSharedWs);
-                            _editor.putStringSet(name+"_usernames",wsUsernames);
+                            _editor.putStringSet(name+"_emails",wsEmails);
                             _wsNamesList.add(name);
                             _wsNamesAdapter.notifyDataSetChanged();
                             // Create the actual directory in the app's private space
