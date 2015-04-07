@@ -350,7 +350,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         final EditText etName = (EditText) customView.findViewById(R.id.et_file_name);
         final String[] wsUsernamesTemp = new String[1];
 
-        final EditText etUsernamesTemp = (EditText) customView.findViewById(R.id.et_usernames);
+        final EditText etUsernamesTemp = (EditText) customView.findViewById(R.id.et_emails);
 
         // Set usernames list and button behaviour
         final ListView lv_usernames = (ListView) customView.findViewById(R.id.lv_usernames);
@@ -358,12 +358,12 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         final ArrayAdapter<String> usernamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, usernamesList);
 
         lv_usernames.setAdapter(usernamesAdapter);
-        Button bt_add_username = (Button) customView.findViewById(R.id.bt_add_username);
+        Button bt_add_username = (Button) customView.findViewById(R.id.bt_add_email);
 
         bt_add_username.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText et_usernames = (EditText) customView.findViewById(R.id.et_usernames);
+                EditText et_usernames = (EditText) customView.findViewById(R.id.et_emails);
                 String username = et_usernames.getText().toString().trim();
                 if (username.isEmpty())
                     Toast.makeText(SUBCLASS_CONTEXT, "Insert a username.", Toast.LENGTH_LONG).show();

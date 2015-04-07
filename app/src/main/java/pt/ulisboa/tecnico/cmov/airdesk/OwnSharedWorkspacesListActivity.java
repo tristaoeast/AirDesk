@@ -5,16 +5,10 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,7 +37,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
         final String[] wsUsernamesTemp = new String[1];
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        final View customView = inflater.inflate(R.layout.dialog_new_shared_workspace, null);
+        final View yourCustomView = inflater.inflate(R.layout.dialog_new_shared_workspace, null);
 
         final ListView lv_usernames = (ListView) customView.findViewById(R.id.lv_usernames);
         final ArrayList<String> usernamesList = new ArrayList<String>();
@@ -118,7 +112,11 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                         }
                         String name = wsName[0];
                         _editor.putInt(name + "_quota", quota);
-                        HashSet<String> wsUsernames = new HashSet<String>(usernamesList);
+                        MiscUtils mu = new MiscUtils();
+                        HashSet<String> wsUsernames = mu.stringToSetTokenzier(wsUsernamesTemp[0],",");
+
+
+
                         Set<String> ownSharedWs = _prefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
                         Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                         Set<String> foreignSharedWs = _prefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
@@ -131,6 +129,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                             ownSharedWs.add(name);
                             allWs.add(name);
                             foreignSharedWs.add(name);
+
                             _editor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWs);
                             _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
                             _editor.putStringSet(getString(R.string.foreign_shared_workspaces_list), foreignSharedWs);
