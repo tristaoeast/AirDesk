@@ -58,7 +58,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="UnShare"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:onClick="unShareWorkspace"/>
 
         <Button
             android:id="@+id/bt_publish_ws"

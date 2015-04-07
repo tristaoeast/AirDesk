@@ -10,6 +10,7 @@ public class OwnPrivateWorkspaceActivity extends OwnWorkspaceActivity {
         setActivityLayout(R.layout.activity_own_private_workspace);
         setActivityContext(this);
         setWorkspacesList(R.string.own_private_workspaces_list);
+        setWorkspaceMode("PRIVATE");
         super.onCreate(savedInstanceState);
     }
 }
