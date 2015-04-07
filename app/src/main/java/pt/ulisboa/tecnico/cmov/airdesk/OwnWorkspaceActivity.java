@@ -30,8 +30,10 @@ import java.util.Set;
 public abstract class OwnWorkspaceActivity extends ActionBarActivity {
 
     private int SUBCLASS_ACTIVITY_LAYOUT;
+
     private String WORKSPACE_DIR;
     private String WORKSPACE_NAME;
+    private String WORKSPACE_MODE;
     private Context SUBCLASS_CONTEXT;
     private int WORKSPACES_LIST;
 
@@ -51,14 +53,30 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         Intent intent = getIntent();
         WORKSPACE_DIR = intent.getExtras().get("workspace_name").toString();
         WORKSPACE_NAME = WORKSPACE_DIR;
-        getSupportActionBar().setTitle(WORKSPACE_NAME);
-
+        getSupportActionBar().setTitle(WORKSPACE_NAME+ "(OWNED - "+WORKSPACE_MODE+")");
         setupFilesList();
-
         _appDir = getApplicationContext().getFilesDir();
-
-
     }
+
+    public String getWorkspaceName() {
+        return WORKSPACE_NAME;
+    }
+
+
+    public String getWorkspaceDir() {
+        return WORKSPACE_DIR;
+    }
+
+
+    public File getAppDir() {
+        return _appDir;
+    }
+
+
+    public SharedPreferences getSharedPrefs() {
+        return _prefs;
+    }
+
 
     protected void setupFilesList() {
         _fileNamesList = new ArrayList<String>();
@@ -129,6 +147,10 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
 
     public void setWorkspacesList(int workspacesList) {
         WORKSPACES_LIST = workspacesList;
+    }
+
+    public void setWorkspaceMode(String workspaceMode) {
+        WORKSPACE_MODE = workspaceMode;
     }
 
     public void newFile(final View view) {
