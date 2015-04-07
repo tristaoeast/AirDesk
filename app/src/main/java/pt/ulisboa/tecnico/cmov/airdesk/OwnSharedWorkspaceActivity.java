@@ -59,7 +59,10 @@ public class OwnSharedWorkspaceActivity extends OwnWorkspaceActivity {
                         _editor.remove(getWorkspaceName() + "_names");
                         Set<String> ownSharedWs = _prefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
                         ownSharedWs.remove(getWorkspaceName());
-                        _editor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWs).commit();
+                        _editor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWs);
+                        Set<String> ownPrivateWs = _prefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
+                        ownPrivateWs.add(getWorkspaceName());
+                        _editor.putStringSet(getString(R.string.own_private_workspaces_list),ownPrivateWs).commit();
                         Intent intent = new Intent(OwnSharedWorkspaceActivity.this, OwnPrivateWorkspaceActivity.class);
                         intent.putExtra("workspace_name", getWorkspaceName());
                         startActivity(intent);

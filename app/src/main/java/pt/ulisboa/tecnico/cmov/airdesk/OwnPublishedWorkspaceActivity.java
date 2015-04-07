@@ -62,9 +62,12 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
                 .setPositiveButton("Unpublish", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         _editor.remove(getWorkspaceName() + "_tags");
-                        Set<String> ownSharedWs = _prefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
-                        ownSharedWs.remove(getWorkspaceName());
-                        _editor.putStringSet(getString(R.string.own_published_workspaces_list), ownSharedWs).commit();
+                        Set<String> ownPublishedWs = _prefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
+                        ownPublishedWs.remove(getWorkspaceName());
+                        _editor.putStringSet(getString(R.string.own_published_workspaces_list), ownPublishedWs);
+                        Set<String> ownPrivateWs = _prefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
+                        ownPrivateWs.add(getWorkspaceName());
+                        _editor.putStringSet(getString(R.string.own_private_workspaces_list),ownPrivateWs).commit();
                         Intent intent = new Intent(OwnPublishedWorkspaceActivity.this, OwnPrivateWorkspaceActivity.class);
                         intent.putExtra("workspace_name", getWorkspaceName());
                         startActivity(intent);
