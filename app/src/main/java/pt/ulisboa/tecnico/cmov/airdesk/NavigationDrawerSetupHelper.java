@@ -85,34 +85,25 @@ public class NavigationDrawerSetupHelper {
         _expListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                // Create a new fragment and specify the planet to show based on position
                 _itemSelected = true;
-//                OwnPrivateWorkspacesListFragment wsListFragment;
-//                Toast.makeText(WorkspacesActivity.this,groupPosition+" "+childPosition,Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(_currentActivityContext, OwnPrivateWorkspacesListActivity.class);
 
                 if (0 == groupPosition) {
                     if (0 == childPosition) {
                         intent = new Intent(_currentActivityContext, OwnPrivateWorkspacesListActivity.class);
-//                        intent.putExtra("LIST_SELECTED", "OPrWS");
                     } else if (1 == childPosition) {
                         intent = new Intent(_currentActivityContext, OwnSharedWorkspacesListActivity.class);
-//                        intent.putExtra("LIST_SELECTED", "OSWS");
                     } else if (2 == childPosition) {
                         intent = new Intent(_currentActivityContext, OwnPublishedWorkspacesListActivity.class);
-//                        intent.putExtra("LIST_SELECTED", "OPuWS");
                     }
                 } else if (1 == groupPosition) {
                     if (0 == childPosition) {
                         intent = new Intent(_currentActivityContext, ForeignSharedWorkspacesListActivity.class);
-//                        intent.putExtra("LIST_SELECTED", "FShWS");
                     } else if (1 == childPosition) {
                         intent = new Intent(_currentActivityContext, ForeignSubscribedWorkspacesListActivity.class);
-//                        intent.putExtra("LIST_SELECTED", "FSuWS");
                     }
                 }
                 _currentActivity.startActivity(intent);
-
                 // Highlight the selected item, update the title, and close the drawer
                 _expListView.setItemChecked(childPosition, true);
                 _drawerLayout.closeDrawer(_expListView);

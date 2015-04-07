@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="@dimen/abc_action_bar_default_padding_material"
+    tools:context=".OwnPublishedWorkspacesListActivity">
 
-    <EditText
-        android:id="@+id/et_ws_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Name..." />
 
-    <EditText
-        android:id="@+id/et_ws_quota"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Quota (MB)..." />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -33,8 +26,7 @@
             android:layout_height="wrap_content"
             android:text="Add Username"
             android:layout_alignParentRight="true"
-            android:layout_alignBaseline="@+id/et_usernames"
-            />
+            android:layout_alignBaseline="@+id/et_usernames" />
     </RelativeLayout>
 
     <RelativeLayout

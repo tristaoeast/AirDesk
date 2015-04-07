@@ -119,7 +119,6 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
                 }
                 String name = wsName[0];
                 _prefs.edit().putInt(name + "_quota", quota).commit();
-                MiscUtils mu = new MiscUtils();
                 HashSet<String> wsTags = new HashSet<String>(tagsList);
                 Set<String> ownPublishedWs = _prefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
                 Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());

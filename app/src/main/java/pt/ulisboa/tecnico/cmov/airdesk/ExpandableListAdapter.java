@@ -99,16 +99,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
 
     @Override
-
-
     public boolean hasStableIds() {
         return false;
     }
 
 
     @Override
-
-
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
     }

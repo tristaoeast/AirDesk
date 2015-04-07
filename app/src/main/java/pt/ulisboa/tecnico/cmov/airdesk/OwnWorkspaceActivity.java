@@ -43,6 +43,12 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
     private ArrayList<String> _fileNamesList;
     private ArrayAdapter<String> _fileNamesAdapter;
     private ListView _listView;
+    protected ArrayList<String> _tagsList;
+    protected ArrayAdapter<String> _tagsAdapter;
+    protected ListView _tagsListView;
+    protected ArrayList<String> _usernamesList;
+    protected ArrayAdapter<String> _usernamesAdapter;
+    protected ListView _usernamesListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +59,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         Intent intent = getIntent();
         WORKSPACE_DIR = intent.getExtras().get("workspace_name").toString();
         WORKSPACE_NAME = WORKSPACE_DIR;
-        getSupportActionBar().setTitle(WORKSPACE_NAME+ "(OWNED - "+WORKSPACE_MODE+")");
+        getSupportActionBar().setTitle(WORKSPACE_NAME + " (OWNED - " + WORKSPACE_MODE + ")");
         setupFilesList();
         _appDir = getApplicationContext().getFilesDir();
     }
@@ -77,24 +83,49 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         return _prefs;
     }
 
+    protected void setupTagsList() {
+        _tagsList = new ArrayList<String>();
+        _tagsAdapter = new ArrayAdapter<String>(SUBCLASS_CONTEXT, android.R.layout.simple_list_item_1, android.R.id.text1, _tagsList);
+//        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
+//        final View customView = inflater.inflate(R.layout.activity_own_published_workspace, null);
+        _tagsListView = (ListView) findViewById(R.id.lv_tags);
+        _tagsListView.setAdapter(_tagsAdapter);
+        Set<String> tags = _prefs.getStringSet(WORKSPACE_NAME + "_tags", new HashSet<String>());
+        for (String tag : tags) {
+            _tagsList.add(tag);
+        }
+        Collections.sort(_tagsList);
+        _tagsAdapter.notifyDataSetChanged();
+    }
+
+    protected void setupUsernamesList() {
+        _usernamesList = new ArrayList<String>();
+        _usernamesAdapter = new ArrayAdapter<String>(SUBCLASS_CONTEXT, android.R.layout.simple_list_item_1, android.R.id.text1, _usernamesList);
+//        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
+//        final View customView = inflater.inflate(R.layout.activity_own_published_workspace, null);
+        _usernamesListView = (ListView) findViewById(R.id.lv_usernames);
+        _usernamesListView.setAdapter(_usernamesAdapter);
+        Set<String> usernames = _prefs.getStringSet(WORKSPACE_NAME + "_usernames", new HashSet<String>());
+        Log.d("WORKSPACE_NAME",WORKSPACE_NAME);
+        for (String username : usernames) {
+            Log.d("OPuWS_TAG",username);
+            _usernamesList.add(username);
+        }
+        Collections.sort(_usernamesList);
+        _usernamesAdapter.notifyDataSetChanged();
+    }
 
     protected void setupFilesList() {
         _fileNamesList = new ArrayList<String>();
         _fileNamesAdapter = new ArrayAdapter<String>(SUBCLASS_CONTEXT, android.R.layout.simple_list_item_1, android.R.id.text1, _fileNamesList);
-        // Get ListView object from xml
         _listView = (ListView) findViewById(R.id.lv_filesList);
         _listView.setAdapter(_fileNamesAdapter);
-
         Set<String> fileNames = _prefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
-        String debug = "";
         for (String fileName : fileNames) {
             _fileNamesList.add(fileName);
-            debug += fileName + ",";
         }
-        Log.d("Filenames list onCreate", debug);
         Collections.sort(_fileNamesList);
         _fileNamesAdapter.notifyDataSetChanged();
-
         _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -106,12 +137,6 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
     @Override
     public void onResume() {
         super.onResume();
-//        Set<String> fileNames = _prefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
-//        String debug = "";
-//        for (String fileName : fileNames) {
-//            debug += fileName + ",";
-//        }
-//        Log.d("Filenames list onResume", debug);
         _fileNamesAdapter.notifyDataSetChanged();
     }
 

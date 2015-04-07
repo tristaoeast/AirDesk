@@ -5,10 +5,16 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,14 +43,53 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
         final String[] wsUsernamesTemp = new String[1];
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        final View yourCustomView = inflater.inflate(R.layout.dialog_new_shared_workspace, null);
+        final View customView = inflater.inflate(R.layout.dialog_new_shared_workspace, null);
 
-        final EditText etName = (EditText) yourCustomView.findViewById(R.id.et_ws_name);
-        final EditText etQuota = (EditText) yourCustomView.findViewById(R.id.et_ws_quota);
-        final EditText etUsernamesTemp = (EditText) yourCustomView.findViewById(R.id.et_usernames);
+        final ListView lv_usernames = (ListView) customView.findViewById(R.id.lv_usernames);
+        final ArrayList<String> usernamesList = new ArrayList<String>();
+        final ArrayAdapter<String> usernamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, usernamesList);
+        lv_usernames.setAdapter(usernamesAdapter);
+
+        Button bt_add_username = (Button) customView.findViewById(R.id.bt_add_username);
+        bt_add_username.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText et_usernames = (EditText) customView.findViewById(R.id.et_usernames);
+                String username = et_usernames.getText().toString().trim();
+                if (username.isEmpty())
+                    Toast.makeText(SUBCLASS_CONTEXT, "Insert username.", Toast.LENGTH_LONG).show();
+                else if (usernamesList.contains(username))
+                    Toast.makeText(SUBCLASS_CONTEXT, "Username already exsits.", Toast.LENGTH_LONG).show();
+                else {
+                    usernamesList.add(et_usernames.getText().toString());
+                    Collections.sort(usernamesList);
+                    usernamesAdapter.notifyDataSetChanged();
+                    et_usernames.setText("");
+                }
+            }
+        });
+
+        lv_usernames.post(new Runnable() {
+            @Override
+            public void run() {
+                lv_usernames.smoothScrollToPosition(0);
+            }
+        });
+
+        lv_usernames.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                usernamesList.remove(position);
+                usernamesAdapter.notifyDataSetChanged();
+            }
+        });
+
+        final EditText etName = (EditText) customView.findViewById(R.id.et_ws_name);
+        final EditText etQuota = (EditText) customView.findViewById(R.id.et_ws_quota);
+        final EditText etUsernamesTemp = (EditText) customView.findViewById(R.id.et_usernames);
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Create New Workspace")
-                .setView(yourCustomView)
+                .setView(customView)
                 .setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         wsName[0] = etName.getText().toString();
@@ -73,11 +118,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                         }
                         String name = wsName[0];
                         _editor.putInt(name + "_quota", quota);
-                        MiscUtils mu = new MiscUtils();
-                        HashSet<String> wsUsernames = mu.stringToSetTokenzier(wsUsernamesTemp[0],",");
-
-
-
+                        HashSet<String> wsUsernames = new HashSet<String>(usernamesList);
                         Set<String> ownSharedWs = _prefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
                         Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                         Set<String> foreignSharedWs = _prefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
@@ -90,7 +131,6 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                             ownSharedWs.add(name);
                             allWs.add(name);
                             foreignSharedWs.add(name);
-
                             _editor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWs);
                             _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
                             _editor.putStringSet(getString(R.string.foreign_shared_workspaces_list), foreignSharedWs);
