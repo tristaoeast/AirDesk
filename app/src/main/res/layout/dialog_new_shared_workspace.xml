@@ -21,19 +21,19 @@
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/et_usernames"
+            android:id="@+id/et_emails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Username..."
-            android:layout_toLeftOf="@+id/bt_add_username" />
+            android:hint="Emails..."
+            android:layout_toLeftOf="@+id/bt_add_email" />
 
         <Button
-            android:id="@+id/bt_add_username"
+            android:id="@+id/bt_add_email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add Tag"
             android:layout_alignParentRight="true"
-            android:layout_alignBaseline="@+id/et_usernames" />
+            android:layout_alignBaseline="@+id/et_emails" />
     </RelativeLayout>
 
     <RelativeLayout

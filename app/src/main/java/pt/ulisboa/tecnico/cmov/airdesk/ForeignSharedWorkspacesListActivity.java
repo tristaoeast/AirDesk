@@ -36,7 +36,8 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
 
     private SharedPreferences _prefs;
 
-    private String _localUsername;
+    private String _username;
+    private String _email;
 
     private File _subDir;
 
@@ -63,7 +64,8 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
     }
 
     protected void setupWsList() {
-        String username = _prefs.getString("username", "invalid username");
+        _username = _prefs.getString("username", "invalid username");
+        _email = _prefs.getString("email", "invalid email");
         _wsNamesList = new ArrayList<String>();
         _wsInviteesList = new ArrayList<String>();
         _wsNamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _wsNamesList);
@@ -75,14 +77,14 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
         Set<String> wsInvitees;
 
         if(wsNames.isEmpty())
-            Toast.makeText(this, username + ", you have no workspaces being shared with you at the moment", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, _username + ", you have no workspaces being shared with you at the moment", Toast.LENGTH_LONG).show();
 
         for (String wsName : wsNames) {
-            wsInvitees = _prefs.getStringSet(wsName+"_usernames", new HashSet<String>());
+            wsInvitees = _prefs.getStringSet(wsName+"_emails", new HashSet<String>());
             for (String wsInvitee : wsInvitees) {
                 _wsInviteesList.add(wsInvitee);
                 //verify if the logged in user is in the invitees list to choose if the ws should show up
-                if(username.equalsIgnoreCase(wsInvitee)) {
+                if(_email.equalsIgnoreCase(wsInvitee)) {
                     _wsNamesList.add(wsName);
                 }
             }
@@ -94,7 +96,8 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String wsName = _wsNamesList.get(position);
                 Intent intent = new Intent(ForeignSharedWorkspacesListActivity.this, ForeignSharedWorkspaceActivity.class);
-                intent.putExtra("LOCAL_USERNAME", _localUsername);
+                intent.putExtra("LOCAL_USERNAME", _username);
+                intent.putExtra("LOCAL_EMAIL", _email);
                 startActivity(intent);
             }
         });

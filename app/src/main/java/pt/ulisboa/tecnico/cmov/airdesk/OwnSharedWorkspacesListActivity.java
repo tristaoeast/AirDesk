@@ -34,14 +34,14 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
 
         final String[] wsName = new String[1];
         final String[] wsQuota = new String[1];
-        final String[] wsUsernamesTemp = new String[1];
+        final String[] wsEmailsTemp = new String[1];
 
         LayoutInflater inflater = LayoutInflater.from(this);
         final View yourCustomView = inflater.inflate(R.layout.dialog_new_shared_workspace, null);
 
         final EditText etName = (EditText) yourCustomView.findViewById(R.id.et_ws_name);
         final EditText etQuota = (EditText) yourCustomView.findViewById(R.id.et_ws_quota);
-        final EditText etUsernamesTemp = (EditText) yourCustomView.findViewById(R.id.et_usernames);
+        final EditText etEmailsTemp = (EditText) yourCustomView.findViewById(R.id.et_emails);
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Create New Workspace")
                 .setView(yourCustomView)
@@ -49,9 +49,9 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         wsName[0] = etName.getText().toString();
                         wsQuota[0] = etQuota.getText().toString();
-                        wsUsernamesTemp[0] = etUsernamesTemp.getText().toString();
-                        wsUsernamesTemp[0].replaceAll("\\s","");
-                        if(wsName[0] == null || wsQuota[0] == null || wsUsernamesTemp[0] == null){
+                        wsEmailsTemp[0] = etEmailsTemp.getText().toString();
+                        wsEmailsTemp[0].replaceAll("\\s","");
+                        if(wsName[0] == null || wsQuota[0] == null || wsEmailsTemp[0] == null){
                             Toast.makeText(OwnSharedWorkspacesListActivity.this, "All fields must be filled.", Toast.LENGTH_LONG).show();
                             newOwnWorkspace(view);
                             return;
@@ -74,7 +74,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                         String name = wsName[0];
                         _editor.putInt(name + "_quota", quota);
                         MiscUtils mu = new MiscUtils();
-                        HashSet<String> wsUsernames = mu.stringToSetTokenzier(wsUsernamesTemp[0],",");
+                        HashSet<String> wsEmails = mu.stringToSetTokenzier(wsEmailsTemp[0],",");
 
 
 
@@ -94,7 +94,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                             _editor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWs);
                             _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
                             _editor.putStringSet(getString(R.string.foreign_shared_workspaces_list), foreignSharedWs);
-                            _editor.putStringSet(name+"_usernames",wsUsernames);
+                            _editor.putStringSet(name+"_emails",wsEmails);
                             _wsNamesList.add(name);
                             _wsNamesAdapter.notifyDataSetChanged();
                             // Create the actual directory in the app's private space

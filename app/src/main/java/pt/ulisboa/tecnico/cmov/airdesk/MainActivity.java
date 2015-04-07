@@ -34,6 +34,18 @@ public class MainActivity extends ActionBarActivity {
                 return false;
             }
         });
+
+        EditText et_email = (EditText) findViewById(R.id.et_email);
+        et_email.setOnKeyListener(new EditText.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_CENTER)) {
+                    login(v);
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -48,9 +60,11 @@ public class MainActivity extends ActionBarActivity {
 //                Toast.makeText(MainActivity.this, "First run", Toast.LENGTH_LONG).show();
             } else {
                 String username = _prefs.getString("username", "invalid_username");
-                Toast.makeText(MainActivity.this, "Logged in as " + username, Toast.LENGTH_LONG).show();
+                String email = _prefs.getString("email", "invalid email");
+                Toast.makeText(MainActivity.this, "Logged in as " + username + " with email " + email, Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
                 intent.putExtra("LOCAL_USERNAME", username);
+                intent.putExtra("LOCAL_EMAIL", email);
                 intent.putExtra("LIST_SELECTED", "OPrWS");
                 startActivity(intent);
             }
@@ -81,12 +95,16 @@ public class MainActivity extends ActionBarActivity {
 
     public void login(View view) {
         EditText et_username = (EditText) findViewById(R.id.et_username);
+        EditText et_email = (EditText) findViewById(R.id.et_email);
         String username = et_username.getText().toString();
+        String email = et_email.getText().toString();
         _prefs.edit().putString("username", username).commit();
+        _prefs.edit().putString("email", email).commit();
         _prefs.edit().putBoolean("firstRun", false).commit();
         //Toast.makeText(ListNotesActivity.this, "Title: " + noteTitle + "\nText: " + noteText, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
         intent.putExtra("LOCAL_USERNAME", username);
+        intent.putExtra("LOCAL_EMAIL", email);
         intent.putExtra("LIST_SELECTED", "OPrWS");
         startActivity(intent);
     }
