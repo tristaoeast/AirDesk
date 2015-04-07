@@ -23,25 +23,32 @@ public class MainActivity extends ActionBarActivity {
 
         _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
 
-        EditText et_user = (EditText) findViewById(R.id.et_username);
+        final EditText et_user = (EditText) findViewById(R.id.et_username);
+        final EditText et_email = (EditText) findViewById(R.id.et_email);
         et_user.setOnKeyListener(new EditText.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_CENTER)) {
-                    login(v);
-                    return true;
+                    if (!et_email.getText().toString().isEmpty()) {
+                        login(v);
+                        return true;
+                    } else
+                        Toast.makeText(MainActivity.this, "You must enter an email", Toast.LENGTH_LONG).show();
                 }
                 return false;
             }
         });
 
-        EditText et_email = (EditText) findViewById(R.id.et_email);
+
         et_email.setOnKeyListener(new EditText.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_CENTER)) {
-                    login(v);
-                    return true;
+                    if (!et_user.getText().toString().isEmpty()) {
+                        login(v);
+                        return true;
+                    } else
+                        Toast.makeText(MainActivity.this, "You must enter an username", Toast.LENGTH_LONG).show();
                 }
                 return false;
             }
