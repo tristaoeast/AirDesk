@@ -69,21 +69,21 @@
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
+                android:value="pt.ulisboa.tecnico.cmov.airdesk.OwnPrivateWorkspacesListActivity" />
         </activity>
         <activity
             android:name=".OwnPublishedWorkspaceActivity"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
+                android:value="pt.ulisboa.tecnico.cmov.airdesk.OwnPublishedWorkspacesListActivity" />
         </activity>
         <activity
             android:name=".OwnSharedWorkspaceActivity"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
+                android:value="pt.ulisboa.tecnico.cmov.airdesk.OwnSharedWorkspacesListActivity" />
         </activity>
     </application>
 
