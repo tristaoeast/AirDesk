@@ -96,8 +96,6 @@ public class ForeignSharedWorkspacesListActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String wsName = _wsNamesList.get(position);
                 Intent intent = new Intent(ForeignSharedWorkspacesListActivity.this, ForeignSharedWorkspaceActivity.class);
-                intent.putExtra("LOCAL_USERNAME", _username);
-                intent.putExtra("LOCAL_EMAIL", _email);
                 startActivity(intent);
             }
         });
