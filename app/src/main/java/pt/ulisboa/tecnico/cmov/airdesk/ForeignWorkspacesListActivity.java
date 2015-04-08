@@ -1,21 +1,17 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -43,13 +39,11 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity{
     private String _username;
     private String _email;
 
-    private File _appDir;
     protected SharedPreferences.Editor _editor;
 
     protected int FOREIGN_WORKSPACE_LIST_LAYOUT;
     protected int FOREIGN_WORKSPACE_DIR;
     protected int FOREIGN_WORKSPACES_LIST;
-    protected int NEW_WORKSPACE_DIALOG_LAYOUT;
     protected int FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA;
     protected ActionBarActivity SUBCLASS_LIST_ACTIVITY;
     protected Class SUBCLASS_ACTIVITY_CLASS;
@@ -65,20 +59,16 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity{
         setupWsList();
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(SUBCLASS_LIST_ACTIVITY, SUBCLASS_CONTEXT);
         _drawerToggle = nh.setup();
-        _appDir = getApplicationContext().getFilesDir();
-
     }
 
-    protected void setupSuper(int wsListLayout, int wsDir, int wsList, int wsDL, int wsPermissionPermissions, ActionBarActivity subClassListActivity, Class subClassActivity, Context subClassContext) {
+    protected void setupSuper(int wsListLayout, int wsDir, int wsList, int wsPermissionPermissions, ActionBarActivity subClassListActivity, Class subClassActivity, Context subClassContext) {
         FOREIGN_WORKSPACE_LIST_LAYOUT = wsListLayout;
         FOREIGN_WORKSPACE_DIR = wsDir;
         FOREIGN_WORKSPACES_LIST = wsList;
-        NEW_WORKSPACE_DIALOG_LAYOUT = wsDL;
         FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA = wsPermissionPermissions;
         SUBCLASS_LIST_ACTIVITY = subClassListActivity;
         SUBCLASS_ACTIVITY_CLASS = subClassActivity;
         SUBCLASS_CONTEXT = subClassContext;
-
     }
 
     // A Hack done in order to ensure the correct behaviour of the back button,
@@ -100,6 +90,23 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity{
         _listView = (ListView) findViewById(R.id.lv_wsList);
         _listView.setAdapter(_wsNamesAdapter);
 
+        updateLists();
+
+        _wsNamesAdapter.notifyDataSetChanged();
+
+        _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String wsName = _wsNamesList.get(position);
+                Intent intent = new Intent(SUBCLASS_CONTEXT, SUBCLASS_ACTIVITY_CLASS);
+                intent.putExtra("workspace_name", wsName);
+                startActivity(intent);
+            }
+        });
+    }
+
+    protected void updateLists(){
+        _wsNamesList.clear();
         Set<String> wsNames = _prefs.getStringSet(getString(FOREIGN_WORKSPACES_LIST), new HashSet<String>());
         Set<String> wsPermissions;
 
@@ -139,30 +146,13 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity{
             }
         }
         Collections.sort(_wsNamesList);
-        _wsNamesAdapter.notifyDataSetChanged();
-
-        _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String wsName = _wsNamesList.get(position);
-                Intent intent = new Intent(SUBCLASS_CONTEXT, SUBCLASS_ACTIVITY_CLASS);
-                intent.putExtra("workspace_name", wsName);
-                startActivity(intent);
-            }
-        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         getSupportActionBar().setTitle(getString(FOREIGN_WORKSPACES_LIST));
-        Set<String> wsNames = _prefs.getStringSet(getString(FOREIGN_WORKSPACES_LIST), new HashSet<String>());
-        _wsNamesList.clear();
-        for (String wsName : wsNames) {
-//            Toast.makeText(SUBCLASS_CONTEXT, "ws Name added: " + wsName, Toast.LENGTH_LONG).show();
-            _wsNamesList.add(wsName);
-        }
-        Collections.sort(_wsNamesList);
+        updateLists();
         _wsNamesAdapter.notifyDataSetChanged();
 
     }

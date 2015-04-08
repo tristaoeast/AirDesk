@@ -26,12 +26,15 @@
     <string name="own_private_workspaces_dir">own_private_workspaces</string>
     <string name="own_shared_workspaces_dir">own_shared_workspaces</string>
     <string name="own_published_workspaces_dir">own_published_workspaces</string>
+    <string name="foreign_shared_workspaces_dir">foreign_shared_workspaces</string>
+    <string name="foreign_published_workspaces_dir">foreign_published_workspaces</string>
     <string name="title_activity_own_private_workspace">OwnPrivateWorkspaceActivity</string>
     <string name="title_activity_own_shared_workspace">OwnSharedWorkspaceActivity</string>
     <string name="all_owned_workspaces_names">All Owned Workspaces</string>
     <string name="subscribe_foreign_shared_workspace">Subscribe Shared Workspace</string>
-    <string name="unsubscribe_foreign_shared_workspace">Unsubscribe Shared Workspace</string>
     <string name="hello_world">Hello World!</string>
     <string name="title_activity_read_text_file">ReadTextFileActivity</string>
+    <string name="foreign_workspaces_email_crit">email</string>
+    <string name="foreign_workspaces_tag_crit">tag</string>
 
 </resources>
