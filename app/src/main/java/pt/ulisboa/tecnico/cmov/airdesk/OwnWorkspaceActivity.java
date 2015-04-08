@@ -108,9 +108,9 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         _emailsListView = (ListView) findViewById(R.id.lv_emails);
         _emailsListView.setAdapter(_emailsAdapter);
         Set<String> emails = _prefs.getStringSet(WORKSPACE_NAME + "_emails", new HashSet<String>());
-        Log.d("WORKSPACE_NAME", WORKSPACE_NAME);
+//        Log.d("WORKSPACE_NAME", WORKSPACE_NAME);
         for (String email : emails) {
-            Log.d("OPuWS_TAG", email);
+//            Log.d("OPuWS_TAG", email);
             _emailsList.add(email);
         }
         Collections.sort(_emailsList);
@@ -136,82 +136,90 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         });
     }
 
-    private void openTextFile(final int position) {
+//    private void openTextFileInDialog(final int position) {
+//
+//        final String filename = _fileNamesList.get(position);
+//        File dir = new File(_appDir, WORKSPACE_DIR);
+//        final File textFile = new File(dir, filename);
+////        Toast.makeText(SUBCLASS_CONTEXT,dir.getName()+" size: "+Double.toString(MemoryHelper.fileSizeInKB(textFile)),Toast.LENGTH_LONG).show();
+//        //Read text from file
+//        final StringBuilder text = new StringBuilder();
+//
+//        try {
+//            BufferedReader br = new BufferedReader(new FileReader(textFile));
+//            String line;
+//            while ((line = br.readLine()) != null) {
+//                text.append(line);
+//                text.append('\n');
+//            }
+//            br.close();
+//        } catch (IOException e) {
+//            Log.d("IOException", e.toString());
+//        }
+//
+//        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
+//        final View customView = inflater.inflate(R.layout.dialog_read_text_file, null);
+//        final TextView tv_text = (TextView) customView.findViewById(R.id.tv_text);
+//        tv_text.setText(text);
+//
+//        AlertDialog dialog = new AlertDialog.Builder(this)
+//                .setTitle(filename)
+//                .setView(customView)
+//                .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int whichButton) {
+//                        editTextFileInDialog(filename, textFile, text.toString(), position);
+//                    }
+//                })
+//                .setNegativeButton("Back", null).create();
+//        dialog.show();
+//    }
 
-        final String filename = _fileNamesList.get(position);
-        File dir = new File(_appDir, WORKSPACE_DIR);
-        final File textFile = new File(dir, filename);
-//        Toast.makeText(SUBCLASS_CONTEXT,dir.getName()+" size: "+Double.toString(MemoryHelper.fileSizeInKB(textFile)),Toast.LENGTH_LONG).show();
-        //Read text from file
-        final StringBuilder text = new StringBuilder();
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(textFile));
-            String line;
-            while ((line = br.readLine()) != null) {
-                text.append(line);
-                text.append('\n');
-            }
-            br.close();
-        } catch (IOException e) {
-            Log.d("IOException", e.toString());
-        }
-
-        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
-        final View customView = inflater.inflate(R.layout.dialog_read_text_file, null);
-        final TextView tv_text = (TextView) customView.findViewById(R.id.tv_text);
-        tv_text.setText(text);
-
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle(filename)
-                .setView(customView)
-                .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        editTextFile(filename, textFile, text.toString(), position);
-                    }
-                })
-                .setNegativeButton("Back", null).create();
-        dialog.show();
+    private void openTextFile(int position){
+        String filename = _fileNamesList.get(position);
+        Intent intent = new Intent(SUBCLASS_CONTEXT, ReadTextFileActivity.class);
+        intent.putExtra("FILENAME",filename);
+        intent.putExtra("WORKSPACE_DIR",WORKSPACE_DIR);
+        startActivity(intent);
     }
 
-    private void editTextFile(final String filename, final File textFile, String text, final int position) {
-
-        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
-        final View customView = inflater.inflate(R.layout.dialog_edit_text_file, null);
-        final EditText et_text = (EditText) customView.findViewById(R.id.et_text);
-        et_text.setText(text);
-
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("Edit " + filename)
-                .setView(customView)
-                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        String newText = et_text.getText().toString().trim();
-                        try {
-                            if (!textFile.exists()) {
-
-                                textFile.createNewFile();
-                            }
-
-                            FileWriter fileWritter = new FileWriter(textFile, false);
-                            BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
-                            bufferWritter.write(newText);
-                            bufferWritter.close();
-                            openTextFile(position);
-//TODO VERIFY IF SAVING FILES GOES ABOVE WS QUOTA
-                            return;
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            Toast.makeText(SUBCLASS_CONTEXT, "Error saving file. Try again", Toast.LENGTH_LONG).show();
-                            editTextFile(filename, textFile, newText, position);
-                            return;
-                        }
-                    }
-                })
-                .setNegativeButton("Cancel", null).create();
-        dialog.show();
-    }
+//    private void editTextFileInDialog(final String filename, final File textFile, String text, final int position) {
+//
+//        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
+//        final View customView = inflater.inflate(R.layout.dialog_edit_text_file, null);
+//        final EditText et_text = (EditText) customView.findViewById(R.id.et_text);
+//        et_text.setText(text);
+//
+//        AlertDialog dialog = new AlertDialog.Builder(this)
+//                .setTitle("Edit " + filename)
+//                .setView(customView)
+//                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int whichButton) {
+//                        String newText = et_text.getText().toString().trim();
+//                        try {
+//                            if (!textFile.exists()) {
+//
+//                                textFile.createNewFile();
+//                            }
+//
+//                            FileWriter fileWritter = new FileWriter(textFile, false);
+//                            BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
+//                            bufferWritter.write(newText);
+//                            bufferWritter.close();
+//                            openTextFile(position);
+////TODO VERIFY IF SAVING FILES GOES ABOVE WS QUOTA
+//                            return;
+//
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                            Toast.makeText(SUBCLASS_CONTEXT, "Error saving file. Try again", Toast.LENGTH_LONG).show();
+//                            editTextFile(filename, textFile, newText, position);
+//                            return;
+//                        }
+//                    }
+//                })
+//                .setNegativeButton("Cancel", null).create();
+//        dialog.show();
+//    }
 
     @Override
     public void onResume() {

@@ -32,5 +32,6 @@
     <string name="subscribe_foreign_shared_workspace">Subscribe Shared Workspace</string>
     <string name="unsubscribe_foreign_shared_workspace">Unsubscribe Shared Workspace</string>
     <string name="hello_world">Hello World!</string>
+    <string name="title_activity_read_text_file">ReadTextFileActivity</string>
 
 </resources>

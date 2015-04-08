@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="pt.ulisboa.tecnico.cmov.airdesk">
+    package="pt.ulisboa.tecnico.cmov.airdesk" >
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,7 +19,7 @@
         <activity
             android:name=".OwnWorkspacesListActivity"
             android:label="@string/own_private_workspaces_list"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
@@ -27,7 +27,7 @@
         <activity
             android:name=".OwnPrivateWorkspacesListActivity"
             android:label="@string/own_private_workspaces_list"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
@@ -35,7 +35,7 @@
         <activity
             android:name=".OwnPublishedWorkspacesListActivity"
             android:label="@string/own_published_workspaces_list"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
@@ -43,7 +43,7 @@
         <activity
             android:name=".OwnSharedWorkspacesListActivity"
             android:label="@string/own_shared_workspaces_list"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
@@ -51,7 +51,7 @@
         <activity
             android:name=".ForeignSharedWorkspacesListActivity"
             android:label="@string/foreign_shared_workspaces_list"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
@@ -59,31 +59,35 @@
         <activity
             android:name=".ForeignSubscribedWorkspacesListActivity"
             android:label="@string/foreign_subscribed_workspaces_list"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
         </activity>
         <activity
             android:name=".OwnPrivateWorkspaceActivity"
-            android:parentActivityName=".OwnPrivateWorkspacesListActivity">
+            android:parentActivityName=".OwnPrivateWorkspacesListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.OwnPrivateWorkspacesListActivity" />
         </activity>
         <activity
             android:name=".OwnPublishedWorkspaceActivity"
-            android:parentActivityName=".OwnPublishedWorkspacesListActivity">
+            android:parentActivityName=".OwnPublishedWorkspacesListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.OwnPublishedWorkspacesListActivity" />
         </activity>
         <activity
             android:name=".OwnSharedWorkspaceActivity"
-            android:parentActivityName=".OwnSharedWorkspacesListActivity">
+            android:parentActivityName=".OwnSharedWorkspacesListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.OwnSharedWorkspacesListActivity" />
+        </activity>
+        <activity
+            android:name=".ReadTextFileActivity"
+            android:label="@string/title_activity_read_text_file" >
         </activity>
     </application>
 
