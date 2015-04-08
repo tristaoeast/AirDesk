@@ -35,7 +35,7 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
         setActivityContext(this);
         setWorkspacesList(R.string.own_published_workspaces_list);
         setWorkspaceMode("PUBLISHED");
-        _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);;
+        _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
         _editor = _prefs.edit();
         super.onCreate(savedInstanceState);
         super.setupTagsList();
@@ -46,7 +46,6 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
         _tagsAdapter.notifyDataSetChanged();
         super.onResume();
     }
-
 
 
     public void unPublishWorkspace(View view) {
@@ -67,7 +66,7 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
                         _editor.putStringSet(getString(R.string.own_published_workspaces_list), ownPublishedWs);
                         Set<String> ownPrivateWs = _prefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
                         ownPrivateWs.add(getWorkspaceName());
-                        _editor.putStringSet(getString(R.string.own_private_workspaces_list),ownPrivateWs).commit();
+                        _editor.putStringSet(getString(R.string.own_private_workspaces_list), ownPrivateWs).commit();
                         Intent intent = new Intent(OwnPublishedWorkspaceActivity.this, OwnPrivateWorkspaceActivity.class);
                         intent.putExtra("workspace_name", getWorkspaceName());
                         startActivity(intent);
@@ -79,6 +78,9 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
     }
 
     public void editTags(final View view) {
+
+        final HashSet<String> removedTagsSet = new HashSet<String>();
+        final HashSet<String> addedTagsSet = new HashSet<String>();
 
         LayoutInflater inflater = LayoutInflater.from(OwnPublishedWorkspaceActivity.this);
         final View customView = inflater.inflate(R.layout.dialog_edit_tags, null);
@@ -101,7 +103,8 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
                     Toast.makeText(OwnPublishedWorkspaceActivity.this, "Tag already exists.", Toast.LENGTH_LONG).show();
                 else {
                     _tagsList.add(tag);
-                    tagsSet.add(tag);
+//                    tagsSet.add(tag);
+                    addedTagsSet.add(tag);
                     Collections.sort(_tagsList);
                     _tagsAdapter.notifyDataSetChanged();
                     et_tags.setText("");
@@ -121,8 +124,10 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
         lv_tags.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                removedTagsSet.add(_tagsList.get(position));
                 _tagsList.remove(position);
                 _tagsAdapter.notifyDataSetChanged();
+
             }
         });
 
@@ -136,10 +141,33 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
                     editTags(view);
                     return;
                 }
-                _editor.putStringSet(getWorkspaceName() + "_tags", tagsSet).commit();
+
+
+                HashSet<String> newTagsSet = new HashSet<String>(_tagsList);
+                _prefs.edit().putStringSet(getWorkspaceName() + "_tags", newTagsSet).commit();
             }
         });
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                for (String removedTag : removedTagsSet) {
+                    _tagsList.add(removedTag);
+                    Collections.sort(_tagsList);
+                    _tagsAdapter.notifyDataSetChanged();
+                }
+                for (String removedTag : addedTagsSet) {
+                    _tagsList.remove(removedTag);
+                    Collections.sort(_tagsList);
+                    _tagsAdapter.notifyDataSetChanged();
+                }
+
+                if (_tagsList.isEmpty()) {
+                    Toast.makeText(OwnPublishedWorkspaceActivity.this, "At least one tag must be added.", Toast.LENGTH_LONG).show();
+                    editTags(view);
+                    return;
+                }
+            }
+        });
         AlertDialog dialog = builder.create();
         dialog.show();
 

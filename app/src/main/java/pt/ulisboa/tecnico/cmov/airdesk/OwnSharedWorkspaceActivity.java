@@ -29,18 +29,18 @@ public class OwnSharedWorkspaceActivity extends OwnWorkspaceActivity {
         setActivityLayout(R.layout.activity_own_shared_workspace);
         setActivityContext(this);
         setWorkspacesList(R.string.own_shared_workspaces_list);
-        setWorkspaceMode("PUBLISHED");
-        _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);;
+        setWorkspaceMode("SHARED");
+        _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
         _editor = _prefs.edit();
         super.onCreate(savedInstanceState);
-        super.setupUsernamesList();
+        super.setupEmailsList();
 
     }
 
 
     @Override
     public void onResume() {
-        _usernamesAdapter.notifyDataSetChanged();
+        _emailsAdapter.notifyDataSetChanged();
         super.onResume();
     }
 
@@ -49,20 +49,24 @@ public class OwnSharedWorkspaceActivity extends OwnWorkspaceActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
         final View customView = inflater.inflate(R.layout.dialog_unshare_workspace, null);
         TextView tv = (TextView) customView.findViewById(R.id.tv_msg);
-        tv.setText(super.getWorkspaceName() +" will be made private.");
+        tv.setText(super.getWorkspaceName() + " will be made private.");
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Unshare " + super.getWorkspaceName() + "?")
                 .setView(customView)
                 .setPositiveButton("Unshare", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        _editor.remove(getWorkspaceName() + "_names");
+                        _editor.remove(getWorkspaceName() + "_emails");
                         Set<String> ownSharedWs = _prefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
                         ownSharedWs.remove(getWorkspaceName());
                         _editor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWs);
                         Set<String> ownPrivateWs = _prefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
                         ownPrivateWs.add(getWorkspaceName());
-                        _editor.putStringSet(getString(R.string.own_private_workspaces_list),ownPrivateWs).commit();
+                        _editor.putStringSet(getString(R.string.own_private_workspaces_list), ownPrivateWs);
+                        Set<String> foreignSharedWs = _prefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
+                        foreignSharedWs.remove(getWorkspaceName());
+                        _editor.putStringSet(getString(R.string.foreign_shared_workspaces_list), foreignSharedWs);
+                        _editor.commit();
                         Intent intent = new Intent(OwnSharedWorkspaceActivity.this, OwnPrivateWorkspaceActivity.class);
                         intent.putExtra("workspace_name", getWorkspaceName());
                         startActivity(intent);
@@ -73,68 +77,97 @@ public class OwnSharedWorkspaceActivity extends OwnWorkspaceActivity {
         dialog.show();
     }
 
-    public void editUsernames(final View view) {
+    public void editEmails(final View view) {
+
+        final HashSet<String> removedEmailsSet = new HashSet<String>();
+        final HashSet<String> addedEmailsSet = new HashSet<String>();
 
         LayoutInflater inflater = LayoutInflater.from(OwnSharedWorkspaceActivity.this);
-        final View customView = inflater.inflate(R.layout.dialog_edit_usernames, null);
+        final View customView = inflater.inflate(R.layout.dialog_edit_emails, null);
 
-        // Set usernames list and button behaviour
-        Button bt_add_username = (Button) customView.findViewById(R.id.bt_add_username);
-        final Set<String> usernamesSet = _prefs.getStringSet(getWorkspaceName() + "_usernames", new HashSet<String>());
-        final ListView lv_usernames = (ListView) customView.findViewById(R.id.lv_usernames);
-        lv_usernames.setAdapter(_usernamesAdapter);
-        _usernamesAdapter.notifyDataSetChanged();
+        // Set emails list and button behaviour
+        Button bt_add_email = (Button) customView.findViewById(R.id.bt_add_email);
+        final Set<String> emailsSet = _prefs.getStringSet(getWorkspaceName() + "_emails", new HashSet<String>());
+        final ListView lv_emails = (ListView) customView.findViewById(R.id.lv_emails);
+        lv_emails.setAdapter(_emailsAdapter);
+        _emailsAdapter.notifyDataSetChanged();
 
-        bt_add_username.setOnClickListener(new View.OnClickListener() {
+        bt_add_email.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText et_usernames = (EditText) customView.findViewById(R.id.et_usernames);
-                String username = et_usernames.getText().toString().trim();
-                if (username.isEmpty())
-                    Toast.makeText(OwnSharedWorkspaceActivity.this, "Insert a username.", Toast.LENGTH_LONG).show();
-                else if (_usernamesList.contains(username))
-                    Toast.makeText(OwnSharedWorkspaceActivity.this, "Tag already exists.", Toast.LENGTH_LONG).show();
+                EditText et_email = (EditText) customView.findViewById(R.id.et_email);
+                String email = et_email.getText().toString().trim();
+                if (email.isEmpty())
+                    Toast.makeText(OwnSharedWorkspaceActivity.this, "Insert an email.", Toast.LENGTH_LONG).show();
+                else if (_emailsList.contains(email))
+                    Toast.makeText(OwnSharedWorkspaceActivity.this, "Email already exists.", Toast.LENGTH_LONG).show();
                 else {
-                    _usernamesList.add(username);
-                    usernamesSet.add(username);
-                    Collections.sort(_usernamesList);
-                    _usernamesAdapter.notifyDataSetChanged();
-                    et_usernames.setText("");
+                    _emailsList.add(email);
+//                    emailsSet.add(email);
+                    addedEmailsSet.add(email);
+                    Collections.sort(_emailsList);
+                    _emailsAdapter.notifyDataSetChanged();
+                    et_email.setText("");
                 }
             }
         });
 
         // This is used to refresh the position of the list
-        lv_usernames.post(new Runnable() {
+        lv_emails.post(new Runnable() {
             @Override
             public void run() {
-                lv_usernames.smoothScrollToPosition(0);
+                lv_emails.smoothScrollToPosition(0);
             }
         });
 
-        // Event Listener that removes usernames when clicked
-        lv_usernames.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        // Event Listener that removes emails when clicked
+        lv_emails.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                _usernamesList.remove(position);
-                _usernamesAdapter.notifyDataSetChanged();
+                removedEmailsSet.add(_emailsList.get(position));
+                _emailsList.remove(position);
+                _emailsAdapter.notifyDataSetChanged();
+
             }
         });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Edit Usernames?");
+        builder.setTitle("Edit Emails?");
         builder.setView(customView);
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                if (_usernamesList.isEmpty()) {
-                    Toast.makeText(OwnSharedWorkspaceActivity.this, "At least one username must be added.", Toast.LENGTH_LONG).show();
-                    editUsernames(view);
+                if (_emailsList.isEmpty()) {
+                    Toast.makeText(OwnSharedWorkspaceActivity.this, "At least one email must be added.", Toast.LENGTH_LONG).show();
+                    editEmails(view);
                     return;
                 }
-                _editor.putStringSet(getWorkspaceName() + "_usernames", usernamesSet).commit();
+
+                HashSet<String> newEmailsSet = new HashSet<String>(_emailsList);
+                _prefs.edit().putStringSet(getWorkspaceName() + "_emails", newEmailsSet).commit();
             }
         });
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                for (String removedEmail : removedEmailsSet) {
+                    _emailsList.add(removedEmail);
+                    Collections.sort(_emailsList);
+                    _emailsAdapter.notifyDataSetChanged();
+                }
+
+                for (String addedEmail : addedEmailsSet) {
+                    _emailsList.remove(addedEmail);
+                    Collections.sort(_emailsList);
+                    _emailsAdapter.notifyDataSetChanged();
+                }
+
+                if (_emailsList.isEmpty()) {
+                    Toast.makeText(OwnSharedWorkspaceActivity.this, "At least one email must be added.", Toast.LENGTH_LONG).show();
+                    editEmails(view);
+                    return;
+                }
+            }
+        });
         AlertDialog dialog = builder.create();
         dialog.show();
 
