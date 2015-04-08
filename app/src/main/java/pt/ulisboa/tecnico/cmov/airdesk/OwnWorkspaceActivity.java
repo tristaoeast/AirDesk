@@ -17,9 +17,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,9 +111,9 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         _usernamesListView = (ListView) findViewById(R.id.lv_usernames);
         _usernamesListView.setAdapter(_usernamesAdapter);
         Set<String> usernames = _prefs.getStringSet(WORKSPACE_NAME + "_usernames", new HashSet<String>());
-        Log.d("WORKSPACE_NAME",WORKSPACE_NAME);
+        Log.d("WORKSPACE_NAME", WORKSPACE_NAME);
         for (String username : usernames) {
-            Log.d("OPuWS_TAG",username);
+            Log.d("OPuWS_TAG", username);
             _usernamesList.add(username);
         }
         Collections.sort(_usernamesList);
@@ -129,9 +134,86 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //TODO create new activity which presents text or image
+                openTextFile(position);
             }
         });
+    }
+
+    private void openTextFile(final int position) {
+
+        final String filename = _fileNamesList.get(position);
+        File dir = new File(_appDir, WORKSPACE_DIR);
+        final File textFile = new File(dir, filename);
+//        Toast.makeText(SUBCLASS_CONTEXT,dir.getName()+" size: "+Double.toString(MemoryHelper.fileSizeInKB(textFile)),Toast.LENGTH_LONG).show();
+        //Read text from file
+        final StringBuilder text = new StringBuilder();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(textFile));
+            String line;
+            while ((line = br.readLine()) != null) {
+                text.append(line);
+                text.append('\n');
+            }
+            br.close();
+        } catch (IOException e) {
+            Log.d("IOException", e.toString());
+        }
+
+        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
+        final View customView = inflater.inflate(R.layout.dialog_read_text_file, null);
+        final TextView tv_text = (TextView) customView.findViewById(R.id.tv_text);
+        tv_text.setText(text);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(filename)
+                .setView(customView)
+                .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        editTextFile(filename, textFile, text.toString(), position);
+                    }
+                })
+                .setNegativeButton("Back", null).create();
+        dialog.show();
+    }
+
+    private void editTextFile(final String filename, final File textFile, String text, final int position) {
+
+        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
+        final View customView = inflater.inflate(R.layout.dialog_edit_text_file, null);
+        final EditText et_text = (EditText) customView.findViewById(R.id.et_text);
+        et_text.setText(text);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Edit " + filename)
+                .setView(customView)
+                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String newText = et_text.getText().toString().trim();
+                        try {
+                            if (!textFile.exists()) {
+
+                                textFile.createNewFile();
+                            }
+
+                            FileWriter fileWritter = new FileWriter(textFile, false);
+                            BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
+                            bufferWritter.write(newText);
+                            bufferWritter.close();
+                            openTextFile(position);
+//TODO VERIFY IF SAVING FILES GOES ABOVE WS QUOTA
+                            return;
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Toast.makeText(SUBCLASS_CONTEXT, "Error saving file. Try again", Toast.LENGTH_LONG).show();
+                            editTextFile(filename, textFile, newText, position);
+                            return;
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", null).create();
+        dialog.show();
     }
 
     @Override

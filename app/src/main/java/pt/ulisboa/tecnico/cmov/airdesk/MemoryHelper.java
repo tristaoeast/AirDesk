@@ -92,4 +92,19 @@ public class MemoryHelper {
         return resultBuffer.toString();
     }
 
+    public static double fileSize(File file) {
+        return (double) file.length();
+    }
+
+    public static double fileSizeInKB(File file) {
+//        double size = (double) (fileSize(file) / 1024) + (double) (fileSize(file) % 1024);
+        double size = (double) (fileSize(file) / 1024);
+        return size;
+    }
+
+    public static double fileSizeInMB(File file) {
+        double size = (double) (fileSizeInKB(file) / 1024) + (double) (fileSizeInKB(file) % 1024);
+        return size;
+    }
+
 }
