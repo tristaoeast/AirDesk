@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/ll_filesList"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -31,28 +31,30 @@
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/abc_text_size_title_material"
                 android:layout_weight="0"
-                android:text="Uernames"/>
+                android:text="Users" />
 
-            <ListView android:id="@+id/lv_usernames"
+            <ListView
+                android:id="@+id/lv_emails"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="horizontal">
-                <Button android:id="@+id/bt_edit_usernames"
+
+                <Button
+                    android:id="@+id/bt_edit_emails"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Edit"
-                    android:onClick="editUsernames"/>
-                </LinearLayout>
-
-
-
+                    android:onClick="editEmails" />
             </LinearLayout>
+
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -14,19 +14,19 @@
         android:layout_height="wrap_content">
 
         <EditText
-            android:id="@+id/et_usernames"
+            android:id="@+id/et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Username..."
             android:layout_toLeftOf="@+id/bt_add_username" />
 
         <Button
-            android:id="@+id/bt_add_username"
+            android:id="@+id/bt_add_email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Add Username"
             android:layout_alignParentRight="true"
-            android:layout_alignBaseline="@+id/et_usernames" />
+            android:layout_alignBaseline="@+id/et_email" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -34,7 +34,7 @@
         android:layout_height="match_parent">
 
         <ListView
-            android:id="@+id/lv_usernames"
+            android:id="@+id/lv_emails"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/tv_hint"

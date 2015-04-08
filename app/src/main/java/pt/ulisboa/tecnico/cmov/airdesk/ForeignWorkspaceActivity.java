@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public abstract class OwnWorkspaceActivity extends ActionBarActivity {
+public abstract class ForeignWorkspaceActivity extends ActionBarActivity {
 
     private int SUBCLASS_ACTIVITY_LAYOUT;
 
@@ -51,9 +51,9 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
     protected ArrayList<String> _tagsList;
     protected ArrayAdapter<String> _tagsAdapter;
     protected ListView _tagsListView;
-    protected ArrayList<String> _emailsList;
-    protected ArrayAdapter<String> _emailsAdapter;
-    protected ListView _emailsListView;
+    protected ArrayList<String> _usernamesList;
+    protected ArrayAdapter<String> _usernamesAdapter;
+    protected ListView _usernamesListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +64,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         Intent intent = getIntent();
         WORKSPACE_DIR = intent.getExtras().get("workspace_name").toString();
         WORKSPACE_NAME = WORKSPACE_DIR;
-        getSupportActionBar().setTitle(WORKSPACE_NAME + " (OWNED - " + WORKSPACE_MODE + ")");
+        getSupportActionBar().setTitle(WORKSPACE_NAME + " (FOREIGN - " + WORKSPACE_MODE + ")");
         setupFilesList();
         _appDir = getApplicationContext().getFilesDir();
     }
@@ -73,13 +73,16 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         return WORKSPACE_NAME;
     }
 
+
     public String getWorkspaceDir() {
         return WORKSPACE_DIR;
     }
 
+
     public File getAppDir() {
         return _appDir;
     }
+
 
     public SharedPreferences getSharedPrefs() {
         return _prefs;
@@ -101,20 +104,20 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
     }
 
     protected void setupEmailsList() {
-        _emailsList = new ArrayList<String>();
-        _emailsAdapter = new ArrayAdapter<String>(SUBCLASS_CONTEXT, android.R.layout.simple_list_item_1, android.R.id.text1, _emailsList);
-//                LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
-//        final View customView = inflater.inflate(R.layout.activity_own_shared_workspace, null);
-        _emailsListView = (ListView) findViewById(R.id.lv_emails);
-        _emailsListView.setAdapter(_emailsAdapter);
-        Set<String> emails = _prefs.getStringSet(WORKSPACE_NAME + "_emails", new HashSet<String>());
+        _usernamesList = new ArrayList<String>();
+        _usernamesAdapter = new ArrayAdapter<String>(SUBCLASS_CONTEXT, android.R.layout.simple_list_item_1, android.R.id.text1, _usernamesList);
+//        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
+//        final View customView = inflater.inflate(R.layout.activity_own_published_workspace, null);
+        _usernamesListView = (ListView) findViewById(R.id.lv_emails);
+        _usernamesListView.setAdapter(_usernamesAdapter);
+        Set<String> usernames = _prefs.getStringSet(WORKSPACE_NAME + "_usernames", new HashSet<String>());
         Log.d("WORKSPACE_NAME", WORKSPACE_NAME);
-        for (String email : emails) {
-            Log.d("OPuWS_TAG", email);
-            _emailsList.add(email);
+        for (String username : usernames) {
+            Log.d("OPuWS_TAG", username);
+            _usernamesList.add(username);
         }
-        Collections.sort(_emailsList);
-        _emailsAdapter.notifyDataSetChanged();
+        Collections.sort(_usernamesList);
+        _usernamesAdapter.notifyDataSetChanged();
     }
 
     protected void setupFilesList() {
@@ -388,13 +391,8 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         lv_tags.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Set<String> emailsSet = _prefs.getStringSet(getWorkspaceName() + "_tags", new HashSet<String>());
-                emailsSet.remove(tagsList.get(position));
                 tagsList.remove(position);
                 tagsAdapter.notifyDataSetChanged();
-                _prefs.edit().putStringSet(getWorkspaceName() + "_tags", emailsSet).commit();
-
             }
         });
 
@@ -447,17 +445,17 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         bt_add_email.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText et_email = (EditText) customView.findViewById(R.id.et_email);
-                String email = et_email.getText().toString().trim();
+                EditText et_emails = (EditText) customView.findViewById(R.id.et_emails);
+                String email = et_emails.getText().toString().trim();
                 if (email.isEmpty())
                     Toast.makeText(SUBCLASS_CONTEXT, "Insert a email.", Toast.LENGTH_LONG).show();
                 else if (emailsList.contains(email))
                     Toast.makeText(SUBCLASS_CONTEXT, "Email already exists.", Toast.LENGTH_LONG).show();
                 else {
-                    emailsList.add(et_email.getText().toString());
+                    emailsList.add(et_emails.getText().toString());
                     Collections.sort(emailsList);
                     emailsAdapter.notifyDataSetChanged();
-                    et_email.setText("");
+                    et_emails.setText("");
                 }
             }
         });
@@ -474,11 +472,8 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         lv_emails.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Set<String> emailsSet = _prefs.getStringSet(getWorkspaceName() + "_emails", new HashSet<String>());
-                emailsSet.remove(emailsList.get(position));
                 emailsList.remove(position);
                 emailsAdapter.notifyDataSetChanged();
-                _prefs.edit().putStringSet(getWorkspaceName() + "_emails", emailsSet).commit();
             }
         });
 
