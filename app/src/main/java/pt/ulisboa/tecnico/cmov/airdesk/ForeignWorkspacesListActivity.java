@@ -118,8 +118,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
 
         updateLists();
 
-        _wsNamesAdapter.notifyDataSetChanged();
-
         _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -177,6 +175,8 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
             }
         }
         Collections.sort(_wsNamesList);
+        _wsNamesAdapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -184,7 +184,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
         super.onResume();
         getSupportActionBar().setTitle(getString(FOREIGN_WORKSPACES_LIST));
         updateLists();
-        _wsNamesAdapter.notifyDataSetChanged();
 
     }
 
