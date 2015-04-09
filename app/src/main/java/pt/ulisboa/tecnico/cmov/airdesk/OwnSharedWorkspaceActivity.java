@@ -28,7 +28,7 @@ public class OwnSharedWorkspaceActivity extends OwnWorkspaceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setActivityLayout(R.layout.activity_own_shared_workspace);
+        setActivityLayout(R.layout.activity_own_public_workspace);
         setActivityContext(this);
         setWorkspacesList(R.string.own_shared_workspaces_list);
         setWorkspaceMode("SHARED");

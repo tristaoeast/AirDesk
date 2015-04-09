@@ -31,20 +31,20 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
 
     private int SUBCLASS_ACTIVITY_LAYOUT;
 
-    private String WORKSPACE_DIR;
-    private String WORKSPACE_NAME;
-    private String WORKSPACE_MODE;
-    private Context SUBCLASS_CONTEXT;
-    private int WORKSPACES_LIST;
+    protected String WORKSPACE_DIR;
+    protected String WORKSPACE_NAME;
+    protected String WORKSPACE_MODE;
+    protected Context SUBCLASS_CONTEXT;
+    protected int WORKSPACES_LIST;
 
-    private File _appDir;
-    private SharedPreferences _appPrefs;
-    private SharedPreferences _userPrefs;
-    private SharedPreferences.Editor _appPrefsEditor;
-    private SharedPreferences.Editor _userPrefsEditor;
-    private ArrayList<String> _fileNamesList;
-    private ArrayAdapter<String> _fileNamesAdapter;
-    private ListView _listView;
+    protected File _appDir;
+    protected SharedPreferences _appPrefs;
+    protected SharedPreferences _userPrefs;
+    protected SharedPreferences.Editor _appPrefsEditor;
+    protected SharedPreferences.Editor _userPrefsEditor;
+    protected ArrayList<String> _fileNamesList;
+    protected ArrayAdapter<String> _fileNamesAdapter;
+    protected ListView _listView;
     protected ArrayList<String> _tagsList;
     protected ArrayAdapter<String> _tagsAdapter;
     protected ListView _tagsListView;
@@ -329,12 +329,13 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                         deleteRecursive(dir);
                         _userPrefsEditor.remove(WORKSPACE_NAME + "_files");
                         _userPrefsEditor.remove(WORKSPACE_NAME + "_quota");
-                        Set<String> oWs = _userPrefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
-                        oWs.remove(WORKSPACE_NAME);
-                        _userPrefsEditor.putStringSet(getString(WORKSPACES_LIST), oWs);
-                        Set<String> allWs = _userPrefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
+                        _userPrefsEditor.remove(WORKSPACE_NAME + "_invitedUsers");
+                        Set<String> ownPrivateWsList = _userPrefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
+                        ownPrivateWsList.remove(WORKSPACE_NAME);
+                        _userPrefsEditor.putStringSet(getString(WORKSPACES_LIST), ownPrivateWsList);
+                        Set<String> allWs = _userPrefs.getStringSet(getString(R.string.own_all_workspaces_list), new HashSet<String>());
                         allWs.remove(WORKSPACE_NAME);
-                        _userPrefsEditor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs).commit();
+                        _userPrefsEditor.putStringSet(getString(R.string.own_all_workspaces_list), allWs).commit();
                         Intent intent = new Intent(SUBCLASS_CONTEXT, OwnPrivateWorkspacesListActivity.class);
                         startActivity(intent);
                         finish();
@@ -353,90 +354,32 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
     }
 
     public void publishWorkspace(final View view) {
-
         LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
         final View customView = inflater.inflate(R.layout.dialog_publish_workspace, null);
-        final EditText etName = (EditText) customView.findViewById(R.id.et_file_name);
-        final String[] wsTagsTemp = new String[1];
 
-        final EditText etTagsTemp = (EditText) customView.findViewById(R.id.et_tags);
-
-        // Set tags list and button behaviour
-        final ListView lv_tags = (ListView) customView.findViewById(R.id.lv_tags);
-        final ArrayList<String> tagsList = new ArrayList<String>();
-        final ArrayAdapter<String> tagsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, tagsList);
-
-        lv_tags.setAdapter(tagsAdapter);
-        Button bt_add_tag = (Button) customView.findViewById(R.id.bt_add_tag);
-
-        bt_add_tag.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditText et_tags = (EditText) customView.findViewById(R.id.et_tags);
-                String tag = et_tags.getText().toString().trim();
-                if (tag.isEmpty())
-                    Toast.makeText(SUBCLASS_CONTEXT, "Insert a tag.", Toast.LENGTH_LONG).show();
-                else if (tagsList.contains(tag))
-                    Toast.makeText(SUBCLASS_CONTEXT, "Tag already exists.", Toast.LENGTH_LONG).show();
-                else {
-                    tagsList.add(et_tags.getText().toString());
-                    Collections.sort(tagsList);
-                    tagsAdapter.notifyDataSetChanged();
-                    et_tags.setText("");
-                }
-            }
-        });
-
-        // This is used to refresh the position of the list
-        lv_tags.post(new Runnable() {
-            @Override
-            public void run() {
-                lv_tags.smoothScrollToPosition(0);
-            }
-        });
-
-        // Event Listener that removes tags when clicked
-        lv_tags.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                Set<String> emailsSet = _userPrefs.getStringSet(getWorkspaceName() + "_tags", new HashSet<String>());
-                emailsSet.remove(tagsList.get(position));
-                tagsList.remove(position);
-                tagsAdapter.notifyDataSetChanged();
-                _userPrefs.edit().putStringSet(getWorkspaceName() + "_tags", emailsSet).commit();
-
-            }
-        });
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Publish Workspace?");
-        builder.setView(customView);
-        builder.setPositiveButton("Publish", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                if (tagsList.isEmpty()) {
-                    Toast.makeText(SUBCLASS_CONTEXT, "At least one tag must be added.", Toast.LENGTH_LONG).show();
-                    publishWorkspace(view);
-                    return;
-                }
-                HashSet<String> wsTags = new HashSet<String>(tagsList);
-                Set<String> ownPublishedWsList = _userPrefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
-                Set<String> currentWsList = _userPrefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
-                currentWsList.remove(WORKSPACE_NAME);
-                ownPublishedWsList.add(WORKSPACE_NAME);
-                _userPrefsEditor.putStringSet(getString(R.string.own_published_workspaces_list), ownPublishedWsList);
-                _userPrefsEditor.putStringSet(WORKSPACE_NAME + "_tags", wsTags);
-                _userPrefsEditor.commit();
-
-                Intent intent = new Intent(SUBCLASS_CONTEXT, OwnPublishedWorkspaceActivity.class);
-                intent.putExtra("workspace_name", WORKSPACE_NAME);
-                startActivity(intent);
-                finish();
-            }
-        });
-        builder.setNegativeButton("Cancel", null);
-        AlertDialog dialog = builder.create();
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Publish " + WORKSPACE_NAME + "?")
+                .setView(customView)
+                .setPositiveButton("Publish", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        _userPrefsEditor.putBoolean(WORKSPACE_NAME+"_private", false);
+                        Set<String> ownPrivateWsList = _userPrefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
+                        ownPrivateWsList.remove(WORKSPACE_NAME);
+                        _userPrefsEditor.putStringSet(getString(WORKSPACES_LIST), ownPrivateWsList);
+                        Set<String> ownPublicWsList = _userPrefs.getStringSet(getString(R.string.own_public_workspaces_list), new HashSet<String>());
+                        ownPublicWsList.remove(WORKSPACE_NAME);
+                        _userPrefsEditor.putStringSet(getString(R.string.own_public_workspaces_list), ownPublicWsList);
+                        _userPrefsEditor.commit();
+                        Intent intent = new Intent(SUBCLASS_CONTEXT, OwnPublicWorkspaceActivity.class);
+                        intent.putExtra("workspace_name", WORKSPACE_NAME);
+                        startActivity(intent);
+                        finish();
+                    }
+                })
+                .setNegativeButton("Cancel", null).create();
         dialog.show();
+
+
     }
 
     public void shareWorkspace(final View view) {

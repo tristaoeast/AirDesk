@@ -25,7 +25,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setupSuper(R.layout.activity_own_shared_workspaces_list,
+        setupSuper(R.layout.activity_own_public_workspaces_list,
                 R.string.own_shared_workspaces_dir,
                 R.string.own_shared_workspaces_list,
                 R.layout.dialog_new_shared_workspace,
@@ -120,7 +120,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                         _userPrefsEditor.putInt(name + "_quota", quota);
                         HashSet<String> wsEmails = new HashSet<String>(emailsList);
                         Set<String> ownSharedWs = _userPrefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
-                        Set<String> allWs = _userPrefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
+                        Set<String> allWs = _userPrefs.getStringSet(getString(R.string.own_all_workspaces_list), new HashSet<String>());
                         Set<String> foreignSharedWs = _userPrefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
                         // Verify if own workspace exists with same name
                         if (allWs.contains(name)) {
@@ -133,7 +133,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                             foreignSharedWs.add(name);
 
                             _userPrefsEditor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWs);
-                            _userPrefsEditor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
+                            _userPrefsEditor.putStringSet(getString(R.string.own_all_workspaces_list), allWs);
                             _userPrefsEditor.putStringSet(getString(R.string.foreign_shared_workspaces_list), foreignSharedWs);
                             _userPrefsEditor.putStringSet(name+"_emails",wsEmails);
                             _wsNamesList.add(name);

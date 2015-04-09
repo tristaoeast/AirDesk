@@ -1,20 +1,17 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,20 +44,21 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
     protected SharedPreferences.Editor _appPrefsEditor;
     protected SharedPreferences.Editor _userPrefsEditor;
 
-    protected int FOREIGN_WORKSPACE_LIST_LAYOUT;
-    protected int FOREIGN_WORKSPACE_DIR;
-    protected int FOREIGN_WORKSPACES_LIST;
-    protected int FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA;
-    protected ActionBarActivity SUBCLASS_LIST_ACTIVITY;
-    protected Class SUBCLASS_ACTIVITY_CLASS;
-    protected Context SUBCLASS_CONTEXT;
+//    protected int FOREIGN_WORKSPACE_LIST_LAYOUT;
+//    protected int FOREIGN_WORKSPACE_DIR;
+//    protected int FOREIGN_WORKSPACES_LIST;
+//    protected int FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA;
+//    protected ActionBarActivity SUBCLASS_LIST_ACTIVITY;
+//    protected Class SUBCLASS_ACTIVITY_CLASS;
+//    protected Context SUBCLASS_CONTEXT;
 
     protected String LOCAL_EMAIL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(FOREIGN_WORKSPACE_LIST_LAYOUT);
+        setContentView(R.layout.activity_foreign_workspaces_list);
+        this.setupSuper();
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         _appPrefsEditor = _appPrefs.edit();
         LOCAL_EMAIL = _appPrefs.getString("email", "");
@@ -68,18 +66,18 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
         _userPrefsEditor = _userPrefs.edit();
         LOCAL_EMAIL = _userPrefs.getString("email", "");
         setupWsList();
-        NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(SUBCLASS_LIST_ACTIVITY, SUBCLASS_CONTEXT);
+        NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(this, this);
         _drawerToggle = nh.setup();
     }
 
-    protected void setupSuper(int wsListLayout, int wsDir, int wsList, int wsPermissionPermissions, ActionBarActivity subClassListActivity, Class subClassActivity, Context subClassContext) {
-        FOREIGN_WORKSPACE_LIST_LAYOUT = wsListLayout;
-        FOREIGN_WORKSPACE_DIR = wsDir;
-        FOREIGN_WORKSPACES_LIST = wsList;
-        FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA = wsPermissionPermissions;
-        SUBCLASS_LIST_ACTIVITY = subClassListActivity;
-        SUBCLASS_ACTIVITY_CLASS = subClassActivity;
-        SUBCLASS_CONTEXT = subClassContext;
+    protected void setupSuper() {
+//        FOREIGN_WORKSPACE_LIST_LAYOUT = R.layout.activity_foreign_workspaces_list;
+//        FOREIGN_WORKSPACE_DIR = R.string.foreign_workspaces_dir;
+//        FOREIGN_WORKSPACES_LIST = R.string.foreign_workspaces_list;
+//        FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA = R.string.foreign_workspaces_tag_crit;
+//        SUBCLASS_LIST_ACTIVITY = this;
+//        SUBCLASS_ACTIVITY_CLASS = ForeignWorkspacesListActivity.class;
+//        SUBCLASS_CONTEXT = this;
     }
 
     // A Hack done in order to ensure the correct behaviour of the back button,
@@ -93,7 +91,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
 
     protected void setupTagsList() {
         _tagsList = new ArrayList<String>();
-        _tagsAdapter = new ArrayAdapter<String>(SUBCLASS_CONTEXT, android.R.layout.simple_list_item_1, android.R.id.text1, _tagsList);
+        _tagsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _tagsList);
 //        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
 //        final View customView = inflater.inflate(R.layout.activity_own_published_workspace, null);
         _tagsListView = (ListView) findViewById(R.id.lv_tags);
@@ -122,8 +120,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String wsName = _wsNamesList.get(position);
-                Log.d("NEW ACTIVITY", SUBCLASS_ACTIVITY_CLASS.getName());
-                Intent intent = new Intent(SUBCLASS_CONTEXT, SUBCLASS_ACTIVITY_CLASS);
+                Intent intent = new Intent(ForeignWorkspacesListActivity.this, ForeignWorkspaceActivity.class);
                 intent.putExtra("workspace_name", wsName);
                 startActivity(intent);
             }
@@ -132,48 +129,48 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
 
     protected void updateLists() {
         _wsNamesList.clear();
-        Set<String> wsNames = _userPrefs.getStringSet(getString(FOREIGN_WORKSPACES_LIST), new HashSet<String>());
+        Set<String> wsNames = _userPrefs.getStringSet(getString(R.string.foreign_workspaces_list), new HashSet<String>());
         Set<String> wsPermissions;
 
-        if (wsNames.isEmpty()) {
-            if (getString(FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA).equalsIgnoreCase("email"))
-                Toast.makeText(this, _username + ", you have no workspaces being shared with you at the moment", Toast.LENGTH_LONG).show();
-            else if (getString(FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA).equalsIgnoreCase("tag"))
-                Toast.makeText(this, _username + ", you have no subscribed workspaces at the moment", Toast.LENGTH_LONG).show();
-        }
+//        if (wsNames.isEmpty()) {
+//            if (getString(FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA).equalsIgnoreCase("email"))
+//                Toast.makeText(this, _username + ", you have no workspaces being shared with you at the moment", Toast.LENGTH_LONG).show();
+//            else if (getString(FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA).equalsIgnoreCase("tag"))
+//                Toast.makeText(this, _username + ", you have no subscribed workspaces at the moment", Toast.LENGTH_LONG).show();
+//        }
 
         //caso das foreign shared ws que verifica pelo email
-        if (getString(FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA).equalsIgnoreCase("email")) {
-            for (String wsName : wsNames) {
-                Log.d("FWLAE - WS Name", wsName);
-                wsPermissions = _userPrefs.getStringSet(wsName + "_emails", new HashSet<String>());
-                for (String wsPermission : wsPermissions) {
-                    Log.d("FWLAE - WS Permission", wsPermission);
-                    _wsPermissionsList.add(wsPermission);
-                    //verify if the logged in user is in the invitees list to choose if the ws should show up
-                    if (_email.equalsIgnoreCase(wsPermission)) {
-                        Log.d("FWLAE - email", _email);
-                        _wsNamesList.add(wsName);
-                    }
-                }
-            }
-        }
-
-        //caso das foreign subscribed ws que verificam pelas tags
-        else if (getString(FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA).equalsIgnoreCase("tag")) {
-            Log.d("FWLAT", "SOU UMA SUBSCRIPTION!!!!!");
-            wsNames = _userPrefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
-            for (String wsName : wsNames) {
-                Log.d("FWLAT - WS Name", wsName);
-                Set<String> publishedWsTags =  _userPrefs.getStringSet(wsName + "_tags", new HashSet<String>());
-                Set<String> subscribedWsTags = _userPrefs.getStringSet(getString(R.string.foreign_subscribed_workspaces)+"_tags", new HashSet<String>());
-                for(String subscribedTag : subscribedWsTags){
-                    if (publishedWsTags.contains(subscribedTag)){
-                        if(!(_wsNamesList.contains(wsName))) {
-                            _wsNamesList.add(wsName);
-                        }
-                    }
-                }
+//        if (getString(FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA).equalsIgnoreCase("email")) {
+//            for (String wsName : wsNames) {
+//                Log.d("FWLAE - WS Name", wsName);
+//                wsPermissions = _userPrefs.getStringSet(wsName + "_emails", new HashSet<String>());
+//                for (String wsPermission : wsPermissions) {
+//                    Log.d("FWLAE - WS Permission", wsPermission);
+//                    _wsPermissionsList.add(wsPermission);
+//                    verify if the logged in user is in the invitees list to choose if the ws should show up
+//                    if (_email.equalsIgnoreCase(wsPermission)) {
+//                        Log.d("FWLAE - email", _email);
+//                        _wsNamesList.add(wsName);
+//                    }
+//                }
+//            }
+//        }
+//
+//        caso das foreign subscribed ws que verificam pelas tags
+//        else if (getString(FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA).equalsIgnoreCase("tag")) {
+//            Log.d("FWLAT", "SOU UMA SUBSCRIPTION!!!!!");
+//            wsNames = _userPrefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
+//            for (String wsName : wsNames) {
+//                Log.d("FWLAT - WS Name", wsName);
+//                Set<String> publishedWsTags =  _userPrefs.getStringSet(wsName + "_tags", new HashSet<String>());
+//                Set<String> subscribedWsTags = _userPrefs.getStringSet(getString(R.string.foreign_subscribed_workspaces)+"_tags", new HashSet<String>());
+//                for(String subscribedTag : subscribedWsTags){
+//                    if (publishedWsTags.contains(subscribedTag)){
+//                        if(!(_wsNamesList.contains(wsName))) {
+//                            _wsNamesList.add(wsName);
+//                        }
+//                    }
+//                }
 //                wsPermissions = _userPrefs.getStringSet(wsName + "_tags", new HashSet<String>());
 //                for (String wsPermission : wsPermissions) {
 //                    Toast.makeText(this, "wsName: "+wsName+"tags: "+wsPermission, Toast.LENGTH_LONG).show();
@@ -184,17 +181,17 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
 //                        _wsNamesList.add(wsName);
 //                    }*/
 //                }
-            }
-        }
-        Collections.sort(_wsNamesList);
-        _wsNamesAdapter.notifyDataSetChanged();
+//            }
+//        }
+//        Collections.sort(_wsNamesList);
+//        _wsNamesAdapter.notifyDataSetChanged();
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getSupportActionBar().setTitle(getString(FOREIGN_WORKSPACES_LIST));
+        getSupportActionBar().setTitle(getString(R.string.foreign_workspaces_list));
         updateLists();
 
     }

@@ -6,18 +6,20 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".OwnPublishedWorkspaceActivity">
+    tools:context="pt.ulisboa.tecnico.cmov.airdesk.OwnPublicWorkspaceActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:layout_above="@+id/ll_bt_row1">
+        android:id="@+id/ll_main"
+        android:layout_above="@+id/ll_bt">
 
         <ListView
             android:id="@+id/lv_filesList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_above="@+id/ll_filesList"
             android:layout_weight="1" />
 
         <LinearLayout
@@ -26,49 +28,67 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-
-            <TextView android:id="@+id/tv_tags_title"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/abc_text_size_title_material"
-                android:text="@string/tv_tags_title" />
+                android:text="Users" />
 
             <ListView
-                android:id="@+id/lv_tags"
+                android:id="@+id/lv_emails"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                />
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/bt_edit_emails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Edit"
+                android:onClick="editEmails" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:orientation="horizontal">
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/abc_text_size_title_material"
+                    android:text="Tags" />
+
+                <ListView
+                    android:id="@+id/lv_tags"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
 
                 <Button
                     android:id="@+id/bt_edit_tags"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/bt_edit_tags"
+                    android:text="Edit"
                     android:onClick="editTags" />
             </LinearLayout>
+
+
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ll_bt_row1"
+        android:id="@+id/ll_bt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_above="@+id/ll_bt_row2">
+        android:layout_alignParentBottom="true">
 
         <Button
             android:id="@+id/bt_new_file"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/bt_new_file"
+            android:text="New File"
             android:layout_weight="1"
             android:onClick="newFile" />
 
@@ -76,32 +96,18 @@
             android:id="@+id/bt_delete_ws"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/bt_delete_ws"
+            android:text="Delete"
             android:layout_weight="1"
             android:onClick="deleteWorkspace" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_bt_row2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true">
 
         <Button
             android:id="@+id/bt_unpublish_ws"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/bt_unpublish_ws"
+            android:text="UnPublish"
             android:layout_weight="1"
             android:onClick="unPublishWorkspace" />
 
-        <Button
-            android:id="@+id/bt_share_ws"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/bt_share_ws"
-            android:layout_weight="1"
-            android:onClick="shareWorkspace" />
     </LinearLayout>
+
 </RelativeLayout>

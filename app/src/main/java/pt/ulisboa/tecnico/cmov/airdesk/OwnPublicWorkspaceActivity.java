@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
+public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
 
     private SharedPreferences _appPrefs;
     private SharedPreferences _userPrefs;
@@ -36,7 +36,7 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
         setActivityLayout(R.layout.activity_own_public_workspace);
         setActivityContext(this);
         setWorkspacesList(R.string.own_published_workspaces_list);
-        setWorkspaceMode("PUBLISHED");
+        setWorkspaceMode("PUBLIC");
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         _appPrefsEditor = _appPrefs.edit();
         LOCAL_EMAIL = _appPrefs.getString("email", "");
@@ -72,7 +72,7 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
                         Set<String> ownPrivateWs = _userPrefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
                         ownPrivateWs.add(getWorkspaceName());
                         _userPrefsEditor.putStringSet(getString(R.string.own_private_workspaces_list), ownPrivateWs).commit();
-                        Intent intent = new Intent(OwnPublishedWorkspaceActivity.this, OwnPrivateWorkspaceActivity.class);
+                        Intent intent = new Intent(OwnPublicWorkspaceActivity.this, OwnPrivateWorkspaceActivity.class);
                         intent.putExtra("workspace_name", getWorkspaceName());
                         startActivity(intent);
                         finish();
@@ -87,7 +87,7 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
         final HashSet<String> removedTagsSet = new HashSet<String>();
         final HashSet<String> addedTagsSet = new HashSet<String>();
 
-        LayoutInflater inflater = LayoutInflater.from(OwnPublishedWorkspaceActivity.this);
+        LayoutInflater inflater = LayoutInflater.from(OwnPublicWorkspaceActivity.this);
         final View customView = inflater.inflate(R.layout.dialog_edit_tags, null);
 
         // Set tags list and button behaviour
@@ -103,9 +103,9 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
                 EditText et_tags = (EditText) customView.findViewById(R.id.et_tags);
                 String tag = et_tags.getText().toString().trim();
                 if (tag.isEmpty())
-                    Toast.makeText(OwnPublishedWorkspaceActivity.this, "Insert a tag.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(OwnPublicWorkspaceActivity.this, "Insert a tag.", Toast.LENGTH_LONG).show();
                 else if (_tagsList.contains(tag))
-                    Toast.makeText(OwnPublishedWorkspaceActivity.this, "Tag already exists.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(OwnPublicWorkspaceActivity.this, "Tag already exists.", Toast.LENGTH_LONG).show();
                 else {
                     _tagsList.add(tag);
 //                    tagsSet.add(tag);
@@ -142,7 +142,7 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 if (_tagsList.isEmpty()) {
-                    Toast.makeText(OwnPublishedWorkspaceActivity.this, "At least one tag must be added.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(OwnPublicWorkspaceActivity.this, "At least one tag must be added.", Toast.LENGTH_LONG).show();
                     editTags(view);
                     return;
                 }
@@ -167,7 +167,7 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
                 }
 
                 if (_tagsList.isEmpty()) {
-                    Toast.makeText(OwnPublishedWorkspaceActivity.this, "At least one tag must be added.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(OwnPublicWorkspaceActivity.this, "At least one tag must be added.", Toast.LENGTH_LONG).show();
                     editTags(view);
                     return;
                 }

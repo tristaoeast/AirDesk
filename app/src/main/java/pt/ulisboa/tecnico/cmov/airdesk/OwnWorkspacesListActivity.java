@@ -208,7 +208,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
                         String name = wsName[0];
                         _userPrefsEditor.putInt(name + "_quota", quota);
                         Set<String> ownWs = _userPrefs.getStringSet(getString(OWN_WORKSPACES_LIST), new HashSet<String>());
-                        Set<String> allWs = _userPrefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
+                        Set<String> allWs = _userPrefs.getStringSet(getString(R.string.own_all_workspaces_list), new HashSet<String>());
                         // Verify if own workspace exists with same name
                         if (allWs.contains(name)) {
                             Toast.makeText(SUBCLASS_CONTEXT, "Owned workspace with same name already exists. Choose different name", Toast.LENGTH_LONG).show();
@@ -218,7 +218,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
                             ownWs.add(name);
                             allWs.add(name);
                             _userPrefsEditor.putStringSet(getString(OWN_WORKSPACES_LIST), ownWs);
-                            _userPrefsEditor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
+                            _userPrefsEditor.putStringSet(getString(R.string.own_all_workspaces_list), allWs);
                             _wsNamesList.add(name);
                             Collections.sort(_wsNamesList);
                             _wsNamesAdapter.notifyDataSetChanged();

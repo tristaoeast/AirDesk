@@ -92,15 +92,11 @@ public class NavigationDrawerSetupHelper {
                     if (0 == childPosition) {
                         intent = new Intent(_currentActivityContext, OwnPrivateWorkspacesListActivity.class);
                     } else if (1 == childPosition) {
-                        intent = new Intent(_currentActivityContext, OwnSharedWorkspacesListActivity.class);
-                    } else if (2 == childPosition) {
-                        intent = new Intent(_currentActivityContext, OwnPublishedWorkspacesListActivity.class);
+                        intent = new Intent(_currentActivityContext, OwnPublicWorkspacesListActivity.class);
                     }
                 } else if (1 == groupPosition) {
                     if (0 == childPosition) {
-                        intent = new Intent(_currentActivityContext, ForeignSharedWorkspacesListActivity.class);
-                    } else if (1 == childPosition) {
-                        intent = new Intent(_currentActivityContext, ForeignSubscribedWorkspacesListActivity.class);
+                        intent = new Intent(_currentActivityContext, ForeignWorkspacesListActivity.class);
                     }
                 }
                 _currentActivity.startActivity(intent);
@@ -123,13 +119,12 @@ public class NavigationDrawerSetupHelper {
         // Adding child data
         _ows = new ArrayList<String>();
         _ows.add("Private");
-        _ows.add("Shared");
-        _ows.add("Published");
+        _ows.add("Public");
 //        _ows.add("All");
 
         _fws = new ArrayList<String>();
-        _fws.add("Shared");
-        _fws.add("Subscribed");
+        _fws.add("Foreign");
+
 //        _fws.add("All");
 
         _mapChildTitles.put(_listGroupTitles.get(0), _ows); // Header, Child data

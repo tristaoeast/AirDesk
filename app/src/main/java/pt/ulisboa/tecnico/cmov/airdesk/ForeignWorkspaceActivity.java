@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public abstract class ForeignWorkspaceActivity extends ActionBarActivity {
+public class ForeignWorkspaceActivity extends ActionBarActivity {
 
     private int SUBCLASS_ACTIVITY_LAYOUT;
 

@@ -25,7 +25,7 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setupSuper(R.layout.activity_own_published_workspaces_list,
+        setupSuper(R.layout.activity_own_public_workspaces_list,
                 R.string.own_published_workspaces_dir,
                 R.string.own_published_workspaces_list,
                 R.layout.dialog_new_published_workspace,
@@ -121,7 +121,7 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
                 _userPrefs.edit().putInt(name + "_quota", quota).commit();
                 HashSet<String> wsTags = new HashSet<String>(tagsList);
                 Set<String> ownPublishedWs = _userPrefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
-                Set<String> allWs = _userPrefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
+                Set<String> allWs = _userPrefs.getStringSet(getString(R.string.own_all_workspaces_list), new HashSet<String>());
 
                 // Verify if own workspace exists with same name
                 if (allWs.contains(name)) {
@@ -132,7 +132,7 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
                     ownPublishedWs.add(name);
                     allWs.add(name);
                     _userPrefsEditor.putStringSet(getString(R.string.own_published_workspaces_list), ownPublishedWs);
-                    _userPrefsEditor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
+                    _userPrefsEditor.putStringSet(getString(R.string.own_all_workspaces_list), allWs);
                     _userPrefsEditor.putStringSet(name + "_tags", wsTags);
                     _wsNamesList.add(name);
                     _wsNamesAdapter.notifyDataSetChanged();

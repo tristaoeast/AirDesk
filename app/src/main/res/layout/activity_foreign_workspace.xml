@@ -22,41 +22,6 @@
             android:layout_above="@+id/ll_filesList"
             android:layout_weight="1" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/abc_text_size_title_material"
-                android:text="Users" />
-
-            <ListView
-                android:id="@+id/lv_emails"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/bt_edit_emails"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Edit"
-                    android:onClick="editEmails" />
-            </LinearLayout>
-
-
-        </LinearLayout>
-
     </LinearLayout>
 
     <LinearLayout
@@ -74,23 +39,14 @@
             android:layout_weight="1"
             android:onClick="newFile" />
 
-        <Button
-            android:id="@+id/bt_delete_ws"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Delete"
-            android:layout_weight="1"
-            android:onClick="deleteWorkspace" />
-
 
         <Button
-            android:id="@+id/bt_publish_ws"
+            android:id="@+id/bt_leave_ws"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Publish"
+            android:text="Leave Workspace"
             android:layout_weight="1"
-            android:onClick="publishWorkspace" />
-
+            android:onClick="leaveWorkspace" />
 
     </LinearLayout>
 </RelativeLayout>
