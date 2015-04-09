@@ -136,6 +136,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity{
             for (String wsName : wsNames) {
                 wsPermissions = _prefs.getStringSet(wsName + "_tags", new HashSet<String>());
                 for (String wsPermission : wsPermissions) {
+                    Toast.makeText(this, "wsName: "+wsName+"tags: "+wsPermission, Toast.LENGTH_LONG).show();
                     _wsPermissionsList.add(wsPermission);
                     //verify if the logged in user is in the invitees list to choose if the ws should show up
                     //TODO: cycle that goes and matches the ws_tags with the users_tags
