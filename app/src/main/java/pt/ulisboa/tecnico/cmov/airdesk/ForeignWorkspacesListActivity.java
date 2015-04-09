@@ -196,11 +196,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity{
         return super.onOptionsItemSelected(item);
     }
 
-    public void newForeignWorkspace(final View view) {
-
-        //TODO: implement this
-    }
-
 
     @Override
     protected void onPause() {
