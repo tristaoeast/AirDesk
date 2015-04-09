@@ -167,8 +167,11 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
                 Set<String> publishedWsTags =  _userPrefs.getStringSet(wsName + "_tags", new HashSet<String>());
                 Set<String> subscribedWsTags = _userPrefs.getStringSet(getString(R.string.foreign_subscribed_workspaces)+"_tags", new HashSet<String>());
                 for(String subscribedTag : subscribedWsTags){
-                    if (publishedWsTags.contains(subscribedTag))
-                        _wsNamesList.add(wsName);
+                    if (publishedWsTags.contains(subscribedTag)){
+                        if(!(_wsNamesList.contains(wsName))) {
+                            _wsNamesList.add(wsName);
+                        }
+                    }
                 }
 //                wsPermissions = _userPrefs.getStringSet(wsName + "_tags", new HashSet<String>());
 //                for (String wsPermission : wsPermissions) {
