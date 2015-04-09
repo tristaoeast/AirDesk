@@ -122,6 +122,7 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
                 HashSet<String> wsTags = new HashSet<String>(tagsList);
                 Set<String> ownPublishedWs = _userPrefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
                 Set<String> allWs = _userPrefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
+
                 // Verify if own workspace exists with same name
                 if (allWs.contains(name)) {
                     Toast.makeText(OwnPublishedWorkspacesListActivity.this, "Owned workspace with same name already exists. Choose different name", Toast.LENGTH_LONG).show();

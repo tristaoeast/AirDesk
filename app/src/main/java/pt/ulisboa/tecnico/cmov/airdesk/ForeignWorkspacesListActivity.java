@@ -116,7 +116,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
         _listView = (ListView) findViewById(R.id.lv_wsList);
         _listView.setAdapter(_wsNamesAdapter);
 
-        updateLists();
+//        updateLists();
 
         _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -160,18 +160,26 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
 
         //caso das foreign subscribed ws que verificam pelas tags
         else if (getString(FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA).equalsIgnoreCase("tag")) {
+            Log.d("FWLAT", "SOU UMA SUBSCRIPTION!!!!!");
+            wsNames = _userPrefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
             for (String wsName : wsNames) {
                 Log.d("FWLAT - WS Name", wsName);
-                wsPermissions = _userPrefs.getStringSet(wsName + "_tags", new HashSet<String>());
-                for (String wsPermission : wsPermissions) {
-                    Toast.makeText(this, "wsName: "+wsName+"tags: "+wsPermission, Toast.LENGTH_LONG).show();
-                    _wsPermissionsList.add(wsPermission);
-                    //verify if the logged in user is in the invitees list to choose if the ws should show up
-                    //TODO: cycle that goes and matches the ws_tags with the users_tags
-                    /*if (_tag.equalsIgnoreCase(wsPermission)) {
+                Set<String> publishedWsTags =  _userPrefs.getStringSet(wsName + "_tags", new HashSet<String>());
+                Set<String> subscribedWsTags = _userPrefs.getStringSet(getString(R.string.foreign_subscribed_workspaces)+"_tags", new HashSet<String>());
+                for(String subscribedTag : subscribedWsTags){
+                    if (publishedWsTags.contains(subscribedTag))
                         _wsNamesList.add(wsName);
-                    }*/
                 }
+//                wsPermissions = _userPrefs.getStringSet(wsName + "_tags", new HashSet<String>());
+//                for (String wsPermission : wsPermissions) {
+//                    Toast.makeText(this, "wsName: "+wsName+"tags: "+wsPermission, Toast.LENGTH_LONG).show();
+//                    _wsPermissionsList.add(wsPermission);
+//                    //verify if the logged in user is in the invitees list to choose if the ws should show up
+//                    //TODO: cycle that goes and matches the ws_tags with the users_tags
+//                    /*if (_tag.equalsIgnoreCase(wsPermission)) {
+//                        _wsNamesList.add(wsName);
+//                    }*/
+//                }
             }
         }
         Collections.sort(_wsNamesList);
