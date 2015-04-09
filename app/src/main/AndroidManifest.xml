@@ -86,6 +86,20 @@
                 android:value="pt.ulisboa.tecnico.cmov.airdesk.OwnSharedWorkspacesListActivity" />
         </activity>
         <activity
+            android:name=".ForeignSubscribedWorkspaceActivity"
+            android:parentActivityName=".OwnSharedWorkspacesListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="pt.ulisboa.tecnico.cmov.airdesk.ForeignSubscribedWorkspacesListActivity" />
+        </activity>
+        <activity
+            android:name=".ForeignSharedWorkspaceActivity"
+            android:parentActivityName=".OwnSharedWorkspacesListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="pt.ulisboa.tecnico.cmov.airdesk.ForeignSharedWorkspacesListActivity" />
+        </activity>
+        <activity
             android:name=".ReadTextFileActivity"
             android:label="@string/title_activity_read_text_file"></activity>
     </application>

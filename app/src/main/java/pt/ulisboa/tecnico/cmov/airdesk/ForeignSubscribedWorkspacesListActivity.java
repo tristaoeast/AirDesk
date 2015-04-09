@@ -22,8 +22,6 @@ import java.util.Set;
  */
 public class ForeignSubscribedWorkspacesListActivity extends ForeignWorkspacesListActivity {
 
-
-
     private SharedPreferences _prefs;
     private SharedPreferences.Editor _editor;
     private String _email;

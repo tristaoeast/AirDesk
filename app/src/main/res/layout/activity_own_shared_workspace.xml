@@ -30,7 +30,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/abc_text_size_title_material"
-                android:layout_weight="0"
                 android:text="Users" />
 
             <ListView

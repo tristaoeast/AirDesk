@@ -122,6 +122,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String wsName = _wsNamesList.get(position);
+                Log.d("NEW ACTIVITY", SUBCLASS_ACTIVITY_CLASS.getName());
                 Intent intent = new Intent(SUBCLASS_CONTEXT, SUBCLASS_ACTIVITY_CLASS);
                 intent.putExtra("workspace_name", wsName);
                 startActivity(intent);
