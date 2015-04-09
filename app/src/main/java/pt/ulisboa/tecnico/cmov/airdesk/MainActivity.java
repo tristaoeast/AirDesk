@@ -15,13 +15,17 @@ import android.widget.Toast;
 public class MainActivity extends ActionBarActivity {
 
     SharedPreferences _prefs = null;
+    SharedPreferences _loginPrefs = null;
+
+    private String LOCAL_USERNAME;
+    private String LOCAL_EMAIL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
+        _prefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
 
         final EditText et_user = (EditText) findViewById(R.id.et_username);
         final EditText et_email = (EditText) findViewById(R.id.et_email);
@@ -38,7 +42,6 @@ public class MainActivity extends ActionBarActivity {
                 return false;
             }
         });
-
 
         et_email.setOnKeyListener(new EditText.OnKeyListener() {
             @Override

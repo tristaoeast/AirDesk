@@ -21,8 +21,10 @@ import java.util.Set;
 
 public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
 
-    private SharedPreferences _prefs;
-    private SharedPreferences.Editor _editor;
+    private SharedPreferences _appPrefs;
+    private SharedPreferences _userPrefs;
+    private SharedPreferences.Editor _appPrefsEditor;
+    private SharedPreferences.Editor _userPrefsEditor;
 
 //    private ArrayList<String> _tagsList;
 //    private ArrayAdapter<String> _tagsAdapter;
@@ -35,8 +37,11 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
         setActivityContext(this);
         setWorkspacesList(R.string.own_published_workspaces_list);
         setWorkspaceMode("PUBLISHED");
-        _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
-        _editor = _prefs.edit();
+        _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
+        _appPrefsEditor = _appPrefs.edit();
+        LOCAL_EMAIL = _appPrefs.getString("email", "");
+        _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
+        _userPrefsEditor = _userPrefs.edit();
         super.onCreate(savedInstanceState);
         super.setupTagsList();
     }
@@ -60,13 +65,13 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
                 .setView(customView)
                 .setPositiveButton("Unpublish", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        _editor.remove(getWorkspaceName() + "_tags");
-                        Set<String> ownPublishedWs = _prefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
+                        _userPrefsEditor.remove(getWorkspaceName() + "_tags");
+                        Set<String> ownPublishedWs = _userPrefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
                         ownPublishedWs.remove(getWorkspaceName());
-                        _editor.putStringSet(getString(R.string.own_published_workspaces_list), ownPublishedWs);
-                        Set<String> ownPrivateWs = _prefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
+                        _userPrefsEditor.putStringSet(getString(R.string.own_published_workspaces_list), ownPublishedWs);
+                        Set<String> ownPrivateWs = _userPrefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
                         ownPrivateWs.add(getWorkspaceName());
-                        _editor.putStringSet(getString(R.string.own_private_workspaces_list), ownPrivateWs).commit();
+                        _userPrefsEditor.putStringSet(getString(R.string.own_private_workspaces_list), ownPrivateWs).commit();
                         Intent intent = new Intent(OwnPublishedWorkspaceActivity.this, OwnPrivateWorkspaceActivity.class);
                         intent.putExtra("workspace_name", getWorkspaceName());
                         startActivity(intent);
@@ -87,7 +92,7 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
 
         // Set tags list and button behaviour
         Button bt_add_tag = (Button) customView.findViewById(R.id.bt_add_tag);
-        final Set<String> tagsSet = _prefs.getStringSet(getWorkspaceName() + "_tags", new HashSet<String>());
+        final Set<String> tagsSet = _userPrefs.getStringSet(getWorkspaceName() + "_tags", new HashSet<String>());
         final ListView lv_tags = (ListView) customView.findViewById(R.id.lv_tags);
         lv_tags.setAdapter(_tagsAdapter);
         _tagsAdapter.notifyDataSetChanged();
@@ -144,7 +149,7 @@ public class OwnPublishedWorkspaceActivity extends OwnWorkspaceActivity {
 
 
                 HashSet<String> newTagsSet = new HashSet<String>(_tagsList);
-                _prefs.edit().putStringSet(getWorkspaceName() + "_tags", newTagsSet).commit();
+                _userPrefs.edit().putStringSet(getWorkspaceName() + "_tags", newTagsSet).commit();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

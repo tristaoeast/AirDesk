@@ -8,9 +8,7 @@ import android.os.Bundle;
  */
 public class ForeignSharedWorkspacesListActivity extends ForeignWorkspacesListActivity {
 
-
-    private SharedPreferences _prefs;
-
+    private SharedPreferences _appPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +20,8 @@ public class ForeignSharedWorkspacesListActivity extends ForeignWorkspacesListAc
                 ForeignSharedWorkspaceActivity.class,
                 this);
         super.onCreate(savedInstanceState);
+        _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
+
     }
 
     // A Hack done in order to ensure the correct behaviour of the back button,
@@ -29,7 +29,7 @@ public class ForeignSharedWorkspacesListActivity extends ForeignWorkspacesListAc
     @Override
     public void onBackPressed() {
 //        Toast.makeText(this, "Back button pressed", Toast.LENGTH_LONG).show();
-        _prefs.edit().putBoolean(getString(R.string.event_back_button_pressed), true).commit();
+        _appPrefs.edit().putBoolean(getString(R.string.event_back_button_pressed), true).commit();
         super.onBackPressed();
     }
 }

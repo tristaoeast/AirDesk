@@ -17,14 +17,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,8 +38,10 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
     private int WORKSPACES_LIST;
 
     private File _appDir;
-    private SharedPreferences _prefs;
-    private SharedPreferences.Editor _editor;
+    private SharedPreferences _appPrefs;
+    private SharedPreferences _userPrefs;
+    private SharedPreferences.Editor _appPrefsEditor;
+    private SharedPreferences.Editor _userPrefsEditor;
     private ArrayList<String> _fileNamesList;
     private ArrayAdapter<String> _fileNamesAdapter;
     private ListView _listView;
@@ -55,12 +52,18 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
     protected ArrayAdapter<String> _emailsAdapter;
     protected ListView _emailsListView;
 
+    protected String LOCAL_EMAIL;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(SUBCLASS_ACTIVITY_LAYOUT);
-        _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
-        _editor = _prefs.edit();
+        _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
+        _appPrefsEditor = _appPrefs.edit();
+        LOCAL_EMAIL = _appPrefs.getString("email", "");
+        Log.d("WS_ACTIVITY_EMAIL", LOCAL_EMAIL);
+        _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
+        _userPrefsEditor = _userPrefs.edit();
         Intent intent = getIntent();
         WORKSPACE_DIR = intent.getExtras().get("workspace_name").toString();
         WORKSPACE_NAME = WORKSPACE_DIR;
@@ -82,7 +85,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
     }
 
     public SharedPreferences getSharedPrefs() {
-        return _prefs;
+        return _userPrefs;
     }
 
     protected void setupTagsList() {
@@ -92,7 +95,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
 //        final View customView = inflater.inflate(R.layout.activity_own_published_workspace, null);
         _tagsListView = (ListView) findViewById(R.id.lv_tags);
         _tagsListView.setAdapter(_tagsAdapter);
-        Set<String> tags = _prefs.getStringSet(WORKSPACE_NAME + "_tags", new HashSet<String>());
+        Set<String> tags = _userPrefs.getStringSet(WORKSPACE_NAME + "_tags", new HashSet<String>());
         for (String tag : tags) {
             _tagsList.add(tag);
         }
@@ -107,7 +110,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
 //        final View customView = inflater.inflate(R.layout.activity_own_shared_workspace, null);
         _emailsListView = (ListView) findViewById(R.id.lv_emails);
         _emailsListView.setAdapter(_emailsAdapter);
-        Set<String> emails = _prefs.getStringSet(WORKSPACE_NAME + "_emails", new HashSet<String>());
+        Set<String> emails = _userPrefs.getStringSet(WORKSPACE_NAME + "_emails", new HashSet<String>());
 //        Log.d("WORKSPACE_NAME", WORKSPACE_NAME);
         for (String email : emails) {
 //            Log.d("OPuWS_TAG", email);
@@ -122,7 +125,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         _fileNamesAdapter = new ArrayAdapter<String>(SUBCLASS_CONTEXT, android.R.layout.simple_list_item_1, android.R.id.text1, _fileNamesList);
         _listView = (ListView) findViewById(R.id.lv_filesList);
         _listView.setAdapter(_fileNamesAdapter);
-        Set<String> fileNames = _prefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
+        Set<String> fileNames = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
         for (String fileName : fileNames) {
             _fileNamesList.add(fileName);
         }
@@ -174,11 +177,11 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
 //        dialog.show();
 //    }
 
-    private void openTextFile(int position){
+    private void openTextFile(int position) {
         String filename = _fileNamesList.get(position);
         Intent intent = new Intent(SUBCLASS_CONTEXT, ReadTextFileActivity.class);
-        intent.putExtra("FILENAME",filename);
-        intent.putExtra("WORKSPACE_DIR",WORKSPACE_DIR);
+        intent.putExtra("FILENAME", filename);
+        intent.putExtra("WORKSPACE_DIR", WORKSPACE_DIR);
         startActivity(intent);
     }
 
@@ -279,7 +282,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         fName[0] = etName.getText().toString();
                         String filename = fName[0] + ".txt";
-                        Set<String> wsFiles = _prefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
+                        Set<String> wsFiles = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
                         if (wsFiles.contains(filename)) {
                             Toast.makeText(SUBCLASS_CONTEXT, "File with that name already exists.", Toast.LENGTH_LONG).show();
                             newFile(view);
@@ -303,7 +306,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                         Collections.sort(_fileNamesList);
                         _fileNamesAdapter.notifyDataSetChanged();
                         wsFiles.add(filename);
-                        _editor.putStringSet(WORKSPACE_NAME + "_files", wsFiles).commit();
+                        _userPrefsEditor.putStringSet(WORKSPACE_NAME + "_files", wsFiles).commit();
                         Toast.makeText(SUBCLASS_CONTEXT, "Empty File " + filename + " created.", Toast.LENGTH_LONG).show();
                     }
                 })
@@ -324,14 +327,14 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         File dir = new File(_appDir, WORKSPACE_DIR);
                         deleteRecursive(dir);
-                        _editor.remove(WORKSPACE_NAME + "_files");
-                        _editor.remove(WORKSPACE_NAME + "_quota");
-                        Set<String> oWs = _prefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
+                        _userPrefsEditor.remove(WORKSPACE_NAME + "_files");
+                        _userPrefsEditor.remove(WORKSPACE_NAME + "_quota");
+                        Set<String> oWs = _userPrefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
                         oWs.remove(WORKSPACE_NAME);
-                        _editor.putStringSet(getString(WORKSPACES_LIST), oWs);
-                        Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
+                        _userPrefsEditor.putStringSet(getString(WORKSPACES_LIST), oWs);
+                        Set<String> allWs = _userPrefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                         allWs.remove(WORKSPACE_NAME);
-                        _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs).commit();
+                        _userPrefsEditor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs).commit();
                         Intent intent = new Intent(SUBCLASS_CONTEXT, OwnPrivateWorkspacesListActivity.class);
                         startActivity(intent);
                         finish();
@@ -397,11 +400,11 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Set<String> emailsSet = _prefs.getStringSet(getWorkspaceName() + "_tags", new HashSet<String>());
+                Set<String> emailsSet = _userPrefs.getStringSet(getWorkspaceName() + "_tags", new HashSet<String>());
                 emailsSet.remove(tagsList.get(position));
                 tagsList.remove(position);
                 tagsAdapter.notifyDataSetChanged();
-                _prefs.edit().putStringSet(getWorkspaceName() + "_tags", emailsSet).commit();
+                _userPrefs.edit().putStringSet(getWorkspaceName() + "_tags", emailsSet).commit();
 
             }
         });
@@ -417,13 +420,13 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                     return;
                 }
                 HashSet<String> wsTags = new HashSet<String>(tagsList);
-                Set<String> ownPublishedWsList = _prefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
-                Set<String> currentWsList = _prefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
+                Set<String> ownPublishedWsList = _userPrefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
+                Set<String> currentWsList = _userPrefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
                 currentWsList.remove(WORKSPACE_NAME);
                 ownPublishedWsList.add(WORKSPACE_NAME);
-                _editor.putStringSet(getString(R.string.own_published_workspaces_list), ownPublishedWsList);
-                _editor.putStringSet(WORKSPACE_NAME + "_tags", wsTags);
-                _editor.commit();
+                _userPrefsEditor.putStringSet(getString(R.string.own_published_workspaces_list), ownPublishedWsList);
+                _userPrefsEditor.putStringSet(WORKSPACE_NAME + "_tags", wsTags);
+                _userPrefsEditor.commit();
 
                 Intent intent = new Intent(SUBCLASS_CONTEXT, OwnPublishedWorkspaceActivity.class);
                 intent.putExtra("workspace_name", WORKSPACE_NAME);
@@ -482,11 +485,11 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         lv_emails.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Set<String> emailsSet = _prefs.getStringSet(getWorkspaceName() + "_emails", new HashSet<String>());
+                Set<String> emailsSet = _userPrefs.getStringSet(getWorkspaceName() + "_emails", new HashSet<String>());
                 emailsSet.remove(emailsList.get(position));
                 emailsList.remove(position);
                 emailsAdapter.notifyDataSetChanged();
-                _prefs.edit().putStringSet(getWorkspaceName() + "_emails", emailsSet).commit();
+                _userPrefs.edit().putStringSet(getWorkspaceName() + "_emails", emailsSet).commit();
             }
         });
 
@@ -501,16 +504,16 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                     return;
                 }
                 HashSet<String> wsEmails = new HashSet<String>(emailsList);
-                Set<String> ownSharedWsList = _prefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
-                Set<String> currentWsList = _prefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
-                Set<String> foreignSharedWs = _prefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
+                Set<String> ownSharedWsList = _userPrefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
+                Set<String> currentWsList = _userPrefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
+                Set<String> foreignSharedWs = _userPrefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
                 currentWsList.remove(WORKSPACE_NAME);
                 ownSharedWsList.add(WORKSPACE_NAME);
                 foreignSharedWs.add(WORKSPACE_NAME);
-                _editor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWsList);
-                _editor.putStringSet(WORKSPACE_NAME + "_emails", wsEmails);
-                _editor.putStringSet(getString(R.string.foreign_shared_workspaces_list), foreignSharedWs).commit();
-                _editor.commit();
+                _userPrefsEditor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWsList);
+                _userPrefsEditor.putStringSet(WORKSPACE_NAME + "_emails", wsEmails);
+                _userPrefsEditor.putStringSet(getString(R.string.foreign_shared_workspaces_list), foreignSharedWs).commit();
+                _userPrefsEditor.commit();
                 Intent intent = new Intent(SUBCLASS_CONTEXT, OwnSharedWorkspaceActivity.class);
                 intent.putExtra("workspace_name", WORKSPACE_NAME);
                 startActivity(intent);
