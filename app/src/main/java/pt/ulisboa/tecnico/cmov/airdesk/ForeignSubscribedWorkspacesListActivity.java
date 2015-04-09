@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 
 /**
  * Created by ist167092 on 24-03-2015.
@@ -27,6 +26,7 @@ public class ForeignSubscribedWorkspacesListActivity extends ForeignWorkspacesLi
     private SharedPreferences _prefs;
     private SharedPreferences.Editor _editor;
     private String _email;
+    private ArrayList<String> tagsList = new ArrayList<String>();
 
 
     @Override
@@ -51,16 +51,12 @@ public class ForeignSubscribedWorkspacesListActivity extends ForeignWorkspacesLi
     }
 
     public void editForeignSubscribedWorkspace(final View view) {
-        _email = _prefs.getString("email", "invalid email");
-
+        //_email = _prefs.getString("email", "invalid email");
         LayoutInflater inflater = LayoutInflater.from(this);
         final View yourCustomView = inflater.inflate(R.layout.dialog_edit_subscription_tags, null);
 
-        final EditText etTagsTemp = (EditText) yourCustomView.findViewById(R.id.et_tags);
-
         // Set tags list and button behaviour
         final ListView lv_tags = (ListView) yourCustomView.findViewById(R.id.lv_tags);
-        final ArrayList<String> tagsList = new ArrayList<String>();
         final ArrayAdapter<String> tagsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, tagsList);
         lv_tags.setAdapter(tagsAdapter);
         Button bt_add_tag = (Button) yourCustomView.findViewById(R.id.bt_add_tag);
@@ -73,7 +69,7 @@ public class ForeignSubscribedWorkspacesListActivity extends ForeignWorkspacesLi
                 if(tag.isEmpty())
                     Toast.makeText(SUBCLASS_CONTEXT, "Insert tag.", Toast.LENGTH_LONG).show();
                 else if (tagsList.contains(tag))
-                    Toast.makeText(SUBCLASS_CONTEXT, "Tag already exists.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SUBCLASS_CONTEXT, "Tag already exsits.", Toast.LENGTH_LONG).show();
                 else {
                     tagsList.add(et_tags.getText().toString());
                     Collections.sort(tagsList);
@@ -97,18 +93,12 @@ public class ForeignSubscribedWorkspacesListActivity extends ForeignWorkspacesLi
                 tagsAdapter.notifyDataSetChanged();
             }
         });
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Edit subscription tags");
+        builder.setTitle("Edit Tags");
         builder.setView(yourCustomView);
-        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                if (tagsList.isEmpty()) {
-                    Toast.makeText(ForeignSubscribedWorkspacesListActivity.this, "Tag field must be filled.", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                HashSet<String> wsTags = new HashSet<String>(tagsList);
-                _editor.putStringSet(_email + "_tags", wsTags);
-                _editor.commit();
             }
         });
         builder.setNegativeButton("Cancel", null);
