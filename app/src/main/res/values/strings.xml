@@ -37,5 +37,11 @@
     <string name="title_activity_read_text_file">ReadTextFileActivity</string>
     <string name="foreign_workspaces_email_crit">email</string>
     <string name="foreign_workspaces_tag_crit">tag</string>
+    <string name="bt_share_ws">Share</string>
+    <string name="bt_unpublish_ws">UnPublish</string>
+    <string name="bt_delete_ws">Delete</string>
+    <string name="bt_new_file">New File</string>
+    <string name="bt_edit_tags">Edit</string>
+    <string name="tv_tags_title">Tags</string>
 
 </resources>

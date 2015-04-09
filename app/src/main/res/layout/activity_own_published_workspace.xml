@@ -18,7 +18,6 @@
             android:id="@+id/lv_filesList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/ll_filesList"
             android:layout_weight="1" />
 
         <LinearLayout
@@ -27,11 +26,12 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
+
             <TextView android:id="@+id/tv_tags_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/abc_text_size_title_material"
-                android:text="Tags" />
+                android:text="@string/tv_tags_title" />
 
             <ListView
                 android:id="@+id/lv_tags"
@@ -50,7 +50,7 @@
                     android:id="@+id/bt_edit_tags"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Edit"
+                    android:text="@string/bt_edit_tags"
                     android:onClick="editTags" />
             </LinearLayout>
         </LinearLayout>
@@ -68,7 +68,7 @@
             android:id="@+id/bt_new_file"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="New File"
+            android:text="@string/bt_new_file"
             android:layout_weight="1"
             android:onClick="newFile" />
 
@@ -76,7 +76,7 @@
             android:id="@+id/bt_delete_ws"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Delete"
+            android:text="@string/bt_delete_ws"
             android:layout_weight="1"
             android:onClick="deleteWorkspace" />
     </LinearLayout>
@@ -92,7 +92,7 @@
             android:id="@+id/bt_unpublish_ws"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="UnPublish"
+            android:text="@string/bt_unpublish_ws"
             android:layout_weight="1"
             android:onClick="unPublishWorkspace" />
 
@@ -100,7 +100,7 @@
             android:id="@+id/bt_share_ws"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Share"
+            android:text="@string/bt_share_ws"
             android:layout_weight="1"
             android:onClick="shareWorkspace" />
     </LinearLayout>
