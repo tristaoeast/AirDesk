@@ -17,7 +17,7 @@
     <string name="drawer_close">Close navigation drawer</string>
     <string name="own_private_workspaces_list">Own Private Workspaces</string>
     <string name="activity_main_login_button_text">LOGIN</string>
-    <string name="activity_login_shared_preferences">pt.ulisboa.tecnico.cmov.airdesk</string>
+    <string name="app_preferences">pt.ulisboa.tecnico.cmov.airdesk</string>
     <string name="event_back_button_pressed">onBackPressed</string>
     <string name="own_published_workspaces_list">Own Published Workspaces</string>
     <string name="own_shared_workspaces_list">Own Shared Workspaces</string>

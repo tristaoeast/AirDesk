@@ -118,10 +118,10 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
                     return;
                 }
                 String name = wsName[0];
-                _prefs.edit().putInt(name + "_quota", quota).commit();
+                _userPrefs.edit().putInt(name + "_quota", quota).commit();
                 HashSet<String> wsTags = new HashSet<String>(tagsList);
-                Set<String> ownPublishedWs = _prefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
-                Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
+                Set<String> ownPublishedWs = _userPrefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
+                Set<String> allWs = _userPrefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                 // Verify if own workspace exists with same name
                 if (allWs.contains(name)) {
                     Toast.makeText(OwnPublishedWorkspacesListActivity.this, "Owned workspace with same name already exists. Choose different name", Toast.LENGTH_LONG).show();
@@ -130,9 +130,9 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
                 } else {
                     ownPublishedWs.add(name);
                     allWs.add(name);
-                    _editor.putStringSet(getString(R.string.own_published_workspaces_list), ownPublishedWs);
-                    _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
-                    _editor.putStringSet(name + "_tags", wsTags);
+                    _userPrefsEditor.putStringSet(getString(R.string.own_published_workspaces_list), ownPublishedWs);
+                    _userPrefsEditor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
+                    _userPrefsEditor.putStringSet(name + "_tags", wsTags);
                     _wsNamesList.add(name);
                     _wsNamesAdapter.notifyDataSetChanged();
                     // Create the actual directory in the app's private space
@@ -142,7 +142,7 @@ public class OwnPublishedWorkspacesListActivity extends OwnWorkspacesListActivit
                         wsDir.mkdir();
                     }
                 }
-                _editor.commit();
+                _userPrefsEditor.commit();
             }
         });
         builder.setNegativeButton("Cancel", null);

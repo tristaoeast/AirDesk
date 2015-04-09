@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,9 +35,11 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     protected ArrayList<String> _wsNamesList;
     protected ArrayAdapter<String> _wsNamesAdapter;
     protected ListView _listView;
-    protected SharedPreferences _prefs;
+    protected SharedPreferences _appPrefs;
+    protected SharedPreferences _userPrefs;
     protected File _appDir;
-    protected SharedPreferences.Editor _editor;
+    protected SharedPreferences.Editor _appPrefsEditor;
+    protected SharedPreferences.Editor _userPrefsEditor;
 
     protected int OWN_WORKSPACE_LIST_LAYOUT;
     protected int OWN_WORKSPACE_DIR;
@@ -46,13 +49,18 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     protected Class SUBCLASS_ACTIVITY_CLASS;
     protected Context SUBCLASS_CONTEXT;
 
+    protected String LOCAL_EMAIL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(OWN_WORKSPACE_LIST_LAYOUT);
-        _prefs = getSharedPreferences(getString(R.string.activity_login_shared_preferences), MODE_PRIVATE);
-        _editor = _prefs.edit();
+        _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
+        _appPrefsEditor = _appPrefs.edit();
+        LOCAL_EMAIL = _appPrefs.getString("email", "");
+        Log.d("WS_LIST_ACTIVITY_EMAIL", LOCAL_EMAIL);
+        _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
+        _userPrefsEditor = _userPrefs.edit();
         setupWsList();
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(SUBCLASS_LIST_ACTIVITY, SUBCLASS_CONTEXT);
         _drawerToggle = nh.setup();
@@ -76,7 +84,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     @Override
     public void onBackPressed() {
 //        Toast.makeText(this, "Back button pressed", Toast.LENGTH_LONG).show();
-        _prefs.edit().putBoolean(getString(R.string.event_back_button_pressed), true).commit();
+        _appPrefs.edit().putBoolean(getString(R.string.event_back_button_pressed), true).commit();
         super.onBackPressed();
     }
 
@@ -88,7 +96,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         _listView.setAdapter(_wsNamesAdapter);
 //        Toast.makeText(SUBCLASS_CONTEXT, "OWN_WORKSPACES_LIST: " + getString(OWN_WORKSPACES_LIST), Toast.LENGTH_LONG).show();
 
-        Set<String> wsNames = _prefs.getStringSet(getString(OWN_WORKSPACES_LIST), new HashSet<String>());
+        Set<String> wsNames = _userPrefs.getStringSet(getString(OWN_WORKSPACES_LIST), new HashSet<String>());
         for (String wsName : wsNames) {
 //            Toast.makeText(SUBCLASS_CONTEXT, "ws Name added: " + wsName, Toast.LENGTH_LONG).show();
             _wsNamesList.add(wsName);
@@ -111,7 +119,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
         getSupportActionBar().setTitle(getString(OWN_WORKSPACES_LIST));
-        Set<String> wsNames = _prefs.getStringSet(getString(OWN_WORKSPACES_LIST), new HashSet<String>());
+        Set<String> wsNames = _userPrefs.getStringSet(getString(OWN_WORKSPACES_LIST), new HashSet<String>());
         _wsNamesList.clear();
         for (String wsName : wsNames) {
 //            Toast.makeText(SUBCLASS_CONTEXT, "ws Name added: " + wsName, Toast.LENGTH_LONG).show();
@@ -198,9 +206,9 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
                             return;
                         }
                         String name = wsName[0];
-                        _editor.putInt(name + "_quota", quota);
-                        Set<String> ownWs = _prefs.getStringSet(getString(OWN_WORKSPACES_LIST), new HashSet<String>());
-                        Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
+                        _userPrefsEditor.putInt(name + "_quota", quota);
+                        Set<String> ownWs = _userPrefs.getStringSet(getString(OWN_WORKSPACES_LIST), new HashSet<String>());
+                        Set<String> allWs = _userPrefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
                         // Verify if own workspace exists with same name
                         if (allWs.contains(name)) {
                             Toast.makeText(SUBCLASS_CONTEXT, "Owned workspace with same name already exists. Choose different name", Toast.LENGTH_LONG).show();
@@ -209,8 +217,8 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
                         } else {
                             ownWs.add(name);
                             allWs.add(name);
-                            _editor.putStringSet(getString(OWN_WORKSPACES_LIST), ownWs);
-                            _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
+                            _userPrefsEditor.putStringSet(getString(OWN_WORKSPACES_LIST), ownWs);
+                            _userPrefsEditor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
                             _wsNamesList.add(name);
                             Collections.sort(_wsNamesList);
                             _wsNamesAdapter.notifyDataSetChanged();
@@ -221,7 +229,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
                                 wsDir.mkdir();
                             }
                         }
-                        _editor.commit();
+                        _userPrefsEditor.commit();
                     }
                 })
                 .setNegativeButton("Cancel", null).create();
@@ -232,6 +240,6 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     @Override
     protected void onPause() {
         super.onStop();
-        _prefs.edit().commit();
+        _userPrefs.edit().commit();
     }
 }

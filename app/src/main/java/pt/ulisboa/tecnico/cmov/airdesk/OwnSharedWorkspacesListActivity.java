@@ -117,11 +117,11 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                             return;
                         }
                         String name = wsName[0];
-                        _editor.putInt(name + "_quota", quota);
+                        _userPrefsEditor.putInt(name + "_quota", quota);
                         HashSet<String> wsEmails = new HashSet<String>(emailsList);
-                        Set<String> ownSharedWs = _prefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
-                        Set<String> allWs = _prefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
-                        Set<String> foreignSharedWs = _prefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
+                        Set<String> ownSharedWs = _userPrefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
+                        Set<String> allWs = _userPrefs.getStringSet(getString(R.string.all_owned_workspaces_names), new HashSet<String>());
+                        Set<String> foreignSharedWs = _userPrefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
                         // Verify if own workspace exists with same name
                         if (allWs.contains(name)) {
                             Toast.makeText(OwnSharedWorkspacesListActivity.this, "Owned workspace with same name already exists. Choose different name", Toast.LENGTH_LONG).show();
@@ -132,10 +132,10 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                             allWs.add(name);
                             foreignSharedWs.add(name);
 
-                            _editor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWs);
-                            _editor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
-                            _editor.putStringSet(getString(R.string.foreign_shared_workspaces_list), foreignSharedWs);
-                            _editor.putStringSet(name+"_emails",wsEmails);
+                            _userPrefsEditor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWs);
+                            _userPrefsEditor.putStringSet(getString(R.string.all_owned_workspaces_names), allWs);
+                            _userPrefsEditor.putStringSet(getString(R.string.foreign_shared_workspaces_list), foreignSharedWs);
+                            _userPrefsEditor.putStringSet(name+"_emails",wsEmails);
                             _wsNamesList.add(name);
                             _wsNamesAdapter.notifyDataSetChanged();
                             // Create the actual directory in the app's private space
@@ -145,7 +145,7 @@ public class OwnSharedWorkspacesListActivity extends OwnWorkspacesListActivity {
                                 wsDir.mkdir();
                             }
                         }
-                        _editor.commit();
+                        _userPrefsEditor.commit();
                     }
                 })
                 .setNegativeButton("Cancel", null).create();
