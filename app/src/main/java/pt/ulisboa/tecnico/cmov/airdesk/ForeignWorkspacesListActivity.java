@@ -34,11 +34,15 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
     private ArrayAdapter<String> _wsNamesAdapter;
     private ListView _listView;
 
-    private SharedPreferences _userPrefs;
-    private SharedPreferences _appPrefs;
+    protected SharedPreferences _userPrefs;
+    protected SharedPreferences _appPrefs;
 
     private String _username;
     private String _email;
+
+    protected ArrayList<String> _tagsList;
+    protected ArrayAdapter<String> _tagsAdapter;
+    protected ListView _tagsListView;
 
     protected SharedPreferences.Editor _appPrefsEditor;
     protected SharedPreferences.Editor _userPrefsEditor;
@@ -85,6 +89,21 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
 //        Toast.makeText(this, "Back button pressed", Toast.LENGTH_LONG).show();
         _userPrefs.edit().putBoolean(getString(R.string.event_back_button_pressed), true).commit();
         super.onBackPressed();
+    }
+
+    protected void setupTagsList() {
+        _tagsList = new ArrayList<String>();
+        _tagsAdapter = new ArrayAdapter<String>(SUBCLASS_CONTEXT, android.R.layout.simple_list_item_1, android.R.id.text1, _tagsList);
+//        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
+//        final View customView = inflater.inflate(R.layout.activity_own_published_workspace, null);
+        _tagsListView = (ListView) findViewById(R.id.lv_tags);
+        _tagsListView.setAdapter(_tagsAdapter);
+        Set<String> tags = _userPrefs.getStringSet(getString(R.string.foreign_subscribed_workspaces) + "_tags", new HashSet<String>());
+        for (String tag : tags) {
+            _tagsList.add(tag);
+        }
+        Collections.sort(_tagsList);
+        _tagsAdapter.notifyDataSetChanged();
     }
 
     protected void setupWsList() {
