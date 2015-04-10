@@ -376,7 +376,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                         ownPrivateWsList.remove(WORKSPACE_NAME);
                         _userPrefsEditor.putStringSet(getString(R.string.own_private_workspaces_list), ownPrivateWsList);
                         Set<String> ownPublicWsList = _userPrefs.getStringSet(getString(R.string.own_public_workspaces_list), new HashSet<String>());
-                        ownPublicWsList.remove(WORKSPACE_NAME);
+                        ownPublicWsList.add(WORKSPACE_NAME);
                         _userPrefsEditor.putStringSet(getString(R.string.own_public_workspaces_list), ownPublicWsList);
                         _userPrefsEditor.commit();
                         Intent intent = new Intent(SUBCLASS_CONTEXT, OwnPublicWorkspaceActivity.class);
