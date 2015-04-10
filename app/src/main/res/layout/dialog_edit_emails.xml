@@ -42,7 +42,7 @@
             android:id="@+id/tv_hint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Tap the usernames to remove them."
+            android:hint="Tap the emails to remove them."
             android:layout_alignParentBottom="true" />
     </RelativeLayout>
 
