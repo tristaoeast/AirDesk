@@ -141,11 +141,11 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
         builder.setView(customView);
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                if (_tagsList.isEmpty()) {
-                    Toast.makeText(OwnPublicWorkspaceActivity.this, "At least one tag must be added.", Toast.LENGTH_LONG).show();
-                    editTags(view);
-                    return;
-                }
+//                if (_tagsList.isEmpty()) {
+//                    Toast.makeText(OwnPublicWorkspaceActivity.this, "At least one tag must be added.", Toast.LENGTH_LONG).show();
+//                    editTags(view);
+//                    return;
+//                }
 
 
                 HashSet<String> newTagsSet = new HashSet<String>(_tagsList);
@@ -166,11 +166,105 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
                     _tagsAdapter.notifyDataSetChanged();
                 }
 
-                if (_tagsList.isEmpty()) {
-                    Toast.makeText(OwnPublicWorkspaceActivity.this, "At least one tag must be added.", Toast.LENGTH_LONG).show();
-                    editTags(view);
-                    return;
+//                if (_tagsList.isEmpty()) {
+//                    Toast.makeText(OwnPublicWorkspaceActivity.this, "At least one tag must be added.", Toast.LENGTH_LONG).show();
+//                    editTags(view);
+//                    return;
+//                }
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+    }
+
+    public void editEmails(final View view) {
+        final HashSet<String> removedEmailsSet = new HashSet<String>();
+        final HashSet<String> addedEmailsSet = new HashSet<String>();
+
+        LayoutInflater inflater = LayoutInflater.from(OwnPublicWorkspaceActivity.this);
+        final View customView = inflater.inflate(R.layout.dialog_edit_emails, null);
+
+        // Set emails list and button behaviour
+        Button bt_add_email = (Button) customView.findViewById(R.id.bt_add_email);
+//        final Set<String> invitedEmailsSet = _userPrefs.getStringSet(getWorkspaceName() + "_invitedUsers", new HashSet<String>());
+        final ListView lv_emails = (ListView) customView.findViewById(R.id.lv_emails);
+        lv_emails.setAdapter(_emailsAdapter);
+        _emailsAdapter.notifyDataSetChanged();
+
+        bt_add_email.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText et_email = (EditText) customView.findViewById(R.id.et_email);
+                String email = et_email.getText().toString().trim();
+                if (email.isEmpty())
+                    Toast.makeText(OwnPublicWorkspaceActivity.this, "Insert an email.", Toast.LENGTH_LONG).show();
+                else if (_emailsList.contains(email))
+                    Toast.makeText(OwnPublicWorkspaceActivity.this, "Email already exists.", Toast.LENGTH_LONG).show();
+                else {
+                    _emailsList.add(email);
+//                    emailsSet.add(email);
+                    addedEmailsSet.add(email);
+                    Collections.sort(_emailsList);
+                    _emailsAdapter.notifyDataSetChanged();
+                    et_email.setText("");
                 }
+            }
+        });
+
+        // This is used to refresh the position of the list
+        lv_emails.post(new Runnable() {
+            @Override
+            public void run() {
+                lv_emails.smoothScrollToPosition(0);
+            }
+        });
+
+        // Event Listener that removes emails when clicked
+        lv_emails.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                removedEmailsSet.add(_emailsList.get(position));
+                _emailsList.remove(position);
+                _emailsAdapter.notifyDataSetChanged();
+
+            }
+        });
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit Emails?");
+        builder.setView(customView);
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+//                if (_emailsList.isEmpty()) {
+//                    Toast.makeText(OwnPrivateWorkspaceActivity.this, "At least one email must be added.", Toast.LENGTH_LONG).show();
+//                    editEmails(view);
+//                    return;
+//                }
+                HashSet<String> newEmailsSet = new HashSet<String>(_emailsList);
+                _userPrefsEditor.putStringSet(getWorkspaceName() + "_invitedUsers", newEmailsSet).commit();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                for (String removedEmail : removedEmailsSet) {
+                    _emailsList.add(removedEmail);
+                    Collections.sort(_emailsList);
+                    _emailsAdapter.notifyDataSetChanged();
+                }
+
+                for (String addedEmail : addedEmailsSet) {
+                    _emailsList.remove(addedEmail);
+                    Collections.sort(_emailsList);
+                    _emailsAdapter.notifyDataSetChanged();
+                }
+
+//                if (_emailsList.isEmpty()) {
+//                    Toast.makeText(OwnPrivateWorkspaceActivity.this, "At least one email must be added.", Toast.LENGTH_LONG).show();
+//                    editEmails(view);
+//                    return;
+//                }
             }
         });
         AlertDialog dialog = builder.create();
