@@ -52,6 +52,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
     protected ListView _emailsListView;
 
     protected String LOCAL_EMAIL;
+    protected String LOCAL_USERNAME;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         _appPrefsEditor = _appPrefs.edit();
         LOCAL_EMAIL = _appPrefs.getString("email", "");
+        LOCAL_USERNAME = _appPrefs.getString("username", "");
         Log.d("WS_ACTIVITY_EMAIL", LOCAL_EMAIL);
         _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
         _userPrefsEditor = _userPrefs.edit();
@@ -69,6 +71,8 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         getSupportActionBar().setTitle(WORKSPACE_NAME + " (OWNED - " + WORKSPACE_MODE + ")");
         setupFilesList();
         _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
+        if(!_appDir.exists())
+            _appDir.mkdir();
     }
 
     public String getWorkspaceName() {
@@ -361,7 +365,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                 .setView(customView)
                 .setPositiveButton("Publish", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        _userPrefsEditor.putBoolean(WORKSPACE_NAME+"_private", false);
+                        _userPrefsEditor.putBoolean(WORKSPACE_NAME + "_private", false);
                         Set<String> ownPrivateWsList = _userPrefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
                         ownPrivateWsList.remove(WORKSPACE_NAME);
                         _userPrefsEditor.putStringSet(getString(R.string.own_private_workspaces_list), ownPrivateWsList);
@@ -380,7 +384,6 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
 
 
     }
-
 
 
 }

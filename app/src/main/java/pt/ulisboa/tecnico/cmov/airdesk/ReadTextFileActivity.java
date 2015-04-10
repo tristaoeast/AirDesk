@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,6 +26,9 @@ import java.io.IOException;
 public class ReadTextFileActivity extends ActionBarActivity {
 
     private String WORKSPACE_DIR;
+    private SharedPreferences _userPrefs;
+    private SharedPreferences _appPrefs;
+    private String LOCAL_EMAIL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +38,15 @@ public class ReadTextFileActivity extends ActionBarActivity {
         String filename = intent.getExtras().getString("FILENAME");
         getSupportActionBar().setTitle(filename);
         WORKSPACE_DIR = intent.getExtras().getString("WORKSPACE_DIR");
+        _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
+        LOCAL_EMAIL = _appPrefs.getString("email", "");
+        _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
         openTextFile(filename);
     }
 
     public void openTextFile(final String filename) {
 
-        File appDir = getApplicationContext().getFilesDir();
+        File appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
         File dir = new File(appDir, WORKSPACE_DIR);
         final File textFile = new File(dir, filename);
 //        Toast.makeText(SUBCLASS_CONTEXT,dir.getName()+" size: "+Double.toString(MemoryHelper.fileSizeInKB(textFile)),Toast.LENGTH_LONG).show();

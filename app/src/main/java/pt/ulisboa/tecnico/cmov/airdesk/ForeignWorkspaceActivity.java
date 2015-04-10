@@ -52,6 +52,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
     protected ListView _usernamesListView;
 
     protected String LOCAL_EMAIL;
+    protected String LOCAL_USERNAME;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,15 +61,18 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         _appPrefsEditor = _appPrefs.edit();
         LOCAL_EMAIL = _appPrefs.getString("email", "");
+        LOCAL_USERNAME = _appPrefs.getString("username", "");
         _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
         _userPrefsEditor = _userPrefs.edit();
-        LOCAL_EMAIL = _userPrefs.getString("email", "");
+//        LOCAL_EMAIL = _userPrefs.getString("email", "");
         Intent intent = getIntent();
         WORKSPACE_DIR = intent.getExtras().get("workspace_name").toString();
         WORKSPACE_NAME = WORKSPACE_DIR;
         getSupportActionBar().setTitle(WORKSPACE_NAME + " (FOREIGN - " + WORKSPACE_MODE + ")");
         setupFilesList();
         _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
+        if(!_appDir.exists())
+            _appDir.mkdir();
     }
 
     public String getWorkspaceName() {
