@@ -3,7 +3,6 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,7 +27,7 @@ public class ForeignSubscribedWorkspacesListActivity extends ForeignWorkspacesLi
     private ArrayList<String> tagsList = new ArrayList<String>();
 
 
-    @Override
+    /*@Override
     protected void onCreate(Bundle savedInstanceState) {
 //        setupSuper(R.layout.activity_foreign_subscribed_workspaces_list,
 //                R.string.foreign_subscribed_workspaces_dir,
@@ -39,7 +38,7 @@ public class ForeignSubscribedWorkspacesListActivity extends ForeignWorkspacesLi
 //                this);
         super.onCreate(savedInstanceState);
         setupTagsList();
-    }
+    }*/
 
     // A Hack done in order to ensure the correct behaviour of the back button,
     // since the main activity automatically redirects to this one
