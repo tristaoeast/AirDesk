@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.content.SharedPreferences;
-import android.os.Bundle;
 
 /**
  * Created by ist167092 on 24-03-2015.
@@ -10,7 +9,7 @@ public class ForeignSharedWorkspacesListActivity extends ForeignWorkspacesListAc
 
     private SharedPreferences _appPrefs;
 
-    @Override
+    /*@Override
     protected void onCreate(Bundle savedInstanceState) {
 //        setupSuper(R.layout.activity_foreign_shared_workspaces_list,
 //                R.string.foreign_shared_workspaces_dir,
@@ -22,7 +21,7 @@ public class ForeignSharedWorkspacesListActivity extends ForeignWorkspacesListAc
         super.onCreate(savedInstanceState);
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
 
-    }
+    }*/
 
     // A Hack done in order to ensure the correct behaviour of the back button,
     // since the main activity automatically redirects to this one
