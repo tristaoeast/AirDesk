@@ -50,6 +50,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     protected Context SUBCLASS_CONTEXT;
 
     protected String LOCAL_EMAIL;
+    protected String LOCAL_USERNAME;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         _appPrefsEditor = _appPrefs.edit();
         LOCAL_EMAIL = _appPrefs.getString("email", "");
+        LOCAL_USERNAME = _appPrefs.getString("username","");
         Log.d("WS_LIST_ACTIVITY_EMAIL", LOCAL_EMAIL);
         _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
         _userPrefsEditor = _userPrefs.edit();
@@ -65,6 +67,8 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(SUBCLASS_LIST_ACTIVITY, SUBCLASS_CONTEXT);
         _drawerToggle = nh.setup();
         _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
+        if(!_appDir.exists())
+            _appDir.mkdir();
 
     }
 

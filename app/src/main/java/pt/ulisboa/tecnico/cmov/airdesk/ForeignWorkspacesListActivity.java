@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -54,7 +55,10 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
 //    protected Class SUBCLASS_ACTIVITY_CLASS;
     protected Context SUBCLASS_CONTEXT;
 
+    protected File _appDir;
+
     protected String LOCAL_EMAIL;
+    protected String LOCAL_USERNAME;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,14 +67,17 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         _appPrefsEditor = _appPrefs.edit();
         LOCAL_EMAIL = _appPrefs.getString("email", "");
+        LOCAL_USERNAME = _appPrefs.getString("username", "");
         _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
         _userPrefsEditor = _userPrefs.edit();
-        LOCAL_EMAIL = _userPrefs.getString("email", "");
         setupWsList();
         SUBCLASS_LIST_ACTIVITY = this;
         SUBCLASS_CONTEXT = this;
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(SUBCLASS_LIST_ACTIVITY, SUBCLASS_CONTEXT);
         _drawerToggle = nh.setup();
+        _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
+        if(!_appDir.exists())
+            _appDir.mkdir();
     }
 
     protected void setupSuper() {
