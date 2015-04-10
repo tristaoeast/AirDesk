@@ -17,14 +17,14 @@
             android:id="@+id/et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Username..."
-            android:layout_toLeftOf="@+id/bt_add_username" />
+            android:hint="Email..."
+            android:layout_toLeftOf="@+id/bt_add_email" />
 
         <Button
             android:id="@+id/bt_add_email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add Username"
+            android:text="Add Email"
             android:layout_alignParentRight="true"
             android:layout_alignBaseline="@+id/et_email" />
     </RelativeLayout>

@@ -14,7 +14,7 @@ public class OwnPublicWorkspacesListActivity extends OwnWorkspacesListActivity {
                 R.string.own_public_workspaces_list,
                 R.layout.dialog_new_public_workspace,
                 this,
-                OwnPrivateWorkspaceActivity.class,
+                OwnPublicWorkspaceActivity.class,
                 this);
         super.onCreate(savedInstanceState);
     }

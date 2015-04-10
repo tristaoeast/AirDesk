@@ -29,7 +29,7 @@ public class OwnPrivateWorkspaceActivity extends OwnWorkspaceActivity {
     @Override
     public void onResume() {
         super.onResume();
-        this.setupEmailsList();
+
     }
 
     @Override

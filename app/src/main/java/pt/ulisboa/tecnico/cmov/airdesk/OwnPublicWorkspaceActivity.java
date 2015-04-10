@@ -35,7 +35,7 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         setActivityLayout(R.layout.activity_own_public_workspace);
         setActivityContext(this);
-        setWorkspacesList(R.string.own_published_workspaces_list);
+        setWorkspacesList(R.string.own_public_workspaces_list);
         setWorkspaceMode("PUBLIC");
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         _appPrefsEditor = _appPrefs.edit();
@@ -43,11 +43,11 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
         _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
         _userPrefsEditor = _userPrefs.edit();
         super.onCreate(savedInstanceState);
-        super.setupTagsList();
     }
 
     @Override
     public void onResume() {
+        super.setupTagsList();
         _tagsAdapter.notifyDataSetChanged();
         super.onResume();
     }
@@ -66,9 +66,9 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
                 .setPositiveButton("Unpublish", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         _userPrefsEditor.remove(getWorkspaceName() + "_tags");
-                        Set<String> ownPublishedWs = _userPrefs.getStringSet(getString(R.string.own_published_workspaces_list), new HashSet<String>());
+                        Set<String> ownPublishedWs = _userPrefs.getStringSet(getString(R.string.own_public_workspaces_list), new HashSet<String>());
                         ownPublishedWs.remove(getWorkspaceName());
-                        _userPrefsEditor.putStringSet(getString(R.string.own_published_workspaces_list), ownPublishedWs);
+                        _userPrefsEditor.putStringSet(getString(R.string.own_public_workspaces_list), ownPublishedWs);
                         Set<String> ownPrivateWs = _userPrefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
                         ownPrivateWs.add(getWorkspaceName());
                         _userPrefsEditor.putStringSet(getString(R.string.own_private_workspaces_list), ownPrivateWs).commit();

@@ -230,6 +230,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
     @Override
     public void onResume() {
         super.onResume();
+        this.setupEmailsList();
         _fileNamesAdapter.notifyDataSetChanged();
     }
 
