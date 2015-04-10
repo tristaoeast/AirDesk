@@ -233,4 +233,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
         super.onStop();
         _userPrefs.edit().commit();
     }
+
+    public void editTags(View view) {
+    }
 }
