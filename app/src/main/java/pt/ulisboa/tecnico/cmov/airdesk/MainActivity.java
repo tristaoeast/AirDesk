@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
 
-    SharedPreferences _prefs = null;
+    SharedPreferences _appPrefs = null;
     SharedPreferences _loginPrefs = null;
 
     private String LOCAL_USERNAME;
@@ -25,7 +25,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        _prefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
+        _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
 
         final EditText et_user = (EditText) findViewById(R.id.et_username);
         final EditText et_email = (EditText) findViewById(R.id.et_email);
@@ -61,16 +61,16 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (_prefs.getBoolean(getString(R.string.event_back_button_pressed), false)) { //HACK MANHOSO PARA QUANDO CARREGAR NO BOTAO PARA TRAS SAIR DA APLICAÇÃO EM VEZ DE VIR PARA A ACTIVITIDADE DE LOGIN
-            _prefs.edit().putBoolean(getString(R.string.event_back_button_pressed), false).commit();
+        if (_appPrefs.getBoolean(getString(R.string.event_back_button_pressed), false)) { //HACK MANHOSO PARA QUANDO CARREGAR NO BOTAO PARA TRAS SAIR DA APLICAÇÃO EM VEZ DE VIR PARA A ACTIVITIDADE DE LOGIN
+            _appPrefs.edit().putBoolean(getString(R.string.event_back_button_pressed), false).commit();
             Toast.makeText(MainActivity.this, "Exit AirDesk", Toast.LENGTH_LONG).show();
             exitApp();
         } else {
-            if (_prefs.getBoolean("firstRun", true)) {
+            if (_appPrefs.getBoolean("firstRun", true)) {
 //                Toast.makeText(MainActivity.this, "First run", Toast.LENGTH_LONG).show();
             } else {
-                String username = _prefs.getString("username", "invalid_username");
-                String email = _prefs.getString("email", "invalid email");
+                String username = _appPrefs.getString("username", "invalid_username");
+                String email = _appPrefs.getString("email", "invalid email");
 
                 Toast.makeText(MainActivity.this, "Logged in as " + username + " with email " + email, Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
@@ -106,7 +106,7 @@ public class MainActivity extends ActionBarActivity {
         EditText et_email = (EditText) findViewById(R.id.et_email);
         String username = et_username.getText().toString();
         String email = et_email.getText().toString();
-        SharedPreferences.Editor editor = _prefs.edit();
+        SharedPreferences.Editor editor = _appPrefs.edit();
         editor.putString("username", username);
         editor.putString("email", email);
         editor.putBoolean("firstRun", false).commit();

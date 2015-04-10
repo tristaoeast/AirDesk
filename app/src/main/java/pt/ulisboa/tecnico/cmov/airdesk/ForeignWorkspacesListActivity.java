@@ -214,6 +214,11 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if(id == R.id.action_logout){
+            _appPrefs.edit().putBoolean("firstRun", true).commit();
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         }
         // Activate the navigation drawer toggle
         if (_drawerToggle.onOptionsItemSelected(item)) {

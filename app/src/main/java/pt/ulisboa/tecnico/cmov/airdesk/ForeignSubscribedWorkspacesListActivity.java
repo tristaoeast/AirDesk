@@ -148,7 +148,7 @@ public class ForeignSubscribedWorkspacesListActivity extends ForeignWorkspacesLi
 
 
 //    public void editForeignSubscribedWorkspace(final View view) {
-//        //_email = _prefs.getString("email", "invalid email");
+//        //_email = _appPrefs.getString("email", "invalid email");
 //        LayoutInflater inflater = LayoutInflater.from(this);
 //        final View yourCustomView = inflater.inflate(R.layout.dialog_edit_subscription_tags, null);
 //

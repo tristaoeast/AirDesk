@@ -108,7 +108,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_own_private_workspace, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -122,7 +122,13 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }  else if(id == R.id.action_logout){
+            _appPrefs.edit().putBoolean("firstRun", true).commit();
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         }
+
 
         return super.onOptionsItemSelected(item);
     }
