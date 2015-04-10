@@ -30,13 +30,13 @@ public class ForeignSubscribedWorkspacesListActivity extends ForeignWorkspacesLi
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setupSuper(R.layout.activity_foreign_subscribed_workspaces_list,
-                R.string.foreign_subscribed_workspaces_dir,
-                R.string.foreign_subscribed_workspaces_list,
-                R.string.foreign_workspaces_tag_crit,
-                this,
-                ForeignSubscribedWorkspaceActivity.class,
-                this);
+//        setupSuper(R.layout.activity_foreign_subscribed_workspaces_list,
+//                R.string.foreign_subscribed_workspaces_dir,
+//                R.string.foreign_subscribed_workspaces_list,
+//                R.string.foreign_workspaces_tag_crit,
+//                this,
+//                ForeignSubscribedWorkspaceActivity.class,
+//                this);
         super.onCreate(savedInstanceState);
         setupTagsList();
     }

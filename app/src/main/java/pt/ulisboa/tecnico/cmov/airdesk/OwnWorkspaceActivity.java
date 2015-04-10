@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -69,7 +68,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         WORKSPACE_NAME = WORKSPACE_DIR;
         getSupportActionBar().setTitle(WORKSPACE_NAME + " (OWNED - " + WORKSPACE_MODE + ")");
         setupFilesList();
-        _appDir = getApplicationContext().getFilesDir();
+        _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
     }
 
     public String getWorkspaceName() {
@@ -110,7 +109,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
 //        final View customView = inflater.inflate(R.layout.activity_own_shared_workspace, null);
         _emailsListView = (ListView) findViewById(R.id.lv_emails);
         _emailsListView.setAdapter(_emailsAdapter);
-        Set<String> emails = _userPrefs.getStringSet(WORKSPACE_NAME + "_emails", new HashSet<String>());
+        Set<String> emails = _userPrefs.getStringSet(WORKSPACE_NAME + "_invitedUsers", new HashSet<String>());
 //        Log.d("WORKSPACE_NAME", WORKSPACE_NAME);
         for (String email : emails) {
 //            Log.d("OPuWS_TAG", email);
@@ -363,9 +362,9 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                 .setPositiveButton("Publish", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         _userPrefsEditor.putBoolean(WORKSPACE_NAME+"_private", false);
-                        Set<String> ownPrivateWsList = _userPrefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
+                        Set<String> ownPrivateWsList = _userPrefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
                         ownPrivateWsList.remove(WORKSPACE_NAME);
-                        _userPrefsEditor.putStringSet(getString(WORKSPACES_LIST), ownPrivateWsList);
+                        _userPrefsEditor.putStringSet(getString(R.string.own_private_workspaces_list), ownPrivateWsList);
                         Set<String> ownPublicWsList = _userPrefs.getStringSet(getString(R.string.own_public_workspaces_list), new HashSet<String>());
                         ownPublicWsList.remove(WORKSPACE_NAME);
                         _userPrefsEditor.putStringSet(getString(R.string.own_public_workspaces_list), ownPublicWsList);
@@ -382,90 +381,6 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
 
     }
 
-    public void shareWorkspace(final View view) {
-        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
-        final View customView = inflater.inflate(R.layout.dialog_share_workspace, null);
-        final EditText etName = (EditText) customView.findViewById(R.id.et_file_name);
-        final String[] wsEmailsTemp = new String[1];
 
-        final EditText etEmailsTemp = (EditText) customView.findViewById(R.id.et_emails);
-
-        // Set emails list and button behaviour
-        final ListView lv_emails = (ListView) customView.findViewById(R.id.lv_emails);
-        final ArrayList<String> emailsList = new ArrayList<String>();
-        final ArrayAdapter<String> emailsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, emailsList);
-
-        lv_emails.setAdapter(emailsAdapter);
-        Button bt_add_email = (Button) customView.findViewById(R.id.bt_add_email);
-
-        bt_add_email.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditText et_email = (EditText) customView.findViewById(R.id.et_email);
-                String email = et_email.getText().toString().trim();
-                if (email.isEmpty())
-                    Toast.makeText(SUBCLASS_CONTEXT, "Insert a email.", Toast.LENGTH_LONG).show();
-                else if (emailsList.contains(email))
-                    Toast.makeText(SUBCLASS_CONTEXT, "Email already exists.", Toast.LENGTH_LONG).show();
-                else {
-                    emailsList.add(et_email.getText().toString());
-                    Collections.sort(emailsList);
-                    emailsAdapter.notifyDataSetChanged();
-                    et_email.setText("");
-                }
-            }
-        });
-
-        // This is used to refresh the position of the list
-        lv_emails.post(new Runnable() {
-            @Override
-            public void run() {
-                lv_emails.smoothScrollToPosition(0);
-            }
-        });
-
-        // Event Listener that removes emails when clicked
-        lv_emails.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Set<String> emailsSet = _userPrefs.getStringSet(getWorkspaceName() + "_emails", new HashSet<String>());
-                emailsSet.remove(emailsList.get(position));
-                emailsList.remove(position);
-                emailsAdapter.notifyDataSetChanged();
-                _userPrefs.edit().putStringSet(getWorkspaceName() + "_emails", emailsSet).commit();
-            }
-        });
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Share Workspace?");
-        builder.setView(customView);
-        builder.setPositiveButton("Share", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                if (emailsList.isEmpty()) {
-                    Toast.makeText(SUBCLASS_CONTEXT, "At least one email must be added.", Toast.LENGTH_LONG).show();
-                    shareWorkspace(view);
-                    return;
-                }
-                HashSet<String> wsEmails = new HashSet<String>(emailsList);
-                Set<String> ownSharedWsList = _userPrefs.getStringSet(getString(R.string.own_shared_workspaces_list), new HashSet<String>());
-                Set<String> currentWsList = _userPrefs.getStringSet(getString(WORKSPACES_LIST), new HashSet<String>());
-                Set<String> foreignSharedWs = _userPrefs.getStringSet(getString(R.string.foreign_shared_workspaces_list), new HashSet<String>());
-                currentWsList.remove(WORKSPACE_NAME);
-                ownSharedWsList.add(WORKSPACE_NAME);
-                foreignSharedWs.add(WORKSPACE_NAME);
-                _userPrefsEditor.putStringSet(getString(R.string.own_shared_workspaces_list), ownSharedWsList);
-                _userPrefsEditor.putStringSet(WORKSPACE_NAME + "_emails", wsEmails);
-                _userPrefsEditor.putStringSet(getString(R.string.foreign_shared_workspaces_list), foreignSharedWs).commit();
-                _userPrefsEditor.commit();
-                Intent intent = new Intent(SUBCLASS_CONTEXT, OwnSharedWorkspaceActivity.class);
-                intent.putExtra("workspace_name", WORKSPACE_NAME);
-                startActivity(intent);
-                finish();
-            }
-        });
-        builder.setNegativeButton("Cancel", null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
 
 }

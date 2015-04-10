@@ -3,20 +3,16 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 
 
 public class OwnPrivateWorkspaceActivity extends OwnWorkspaceActivity {
@@ -38,23 +34,24 @@ public class OwnPrivateWorkspaceActivity extends OwnWorkspaceActivity {
 
     @Override
     protected void setupEmailsList() {
-        _emailsList = new ArrayList<String>();
-        _emailsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _emailsList);
-//        LayoutInflater inflater = LayoutInflater.from(this);
-//        final View customView = inflater.inflate(R.layout.activity_own_private_workspace, null);
-        _emailsListView = (ListView) findViewById(R.id.lv_emails);
-        _emailsListView.setAdapter(_emailsAdapter);
-        Set<String> invitedUsersEmails = _userPrefs.getStringSet(WORKSPACE_NAME + "_invitedUsers", new HashSet<String>());
-//        Set<String> subscribedUsersEmails = _userPrefs.getStringSet(WORKSPACE_NAME + "_subscribedUsers", new HashSet<String>());
-//        Set<String> allUsersEmails = new HashSet<String>();
-//        allUsersEmails.addAll(invitedUsersEmails);
-//        allUsersEmails.addAll(subscribedUsersEmails);
-        for (String email : invitedUsersEmails) {
-            Log.d("INVITED EMAIL", email);
-            _emailsList.add(email);
-        }
-        Collections.sort(_emailsList);
-        _emailsAdapter.notifyDataSetChanged();
+//        _emailsList = new ArrayList<String>();
+//        _emailsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _emailsList);
+////        LayoutInflater inflater = LayoutInflater.from(this);
+////        final View customView = inflater.inflate(R.layout.activity_own_private_workspace, null);
+//        _emailsListView = (ListView) findViewById(R.id.lv_emails);
+//        _emailsListView.setAdapter(_emailsAdapter);
+//        Set<String> invitedUsersEmails = _userPrefs.getStringSet(WORKSPACE_NAME + "_invitedUsers", new HashSet<String>());
+////        Set<String> subscribedUsersEmails = _userPrefs.getStringSet(WORKSPACE_NAME + "_subscribedUsers", new HashSet<String>());
+////        Set<String> allUsersEmails = new HashSet<String>();
+////        allUsersEmails.addAll(invitedUsersEmails);
+////        allUsersEmails.addAll(subscribedUsersEmails);
+//        for (String email : invitedUsersEmails) {
+//            Log.d("INVITED EMAIL", email);
+//            _emailsList.add(email);
+//        }
+//        Collections.sort(_emailsList);
+//        _emailsAdapter.notifyDataSetChanged();
+        super.setupEmailsList();
     }
 
     public void editEmails(final View view) {

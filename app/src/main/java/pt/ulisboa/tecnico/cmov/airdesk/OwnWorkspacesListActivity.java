@@ -64,7 +64,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         setupWsList();
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(SUBCLASS_LIST_ACTIVITY, SUBCLASS_CONTEXT);
         _drawerToggle = nh.setup();
-        _appDir = getApplicationContext().getFilesDir();
+        _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
 
     }
 

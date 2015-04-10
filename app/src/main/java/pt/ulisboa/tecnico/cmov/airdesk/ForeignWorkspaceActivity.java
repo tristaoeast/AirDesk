@@ -68,7 +68,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
         WORKSPACE_NAME = WORKSPACE_DIR;
         getSupportActionBar().setTitle(WORKSPACE_NAME + " (FOREIGN - " + WORKSPACE_MODE + ")");
         setupFilesList();
-        _appDir = getApplicationContext().getFilesDir();
+        _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
     }
 
     public String getWorkspaceName() {

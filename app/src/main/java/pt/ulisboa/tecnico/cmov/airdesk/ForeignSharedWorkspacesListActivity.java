@@ -12,13 +12,13 @@ public class ForeignSharedWorkspacesListActivity extends ForeignWorkspacesListAc
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setupSuper(R.layout.activity_foreign_shared_workspaces_list,
-                R.string.foreign_shared_workspaces_dir,
-                R.string.foreign_shared_workspaces_list,
-                R.string.foreign_workspaces_email_crit,
-                this,
-                ForeignSharedWorkspaceActivity.class,
-                this);
+//        setupSuper(R.layout.activity_foreign_shared_workspaces_list,
+//                R.string.foreign_shared_workspaces_dir,
+//                R.string.foreign_shared_workspaces_list,
+//                R.string.foreign_workspaces_email_crit,
+//                this,
+//                ForeignSharedWorkspaceActivity.class,
+//                this);
         super.onCreate(savedInstanceState);
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
 
