@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,12 +27,9 @@ import java.util.Set;
 
 public class ForeignWorkspaceActivity extends ActionBarActivity {
 
-    private int SUBCLASS_ACTIVITY_LAYOUT;
-
     private String WORKSPACE_DIR;
     private String WORKSPACE_NAME;
     private String WORKSPACE_MODE;
-    private Context SUBCLASS_CONTEXT;
     private int WORKSPACES_LIST;
 
     private File _appDir;
@@ -56,7 +52,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(SUBCLASS_ACTIVITY_LAYOUT);
+        setContentView(R.layout.activity_foreign_workspace);
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         _appPrefsEditor = _appPrefs.edit();
         LOCAL_EMAIL = _appPrefs.getString("email", "");
@@ -71,26 +67,9 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
         _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
     }
 
-    public String getWorkspaceName() {
-        return WORKSPACE_NAME;
-    }
-
-    public String getWorkspaceDir() {
-        return WORKSPACE_DIR;
-    }
-
-    public File getAppDir() {
-        return _appDir;
-    }
-
-    public SharedPreferences getSharedPrefs() {
-        return _userPrefs;
-    }
-
-
     protected void setupFilesList() {
         _fileNamesList = new ArrayList<String>();
-        _fileNamesAdapter = new ArrayAdapter<String>(SUBCLASS_CONTEXT, android.R.layout.simple_list_item_1, android.R.id.text1, _fileNamesList);
+        _fileNamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _fileNamesList);
         _listView = (ListView) findViewById(R.id.lv_filesList);
         _listView.setAdapter(_fileNamesAdapter);
         Set<String> fileNames = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
@@ -109,7 +88,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
 
     private void openTextFile(int position){
         String filename = _fileNamesList.get(position);
-        Intent intent = new Intent(SUBCLASS_CONTEXT, ReadTextFileActivity.class);
+        Intent intent = new Intent(ForeignWorkspaceActivity.this, ReadTextFileActivity.class);
         intent.putExtra("FILENAME",filename);
         intent.putExtra("WORKSPACE_DIR",WORKSPACE_DIR);
         startActivity(intent);
@@ -144,26 +123,10 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void setActivityLayout(int activityLayout) {
-        SUBCLASS_ACTIVITY_LAYOUT = activityLayout;
-    }
-
-    public void setActivityContext(Context subclassContext) {
-        SUBCLASS_CONTEXT = subclassContext;
-    }
-
-    public void setWorkspacesList(int workspacesList) {
-        WORKSPACES_LIST = workspacesList;
-    }
-
-    public void setWorkspaceMode(String workspaceMode) {
-        WORKSPACE_MODE = workspaceMode;
-    }
-
     public void newFile(final View view) {
         final File wsDir = new File(_appDir, WORKSPACE_DIR);
         final String[] fName = new String[1];
-        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
+        LayoutInflater inflater = LayoutInflater.from(this);
         final View customView = inflater.inflate(R.layout.dialog_new_file, null);
         final EditText etName = (EditText) customView.findViewById(R.id.et_file_name);
 
@@ -176,12 +139,12 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
                         String filename = fName[0] + ".txt";
                         Set<String> wsFiles = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
                         if (wsFiles.contains(filename)) {
-                            Toast.makeText(SUBCLASS_CONTEXT, "File with that name already exists.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(ForeignWorkspaceActivity.this, "File with that name already exists.", Toast.LENGTH_LONG).show();
                             newFile(view);
                             return;
                         }
                         if (fName[0].isEmpty()) {
-                            Toast.makeText(SUBCLASS_CONTEXT, "Name field must be filled.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(ForeignWorkspaceActivity.this, "Name field must be filled.", Toast.LENGTH_LONG).show();
                             newFile(view);
                             return;
                         }
@@ -190,7 +153,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
                             file.createNewFile();
                         } catch (IOException e) {
                             Log.d("New file IOException", e.toString());
-                            Toast.makeText(SUBCLASS_CONTEXT, "Error creating new file: IOException", Toast.LENGTH_LONG).show();
+                            Toast.makeText(ForeignWorkspaceActivity.this, "Error creating new file: IOException", Toast.LENGTH_LONG).show();
                             newFile(view);
                             return;
                         }
@@ -199,7 +162,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
                         _fileNamesAdapter.notifyDataSetChanged();
                         wsFiles.add(filename);
                         _userPrefsEditor.putStringSet(WORKSPACE_NAME + "_files", wsFiles).commit();
-                        Toast.makeText(SUBCLASS_CONTEXT, "Empty File " + filename + " created.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(ForeignWorkspaceActivity.this, "Empty File " + filename + " created.", Toast.LENGTH_LONG).show();
                     }
                 })
                 .setNegativeButton("Cancel", null).create();
