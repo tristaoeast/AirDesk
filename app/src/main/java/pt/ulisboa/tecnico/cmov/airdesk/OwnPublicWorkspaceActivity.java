@@ -147,7 +147,6 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
 //                    return;
 //                }
 
-
                 HashSet<String> newTagsSet = new HashSet<String>(_tagsList);
                 _userPrefs.edit().putStringSet(getWorkspaceName() + "_tags", newTagsSet).commit();
             }

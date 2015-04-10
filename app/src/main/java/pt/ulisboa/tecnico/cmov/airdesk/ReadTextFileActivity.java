@@ -25,30 +25,43 @@ import java.io.IOException;
 
 public class ReadTextFileActivity extends ActionBarActivity {
 
-    private String WORKSPACE_DIR;
+    private String WORKSPACE_DIR_STRING;
     private SharedPreferences _userPrefs;
     private SharedPreferences _appPrefs;
     private String LOCAL_EMAIL;
+    private String FILENAME;
+    private File WORKSPACE_DIR_FILE;
+    private String WORKSPACE_NAME;
+    private long WORKSPACE_QUOTA;
+    private File _appDir;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read_text_file);
         Intent intent = getIntent();
-        String filename = intent.getExtras().getString("FILENAME");
-        getSupportActionBar().setTitle(filename);
-        WORKSPACE_DIR = intent.getExtras().getString("WORKSPACE_DIR");
+        FILENAME = intent.getExtras().getString("FILENAME");
+        getSupportActionBar().setTitle(FILENAME);
+        WORKSPACE_DIR_STRING = intent.getExtras().getString("WORKSPACE_DIR");
+        WORKSPACE_NAME = intent.getExtras().getString("WORKSPACE_NAME");
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         LOCAL_EMAIL = _appPrefs.getString("email", "");
         _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
-        openTextFile(filename);
+        _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
+        WORKSPACE_DIR_FILE = new File(_appDir, WORKSPACE_DIR_STRING);
+        WORKSPACE_QUOTA = _userPrefs.getLong(WORKSPACE_NAME + "_quota", 0);
     }
 
-    public void openTextFile(final String filename) {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateText(FILENAME);
+    }
 
-        File appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
-        File dir = new File(appDir, WORKSPACE_DIR);
-        final File textFile = new File(dir, filename);
+    public void updateText(final String filename) {
+
+
+        final File textFile = new File(this.WORKSPACE_DIR_FILE, filename);
 //        Toast.makeText(SUBCLASS_CONTEXT,dir.getName()+" size: "+Double.toString(MemoryHelper.fileSizeInKB(textFile)),Toast.LENGTH_LONG).show();
         //Read text from file
         final StringBuilder builtText = new StringBuilder();
@@ -75,18 +88,18 @@ public class ReadTextFileActivity extends ActionBarActivity {
         bt_edit_file.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editTextFileInDialog(filename, textFile,text);
+                editTextFileInDialog(filename, textFile, text);
             }
         });
 
     }
 
-    private void editTextFileInDialog(final String filename, final File textFile, String text) {
+    private void editTextFileInDialog(final String filename, final File textFile, final String oldText) {
 
         LayoutInflater inflater = LayoutInflater.from(this);
         final View customView = inflater.inflate(R.layout.dialog_edit_text_file, null);
         final EditText et_text = (EditText) customView.findViewById(R.id.et_text);
-        et_text.setText(text);
+        et_text.setText(oldText);
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Edit " + filename)
@@ -96,7 +109,6 @@ public class ReadTextFileActivity extends ActionBarActivity {
                         String newText = et_text.getText().toString().trim();
                         try {
                             if (!textFile.exists()) {
-
                                 textFile.createNewFile();
                             }
 
@@ -104,7 +116,15 @@ public class ReadTextFileActivity extends ActionBarActivity {
                             BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
                             bufferWritter.write(newText);
                             bufferWritter.close();
-                            openTextFile(filename);
+                            if (quotaExceeded()) {
+                                FileWriter fileWriterOld = new FileWriter(textFile, false);
+                                BufferedWriter bufferWriterOld = new BufferedWriter(fileWriterOld);
+                                bufferWriterOld.write(oldText);
+                                bufferWriterOld.close();
+                                Toast.makeText(ReadTextFileActivity.this, "Workspace quota exceeded. Please write a shorter text or delete some files.", Toast.LENGTH_LONG).show();
+                                editTextFileInDialog(filename, textFile, newText);
+                            }
+                            updateText(filename);
                             //TODO VERIFY IF SAVING FILES GOES ABOVE WS QUOTA
                             return;
 
@@ -118,6 +138,27 @@ public class ReadTextFileActivity extends ActionBarActivity {
                 })
                 .setNegativeButton("Cancel", null).create();
         dialog.show();
+    }
+
+    public boolean quotaExceeded() {
+
+        long wsSize = folderSize(WORKSPACE_DIR_FILE);
+
+        if(wsSize > WORKSPACE_QUOTA)
+            return true;
+
+        return false;
+    }
+
+    public static long folderSize(File directory) {
+        long length = 0;
+        for (File file : directory.listFiles()) {
+            if (file.isFile())
+                length += file.length();
+            else
+                length += folderSize(file);
+        }
+        return length;
     }
 
     @Override

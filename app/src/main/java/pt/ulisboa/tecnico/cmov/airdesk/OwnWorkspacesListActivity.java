@@ -200,12 +200,12 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
                             newOwnWorkspace(view);
                             return;
                         }
-                        int quota;
+                        long quota;
                         // Verify if quota is an integer
                         try {
-                            quota = Integer.parseInt(wsQuota[0]);
+                            quota = Long.parseLong(wsQuota[0]);
                         } catch (NumberFormatException e) {
-                            Toast.makeText(SUBCLASS_CONTEXT, "Invalid Quota format. Must be a number (MB)", Toast.LENGTH_LONG).show();
+                            Toast.makeText(SUBCLASS_CONTEXT, "Invalid Quota format. Must be a number (bytes)", Toast.LENGTH_LONG).show();
                             newOwnWorkspace(view);
                             return;
                         }
@@ -216,7 +216,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
                             return;
                         }
                         String name = wsName[0];
-                        _userPrefsEditor.putInt(name + "_quota", quota);
+                        _userPrefsEditor.putLong(name + "_quota", quota);
                         Set<String> ownWs = _userPrefs.getStringSet(getString(OWN_WORKSPACES_LIST), new HashSet<String>());
                         Set<String> allWs = _userPrefs.getStringSet(getString(R.string.own_all_workspaces_list), new HashSet<String>());
                         // Verify if own workspace exists with same name

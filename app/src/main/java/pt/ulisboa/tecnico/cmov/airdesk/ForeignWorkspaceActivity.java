@@ -95,6 +95,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
         Intent intent = new Intent(ForeignWorkspaceActivity.this, ReadTextFileActivity.class);
         intent.putExtra("FILENAME",filename);
         intent.putExtra("WORKSPACE_DIR",WORKSPACE_DIR);
+        intent.putExtra("WORKSPACE_NAME", WORKSPACE_NAME);
         startActivity(intent);
     }
 

@@ -185,6 +185,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
         Intent intent = new Intent(SUBCLASS_CONTEXT, ReadTextFileActivity.class);
         intent.putExtra("FILENAME", filename);
         intent.putExtra("WORKSPACE_DIR", WORKSPACE_DIR);
+        intent.putExtra("WORKSPACE_NAME", WORKSPACE_NAME);
         startActivity(intent);
     }
 
@@ -211,7 +212,7 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
 //                            BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
 //                            bufferWritter.write(newText);
 //                            bufferWritter.close();
-//                            openTextFile(position);
+//                            updateText(position);
 ////TODO VERIFY IF SAVING FILES GOES ABOVE WS QUOTA
 //                            return;
 //

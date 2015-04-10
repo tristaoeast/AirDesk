@@ -17,7 +17,7 @@
         android:id="@+id/et_ws_quota"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Quota (MB)..." />
+        android:hint="Quota (bytes)..." />
 
     <LinearLayout
         android:layout_width="match_parent"

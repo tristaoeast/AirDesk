@@ -101,10 +101,10 @@ public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity 
                             newOwnWorkspace(view);
                             return;
                         }
-                        int quota;
+                        Long quota;
                         // Verify if quota is an integer
                         try {
-                            quota = Integer.parseInt(wsQuota[0]);
+                            quota = Long.parseLong(wsQuota[0]);
                         } catch (NumberFormatException e) {
                             Toast.makeText(OwnPrivateWorkspacesListActivity.this, "Invalid Quota format. Must be a number (MB)", Toast.LENGTH_LONG).show();
                             newOwnWorkspace(view);
@@ -117,7 +117,7 @@ public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity 
                             return;
                         }
                         String name = wsName[0];
-                        _userPrefsEditor.putInt(name + "_quota", quota);
+                        _userPrefsEditor.putLong(name + "_quota", quota);
                         HashSet<String> wsEmails = new HashSet<String>(emailsList);
                         Set<String> allWs = _userPrefs.getStringSet(getString(R.string.own_all_workspaces_list), new HashSet<String>());
                         Set<String> privateWs = _userPrefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
@@ -129,7 +129,7 @@ public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity 
                         } else {
                             allWs.add(name);
                             privateWs.add(name);
-                            _userPrefsEditor.putString(name + "_quota", wsQuota[0]);
+                            _userPrefsEditor.putLong(name + "_quota", quota);
                             _userPrefsEditor.putStringSet(getString(R.string.own_private_workspaces_list), privateWs);
                             _userPrefsEditor.putStringSet(getString(R.string.own_all_workspaces_list), allWs);
                             _userPrefsEditor.putStringSet(name + "_invitedUsers", wsEmails);
