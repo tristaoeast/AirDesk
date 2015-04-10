@@ -173,4 +173,27 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
         dialog.show();
     }
 
+    public void leaveWorkspace(View view) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        final View customView = inflater.inflate(R.layout.dialog_leave_workspace, null);
+        final EditText etName = (EditText) customView.findViewById(R.id.et_file_name);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Leave " + WORKSPACE_NAME + "?")
+                .setView(customView)
+                .setPositiveButton("Leave", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Set<String> invitedUsersList = _userPrefs.getStringSet( WORKSPACE_NAME + "_invitedUsers", new HashSet<String>());
+                        invitedUsersList.remove(LOCAL_EMAIL);
+                        _userPrefsEditor.putStringSet(WORKSPACE_NAME + "_invitedUsers", invitedUsersList);
+                        _userPrefsEditor.commit();
+
+                        Intent intent = new Intent(ForeignWorkspaceActivity.this, OwnPrivateWorkspacesListActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                })
+                .setNegativeButton("Cancel", null).create();
+        dialog.show();
+    }
 }
