@@ -7,8 +7,6 @@
     android:padding="@dimen/abc_action_bar_default_padding_material"
     tools:context=".OwnPublishedWorkspacesListActivity">
 
-
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

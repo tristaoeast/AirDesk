@@ -112,11 +112,11 @@ public class OwnPrivateWorkspaceActivity extends OwnWorkspaceActivity {
         builder.setView(customView);
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                if (_emailsList.isEmpty()) {
-                    Toast.makeText(OwnPrivateWorkspaceActivity.this, "At least one email must be added.", Toast.LENGTH_LONG).show();
-                    editEmails(view);
-                    return;
-                }
+//                if (_emailsList.isEmpty()) {
+//                    Toast.makeText(OwnPrivateWorkspaceActivity.this, "At least one email must be added.", Toast.LENGTH_LONG).show();
+//                    editEmails(view);
+//                    return;
+//                }
                 HashSet<String> newEmailsSet = new HashSet<String>(_emailsList);
                 _userPrefsEditor.putStringSet(getWorkspaceName() + "_invitedUsers", newEmailsSet).commit();
             }
@@ -136,11 +136,11 @@ public class OwnPrivateWorkspaceActivity extends OwnWorkspaceActivity {
                     _emailsAdapter.notifyDataSetChanged();
                 }
 
-                if (_emailsList.isEmpty()) {
-                    Toast.makeText(OwnPrivateWorkspaceActivity.this, "At least one email must be added.", Toast.LENGTH_LONG).show();
-                    editEmails(view);
-                    return;
-                }
+//                if (_emailsList.isEmpty()) {
+//                    Toast.makeText(OwnPrivateWorkspaceActivity.this, "At least one email must be added.", Toast.LENGTH_LONG).show();
+//                    editEmails(view);
+//                    return;
+//                }
             }
         });
         AlertDialog dialog = builder.create();
