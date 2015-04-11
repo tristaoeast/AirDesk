@@ -4,8 +4,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -81,6 +82,7 @@ public class ReadTextFileActivity extends ActionBarActivity {
         }
 
         TextView tv_text = (TextView) findViewById(R.id.tv_text);
+        tv_text.setMovementMethod(new ScrollingMovementMethod());
         tv_text.setText(builtText);
 
         final String text = builtText.toString();

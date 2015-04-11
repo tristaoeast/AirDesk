@@ -36,6 +36,16 @@ public class MemoryHelper {
 //        return formatSize(availableBlocks * blockSize);
     }
 
+    public static long getAvailableInternalMemorySizeLongInBytes() {
+        File path = Environment.getDataDirectory();
+        StatFs stat = new StatFs(path.getPath());
+        long blockSize = stat.getBlockSize();
+        long availableBlocks = stat.getAvailableBlocks();
+        long result = blockSize * availableBlocks;
+        return result;
+//        return formatSize(availableBlocks * blockSize);
+    }
+
     public static String getTotalInternalMemorySize() {
         File path = Environment.getDataDirectory();
         StatFs stat = new StatFs(path.getPath());

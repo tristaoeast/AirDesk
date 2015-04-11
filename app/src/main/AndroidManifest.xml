@@ -17,14 +17,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".OwnWorkspacesListActivity"
-            android:label="@string/own_private_workspaces_list"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="pt.ulisboa.tecnico.cmov.airdesk.MainActivity" />
-        </activity>
-        <activity
             android:name=".OwnPrivateWorkspacesListActivity"
             android:label="@string/own_private_workspaces_list"
             android:parentActivityName=".MainActivity">

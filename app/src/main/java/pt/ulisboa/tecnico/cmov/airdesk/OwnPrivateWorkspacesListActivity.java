@@ -111,7 +111,7 @@ public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity 
                             return;
                         }
                         // Verify if quota doesn't exceed internal storage capacity
-                        if (quota > new MemoryHelper().getAvailableInternalMemorySizeLong()) {
+                        if (quota > new MemoryHelper().getAvailableInternalMemorySizeLongInBytes()) {
                             Toast.makeText(OwnPrivateWorkspacesListActivity.this, "Quota higher than available memory. Available memory is of " + new MemoryHelper().getAvailableInternalMemorySize(), Toast.LENGTH_LONG).show();
                             newOwnWorkspace(view);
                             return;

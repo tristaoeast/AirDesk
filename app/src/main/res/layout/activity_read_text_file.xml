@@ -12,7 +12,9 @@
         android:id="@+id/tv_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bt_edit_file"/>
+        android:layout_above="@+id/bt_edit_file"
+        android:maxLines="100000"
+        android:scrollbars="vertical"/>
 
     <Button
         android:id="@+id/bt_edit_file"
