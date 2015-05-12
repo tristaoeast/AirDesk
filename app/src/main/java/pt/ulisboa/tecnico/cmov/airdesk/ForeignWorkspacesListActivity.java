@@ -43,7 +43,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     private boolean justCreated;
     private IntentFilter filter;
     private SimWifiP2pBroadcastReceiverForeign receiver;
-    private boolean 
+    private boolean mBound;
 
     private ActionBarDrawerToggle _drawerToggle;
 
