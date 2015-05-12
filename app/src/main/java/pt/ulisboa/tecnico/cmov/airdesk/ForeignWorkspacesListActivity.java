@@ -1,10 +1,16 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
+import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.Menu;
@@ -21,10 +27,23 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
+import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
+import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
+import pt.inesc.termite.wifidirect.SimWifiP2pManager;
+import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
+
 /**
  * Created by mariana on 08-04-2015.
  */
-public class ForeignWorkspacesListActivity extends ActionBarActivity {
+public class ForeignWorkspacesListActivity extends ActionBarActivity implements SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener{
+
+    private boolean justCreated;
+    private IntentFilter filter;
+    private SimWifiP2pBroadcastReceiverForeign receiver;
+    private boolean 
 
     private ActionBarDrawerToggle _drawerToggle;
 
@@ -78,7 +97,130 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity {
         _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
         if(!_appDir.exists())
             _appDir.mkdir();
+
+        justCreated = true;
+
+        // initialize the WDSim API
+        SimWifiP2pSocketManager.Init(getApplicationContext());
+
+        // register broadcast receiver
+        filter = new IntentFilter();
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
+        receiver = new SimWifiP2pBroadcastReceiverForeign(this);
+        registerReceiver(receiver, filter);
+
+        Intent intent = new Intent(this, SimWifiP2pService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        mBound = true;
+
     }
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(justCreated)
+            justCreated = false;
+        else {
+            // initialize the WDSim API
+            SimWifiP2pSocketManager.Init(getApplicationContext());
+
+            // register broadcast receiver
+            filter = new IntentFilter();
+            filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION);
+            filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
+            filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
+            filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
+            receiver = new SimWifiP2pBroadcastReceiverForeign(this);
+            registerReceiver(receiver, filter);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    public void onPeersAvailable(SimWifiP2pDeviceList peers) {
+        StringBuilder peersStr = new StringBuilder();
+
+        // compile list of devices in range
+        for (SimWifiP2pDevice device : peers.getDeviceList()) {
+            String devstr = "" + device.deviceName + " (" + device.getVirtIp() + ")\n";
+            peersStr.append(devstr);
+        }
+
+        // display list of devices in range
+        new AlertDialog.Builder(this)
+                .setTitle("Devices in WiFi Range")
+                .setMessage(peersStr.toString())
+                .setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
+    }
+
+    @Override
+    public void onGroupInfoAvailable(SimWifiP2pDeviceList devices,
+                                     SimWifiP2pInfo groupInfo) {
+
+        // compile list of network members
+        StringBuilder peersStr = new StringBuilder();
+        for (String deviceName : groupInfo.getDevicesInNetwork()) {
+            SimWifiP2pDevice device = devices.getByName(deviceName);
+            String devstr = "" + deviceName + " (" +
+                    ((device == null)?"??":device.getVirtIp()) + ")\n";
+            peersStr.append(devstr);
+        }
+
+        // display list of network members
+        new AlertDialog.Builder(this)
+                .setTitle("Devices in WiFi Network")
+                .setMessage(peersStr.toString())
+                .setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .show();
+    }
+
+    private ServiceConnection mConnection = new ServiceConnection(){
+
+        /**
+         * Called when a connection to the Service has been established, with
+         * the {@link android.os.IBinder} of the communication channel to the
+         * Service.
+         *
+         * @param name    The concrete component name of the service that has
+         *                been connected.
+         * @param service The IBinder of the Service's communication channel,
+         */
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+
+        }
+
+        /**
+         * Called when a connection to the Service has been lost.  This typically
+         * happens when the process hosting the service has crashed or been killed.
+         * This does <em>not</em> remove the ServiceConnection itself -- this
+         * binding to the service will remain active, and you will receive a call
+         * to {@link #onServiceConnected} when the Service is next running.
+         *
+         * @param name The concrete component name of the service whose
+         *             connection has been lost.
+         */
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
+
 
     protected void setupSuper() {
 //        FOREIGN_WORKSPACE_LIST_LAYOUT = R.layout.activity_foreign_workspaces_list;

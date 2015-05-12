@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +15,15 @@ import android.widget.Toast;
 import java.util.Collections;
 import java.util.HashSet;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
+import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
+import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
+import pt.inesc.termite.wifidirect.SimWifiP2pManager;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 
-public class OwnPrivateWorkspaceActivity extends OwnWorkspaceActivity {
+
+public class OwnPrivateWorkspaceActivity extends OwnWorkspaceActivity  {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +32,7 @@ public class OwnPrivateWorkspaceActivity extends OwnWorkspaceActivity {
         setWorkspacesList(R.string.own_private_workspaces_list);
         setWorkspaceMode("PRIVATE");
         super.onCreate(savedInstanceState);
+
     }
 
     @Override
@@ -147,4 +156,5 @@ public class OwnPrivateWorkspaceActivity extends OwnWorkspaceActivity {
         dialog.show();
 
     }
+
 }
