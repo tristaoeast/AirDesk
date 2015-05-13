@@ -406,7 +406,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
                 if (email.isEmpty())
                     Toast.makeText(SUBCLASS_CONTEXT, "Insert email.", Toast.LENGTH_LONG).show();
                 else if (emailsList.contains(email))
-                    Toast.makeText(SUBCLASS_CONTEXT, "Email already exsits.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SUBCLASS_CONTEXT, "Email already exists.", Toast.LENGTH_LONG).show();
                 else {
                     emailsList.add(et_emails.getText().toString());
                     Collections.sort(emailsList);
@@ -441,10 +441,10 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 EditText et_tags = (EditText) customView.findViewById(R.id.et_tags);
-                String email = et_tags.getText().toString().trim();
-                if (email.isEmpty())
+                String tag = et_tags.getText().toString().trim();
+                if (tag.isEmpty())
                     Toast.makeText(SUBCLASS_CONTEXT, "Insert tag.", Toast.LENGTH_LONG).show();
-                else if (emailsList.contains(email))
+                else if (emailsList.contains(tag))
                     Toast.makeText(SUBCLASS_CONTEXT, "Tag already exists.", Toast.LENGTH_LONG).show();
                 else {
                     tagsList.add(et_tags.getText().toString());
