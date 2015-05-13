@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -33,9 +34,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Queue;
 import java.util.Set;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pManager;
 import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
@@ -47,8 +48,7 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
  */
 public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
 
-    public static final String TAG = "OwnWorkspacesListActivity";
-
+    public static final String TAG = "OwnWSListActivity";
 
     protected ActionBarDrawerToggle _drawerToggle;
     protected ArrayList<String> _wsNamesList;
@@ -78,6 +78,9 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     protected Messenger mService;
     protected SimWifiP2pManager mManager;
     protected SimWifiP2pManager.Channel mChannel;
+    private boolean keepListening;
+    private IntentFilter filter;
+    private SimWifiP2pBroadcastReceiverOwn receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,10 +100,11 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         if (!_appDir.exists())
             _appDir.mkdir();
 
+        keepListening = true;
         initSimWifiP2p();
+        registerSimWifiP2pBcastReceiver();
         bindSimWifiP2pService();
-        new IncommingCommTask().executeOnExecutor(
-                AsyncTask.THREAD_POOL_EXECUTOR);
+        new IncommingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void bindSimWifiP2pService() {
@@ -109,9 +113,39 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         mBound = true;
     }
 
+    public void registerSimWifiP2pBcastReceiver() {
+        // register broadcast receiver
+        filter = new IntentFilter();
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
+        receiver = new SimWifiP2pBroadcastReceiverOwn(this);
+        registerReceiver(receiver, filter);
+    }
+
     public void initSimWifiP2p() {
         // initialize the WDSim API
         SimWifiP2pSocketManager.Init(getApplicationContext());
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+//        unbindService(mConnection);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Toast.makeText(this, "Stopping Own Activity", Toast.LENGTH_LONG).show();
+        keepListening = false;
+        try {
+            mSrvSocket.close();
+            mSrvSocket = null;
+        } catch (IOException e) {
+            Log.d("mSrvSocket close err", e.getMessage());
+        }
     }
 
 
@@ -159,14 +193,20 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         protected Void doInBackground(Void... params) {
 
             Log.d(TAG, "IncommingCommTask started (" + this.hashCode() + ").");
-
-            try {
-                mSrvSocket = new SimWifiP2pSocketServer(
-                        Integer.parseInt(getString(R.string.port)));
-            } catch (IOException e) {
-                e.printStackTrace();
+            while (true) {
+                try {
+                    mSrvSocket = new SimWifiP2pSocketServer(
+                            Integer.parseInt(getString(R.string.port)));
+                    break;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    continue;
+                } catch (Exception e) {
+                    Log.d("Error server socket:", e.getMessage());
+                    continue;
+                }
             }
-            while (!Thread.currentThread().isInterrupted()) {
+            while (keepListening) {
                 try {
                     SimWifiP2pSocket sock = mSrvSocket.accept();
                     publishProgress(sock);
@@ -212,8 +252,8 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
 
                     String email = splt[1];
                     Set<String> allOwnWS = _userPrefs.getStringSet(getString(R.string.own_all_workspaces_list), null);
-                    if(null != allOwnWS){
-                        for(String ws : allOwnWS) {
+                    if (null != allOwnWS) {
+                        for (String ws : allOwnWS) {
 
                         }
                     }
@@ -330,7 +370,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
-        }         else if(id == R.id.action_logout){
+        } else if (id == R.id.action_logout) {
             _appPrefs.edit().putBoolean("firstRun", true).commit();
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -431,7 +471,6 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         });
 
 
-
         final EditText etName = (EditText) customView.findViewById(R.id.et_ws_name);
         final EditText etQuota = (EditText) customView.findViewById(R.id.et_ws_quota);
         AlertDialog dialog = new AlertDialog.Builder(SUBCLASS_CONTEXT)
@@ -495,7 +534,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
 
     @Override
     protected void onPause() {
-        super.onStop();
+        super.onPause();
         _userPrefs.edit().commit();
     }
 }

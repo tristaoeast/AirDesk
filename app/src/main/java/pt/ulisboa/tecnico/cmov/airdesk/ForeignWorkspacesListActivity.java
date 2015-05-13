@@ -52,7 +52,9 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
  */
 public class ForeignWorkspacesListActivity extends ActionBarActivity implements SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener {
 
-    public static final String TAG = "ForeignWorkspacesListActivity";
+    public static final String TAG = "ForeignWSListActivity";
+
+    private boolean keepListening;
 
     private boolean justCreated;
     private IntentFilter filter;
@@ -105,7 +107,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         LOCAL_USERNAME = _appPrefs.getString("username", "");
         _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
         _userPrefsEditor = _userPrefs.edit();
-        setupWsList();
         SUBCLASS_LIST_ACTIVITY = this;
         SUBCLASS_CONTEXT = this;
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(SUBCLASS_LIST_ACTIVITY, SUBCLASS_CONTEXT);
@@ -115,26 +116,26 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
             _appDir.mkdir();
 
         justCreated = true;
+        keepListening = true;
 
         initSimWifiP2p();
         registerSimWifiP2pBcastReceiver();
         bindSimWifiP2pService();
 
+        new IncommingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-
+        setupWsList();
     }
 
     public void bindSimWifiP2pService() {
         Intent intent = new Intent(this, SimWifiP2pService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        mBound = true;
+        //mBound = true;
     }
 
     public void initSimWifiP2p() {
         // initialize the WDSim API
         SimWifiP2pSocketManager.Init(getApplicationContext());
-
-
     }
 
     public void registerSimWifiP2pBcastReceiver() {
@@ -146,24 +147,32 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
         receiver = new SimWifiP2pBroadcastReceiverForeign(this);
         registerReceiver(receiver, filter);
-
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        if (justCreated)
-            justCreated = false;
-        else {
-            initSimWifiP2p();
-            registerSimWifiP2pBcastReceiver();
-        }
+//        if (justCreated)
+//            justCreated = false;
+//        else {
+//            initSimWifiP2p();
+//            registerSimWifiP2pBcastReceiver();
+//            bindSimWifiP2pService();
+//        }
+
+        initSimWifiP2p();
+        registerSimWifiP2pBcastReceiver();
+        bindSimWifiP2pService();
+
+        //new IncommingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        setupWsList();
     }
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         if (mBound) {
             unbindService(mConnection);
             mBound = false;
@@ -173,8 +182,17 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     @Override
     protected void onStop() {
         super.onStop();
+        Toast.makeText(this, "Stopping Foreign Activity", Toast.LENGTH_LONG).show();
         unregisterReceiver(receiver);
+        keepListening = false;
+        try {
+            mSrvSocket.close();
+            mSrvSocket = null;
+        } catch (IOException e) {
+            Log.d("mSrvSocket close err", e.getMessage());
+        }
     }
+
 
     @Override
     public void onPeersAvailable(SimWifiP2pDeviceList peers) {
@@ -244,6 +262,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
          */
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            Toast.makeText(ForeignWorkspacesListActivity.this, "Service Disconnected", Toast.LENGTH_LONG).show();
             mService = null;
             mManager = null;
             mChannel = null;
@@ -251,11 +270,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         }
     };
 
-    /*
-	 * Classes implementing chat message exchange
-	 */
-
-//    protected void setupSuper() {
     private SimWifiP2pSocketServer mSrvSocket = null;
     private ReceiveCommTask mComm = null;
     private SimWifiP2pSocket mCliSocket = null;
@@ -267,13 +281,17 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
 
             Log.d(TAG, "IncommingCommTask started (" + this.hashCode() + ").");
 
-            try {
-                mSrvSocket = new SimWifiP2pSocketServer(
-                        Integer.parseInt(getString(R.string.port)));
-            } catch (IOException e) {
-                e.printStackTrace();
+            while (true) {
+                try {
+                    mSrvSocket = new SimWifiP2pSocketServer(
+                            Integer.parseInt(getString(R.string.port)));
+                    break;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    continue;
+                }
             }
-            while (!Thread.currentThread().isInterrupted()) {
+            while (keepListening) {
                 try {
                     SimWifiP2pSocket sock = mSrvSocket.accept();
                     if (mCliSocket != null && mCliSocket.isClosed()) {
@@ -317,7 +335,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
                         Integer.parseInt(getString(R.string.port)));
 
                 try {
-                    cliSocket.getOutputStream().write( ("WS_SHARED_LIST;" + LOCAL_EMAIL + ";" + "\n").getBytes());
+                    cliSocket.getOutputStream().write(("WS_SHARED_LIST;" + LOCAL_EMAIL + ";" + "\n").getBytes());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -372,8 +390,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
             if (!s.isClosed()) {
                 try {
                     s.close();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Log.d("Error closing socket:", e.getMessage());
                 }
             }
@@ -384,9 +401,10 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
                 //guiUpdateInitState();
             }
         }
+
     }
 
-    protected void setupSuper() {
+//    protected void setupSuper() {
 //        FOREIGN_WORKSPACE_LIST_LAYOUT = R.layout.activity_foreign_workspaces_list;
 //        FOREIGN_WORKSPACE_DIR = R.string.foreign_workspaces_dir;
 //        FOREIGN_WORKSPACES_LIST = R.string.foreign_workspaces_list;
@@ -421,7 +439,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     }
 
 
-
     protected void setupWsList() {
         _username = _appPrefs.getString("username", "invalid username");
         _email = _appPrefs.getString("email", "invalid email");
@@ -454,10 +471,13 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         _wsNamesList.clear();
         //Set<String> wsNames = _userPrefs.getStringSet(getString(R.string.foreign_workspaces_list), new HashSet<String>());
         //TODO pedir nomes de ws aos peers em vez de ir buscar aos sharedprefs
-        mManager.requestGroupInfo(mChannel, (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
-        for (String peer : _peersStr){
-            new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer);
-        }
+        if (mBound) {
+            mManager.requestGroupInfo(mChannel, (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
+            for (String peer : _peersStr) {
+                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer);
+            }
+        } else
+            Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
 
         /*
         Set<String> privateWorkspaces = _userPrefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
@@ -546,7 +566,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
 
     @Override
     protected void onPause() {
-        super.onStop();
+        super.onPause();
         _userPrefs.edit().commit();
     }
 
