@@ -84,18 +84,17 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     protected SharedPreferences.Editor _appPrefsEditor;
     protected SharedPreferences.Editor _userPrefsEditor;
 
-    //    protected int FOREIGN_WORKSPACE_LIST_LAYOUT;
-//    protected int FOREIGN_WORKSPACE_DIR;
-//    protected int FOREIGN_WORKSPACES_LIST;
-//    protected int FOREIGN_WORKSPACES_PERMISSIONS_CRITERIA;
+
     protected ActionBarActivity SUBCLASS_LIST_ACTIVITY;
-    //    protected Class SUBCLASS_ACTIVITY_CLASS;
+
     protected Context SUBCLASS_CONTEXT;
 
     protected File _appDir;
 
     protected String LOCAL_EMAIL;
     protected String LOCAL_USERNAME;
+
+    private String teste;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,13 +117,13 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         setupTagsList();
 
         justCreated = true;
-        keepListening = true;
 
+        keepListening = true;
         initSimWifiP2p();
         registerSimWifiP2pBcastReceiver();
         bindSimWifiP2pService();
-
         new IncommingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        Toast.makeText(this,teste,Toast.LENGTH_LONG).show();
 
         setupWsList();
     }
@@ -132,7 +131,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     public void bindSimWifiP2pService() {
         Intent intent = new Intent(this, SimWifiP2pService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        //mBound = true;
+        mBound = true;
     }
 
     public void initSimWifiP2p() {
@@ -163,11 +162,11 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
 //            bindSimWifiP2pService();
 //        }
 
+        keepListening = true;
         initSimWifiP2p();
         registerSimWifiP2pBcastReceiver();
         bindSimWifiP2pService();
-
-        //new IncommingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        new IncommingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         setupWsList();
     }
@@ -250,6 +249,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
             mManager = new SimWifiP2pManager(mService);
             mChannel = mManager.initialize(getApplication(), getMainLooper(), null);
             mBound = true;
+            teste = "Service Connected";
         }
 
         /**
@@ -264,11 +264,11 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
          */
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Toast.makeText(ForeignWorkspacesListActivity.this, "Service Disconnected", Toast.LENGTH_LONG).show();
             mService = null;
             mManager = null;
             mChannel = null;
             mBound = false;
+            teste = "Service DisConnected";
         }
     };
 
