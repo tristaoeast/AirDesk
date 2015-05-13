@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -185,6 +186,84 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
 
         LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
         final View customView = inflater.inflate(NEW_WORKSPACE_DIALOG_LAYOUT, null);
+
+        final ListView lv_emails = (ListView) customView.findViewById(R.id.lv_emails);
+        final ArrayList<String> emailsList = new ArrayList<String>();
+        final ArrayAdapter<String> emailsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, emailsList);
+        lv_emails.setAdapter(emailsAdapter);
+
+        Button bt_add_email = (Button) customView.findViewById(R.id.bt_add_email);
+        bt_add_email.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText et_emails = (EditText) customView.findViewById(R.id.et_emails);
+                String email = et_emails.getText().toString().trim();
+                if (email.isEmpty())
+                    Toast.makeText(SUBCLASS_CONTEXT, "Insert email.", Toast.LENGTH_LONG).show();
+                else if (emailsList.contains(email))
+                    Toast.makeText(SUBCLASS_CONTEXT, "Email already exsits.", Toast.LENGTH_LONG).show();
+                else {
+                    emailsList.add(et_emails.getText().toString());
+                    Collections.sort(emailsList);
+                    emailsAdapter.notifyDataSetChanged();
+                    et_emails.setText("");
+                }
+            }
+        });
+
+        lv_emails.post(new Runnable() {
+            @Override
+            public void run() {
+                lv_emails.smoothScrollToPosition(0);
+            }
+        });
+
+        lv_emails.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                emailsList.remove(position);
+                emailsAdapter.notifyDataSetChanged();
+            }
+        });
+
+        final ListView lv_tags = (ListView) customView.findViewById(R.id.lv_tags);
+        final ArrayList<String> tagsList = new ArrayList<String>();
+        final ArrayAdapter<String> tagsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, tagsList);
+        lv_tags.setAdapter(tagsAdapter);
+
+        Button bt_add_tag = (Button) customView.findViewById(R.id.bt_add_tag);
+        bt_add_tag.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText et_tags = (EditText) customView.findViewById(R.id.et_tags);
+                String email = et_tags.getText().toString().trim();
+                if (email.isEmpty())
+                    Toast.makeText(SUBCLASS_CONTEXT, "Insert tag.", Toast.LENGTH_LONG).show();
+                else if (emailsList.contains(email))
+                    Toast.makeText(SUBCLASS_CONTEXT, "Tag already exists.", Toast.LENGTH_LONG).show();
+                else {
+                    tagsList.add(et_tags.getText().toString());
+                    Collections.sort(tagsList);
+                    tagsAdapter.notifyDataSetChanged();
+                    et_tags.setText("");
+                }
+            }
+        });
+
+        lv_tags.post(new Runnable() {
+            @Override
+            public void run() {
+                lv_tags.smoothScrollToPosition(0);
+            }
+        });
+
+        lv_tags.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                tagsList.remove(position);
+                tagsAdapter.notifyDataSetChanged();
+            }
+        });
 
         final EditText etName = (EditText) customView.findViewById(R.id.et_ws_name);
         final EditText etQuota = (EditText) customView.findViewById(R.id.et_ws_quota);
