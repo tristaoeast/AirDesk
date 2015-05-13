@@ -1,12 +1,17 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
@@ -21,16 +26,29 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
+
+import pt.inesc.termite.wifidirect.SimWifiP2pManager;
+import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 
 /**
  * Created by ist167092 on 24-03-2015.
  */
 public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
+
+    public static final String TAG = "OwnWorkspacesListActivity";
+
 
     protected ActionBarDrawerToggle _drawerToggle;
     protected ArrayList<String> _wsNamesList;
@@ -53,6 +71,14 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     protected String LOCAL_EMAIL;
     protected String LOCAL_USERNAME;
 
+    protected SimWifiP2pSocketServer mSrvSocket;
+    protected SimWifiP2pSocket mCliSocket;
+    protected ReceiveCommTask mComm;
+    protected boolean mBound;
+    protected Messenger mService;
+    protected SimWifiP2pManager mManager;
+    protected SimWifiP2pManager.Channel mChannel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +86,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         _appPrefsEditor = _appPrefs.edit();
         LOCAL_EMAIL = _appPrefs.getString("email", "");
-        LOCAL_USERNAME = _appPrefs.getString("username","");
+        LOCAL_USERNAME = _appPrefs.getString("username", "");
         Log.d("WS_LIST_ACTIVITY_EMAIL", LOCAL_EMAIL);
         _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
         _userPrefsEditor = _userPrefs.edit();
@@ -68,8 +94,147 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(SUBCLASS_LIST_ACTIVITY, SUBCLASS_CONTEXT);
         _drawerToggle = nh.setup();
         _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
-        if(!_appDir.exists())
+        if (!_appDir.exists())
             _appDir.mkdir();
+
+        initSimWifiP2p();
+        bindSimWifiP2pService();
+        new IncommingCommTask().executeOnExecutor(
+                AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public void bindSimWifiP2pService() {
+        Intent intent = new Intent(this, SimWifiP2pService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        mBound = true;
+    }
+
+    public void initSimWifiP2p() {
+        // initialize the WDSim API
+        SimWifiP2pSocketManager.Init(getApplicationContext());
+    }
+
+
+    protected ServiceConnection mConnection = new ServiceConnection() {
+
+        /**
+         * Called when a connection to the Service has been established, with
+         * the {@link android.os.IBinder} of the communication channel to the
+         * Service.
+         *
+         * @param name    The concrete component name of the service that has
+         *                been connected.
+         * @param service The IBinder of the Service's communication channel,
+         */
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mService = new Messenger(service);
+            mManager = new SimWifiP2pManager(mService);
+            mChannel = mManager.initialize(getApplication(), getMainLooper(), null);
+            mBound = true;
+        }
+
+        /**
+         * Called when a connection to the Service has been lost.  This typically
+         * happens when the process hosting the service has crashed or been killed.
+         * This does <em>not</em> remove the ServiceConnection itself -- this
+         * binding to the service will remain active, and you will receive a call
+         * to {@link #onServiceConnected} when the Service is next running.
+         *
+         * @param name The concrete component name of the service whose
+         *             connection has been lost.
+         */
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+            mManager = null;
+            mChannel = null;
+            mBound = false;
+        }
+    };
+
+    public class IncommingCommTask extends AsyncTask<Void, SimWifiP2pSocket, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            Log.d(TAG, "IncommingCommTask started (" + this.hashCode() + ").");
+
+            try {
+                mSrvSocket = new SimWifiP2pSocketServer(
+                        Integer.parseInt(getString(R.string.port)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    SimWifiP2pSocket sock = mSrvSocket.accept();
+                    publishProgress(sock);
+                } catch (IOException e) {
+                    Log.d("Error accepting socket:", e.getMessage());
+                    break;
+                    //e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+
+        @Override
+        protected void onProgressUpdate(SimWifiP2pSocket... values) {
+            Toast.makeText(OwnWorkspacesListActivity.this, "New connection", Toast.LENGTH_SHORT).show();
+            mCliSocket = values[0];
+            mComm = new ReceiveCommTask();
+
+            mComm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mCliSocket);
+        }
+    }
+
+    public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
+        SimWifiP2pSocket s;
+
+        @Override
+        protected Void doInBackground(SimWifiP2pSocket... params) {
+            BufferedReader sockIn;
+            String st;
+            s = params[0];
+            try {
+                sockIn = new BufferedReader(new InputStreamReader(s.getInputStream()));
+//                while ((st = sockIn.readLine()) != null) {
+//                    publishProgress(st);
+//                }
+                st = sockIn.readLine();
+
+                String[] splt = st.split(";");
+
+                if (splt[0].equals("WS_SHARED_LIST")) {
+                    //TODO PROVIDE WS_SHARED_LIST_RESPONSE
+
+                    String email = splt[1];
+                    Set<String> allOwnWS = _userPrefs.getStringSet(getString(R.string.own_all_workspaces_list), null);
+                    if(null != allOwnWS){
+                        for(String ws : allOwnWS) {
+
+                        }
+                    }
+//                    _userPrefsEditor.putStringSet(getString(R.string.own_all_workspaces_list), allWs);
+//                    _userPrefsEditor.putStringSet(name + "_invitedUsers", wsEmails);
+                } else if (splt[0].equals("WS_SUBSCRIBED_LIST")) {
+                    //TODO PROVIDE WS_SUBSCRIBED_LIST_RESPONSE
+                } else if (splt[0].equals("WS_FILE_LIST")) {
+                    //TODO PROVIDE WS_FILE_LIST_RESPONSE
+                } else if (splt[0].equals("WS_FILE_READ")) {
+                    //TODO PROVIDE GET_WS_FILE_RESPONSE
+                } else if (splt[0].equals("WS_FILE_EDIT")) {
+                    //TODO PROVIDE WS_FILE_EDIT_AUTHORIZATION
+                }
+                s.close();
+            } catch (IOException e) {
+                Log.d("Error reading socket:", e.getMessage());
+            }
+            return null;
+        }
+
 
     }
 
@@ -264,6 +429,8 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
                 tagsAdapter.notifyDataSetChanged();
             }
         });
+
+
 
         final EditText etName = (EditText) customView.findViewById(R.id.et_ws_name);
         final EditText etQuota = (EditText) customView.findViewById(R.id.et_ws_quota);

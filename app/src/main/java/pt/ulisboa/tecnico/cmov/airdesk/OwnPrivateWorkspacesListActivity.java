@@ -29,10 +29,7 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 /**
  * Created by ist167092 on 24-03-2015.
  */
-public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity implements SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener {
-
-    private IntentFilter filter;
-    SimWifiP2pBroadcastReceiverPrivate receiver;
+public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,73 +41,6 @@ public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity 
                 OwnPrivateWorkspaceActivity.class,
                 this);
         super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // initialize the WDSim API
-        SimWifiP2pSocketManager.Init(getApplicationContext());
-
-        // register broadcast receiver
-        filter = new IntentFilter();
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION);
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
-        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
-        receiver = new SimWifiP2pBroadcastReceiverPrivate(this);
-        registerReceiver(receiver, filter);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unregisterReceiver(receiver);
-    }
-
-    @Override
-    public void onPeersAvailable(SimWifiP2pDeviceList peers) {
-        StringBuilder peersStr = new StringBuilder();
-
-        // compile list of devices in range
-        for (SimWifiP2pDevice device : peers.getDeviceList()) {
-            String devstr = "" + device.deviceName + " (" + device.getVirtIp() + ")\n";
-            peersStr.append(devstr);
-        }
-
-        // display list of devices in range
-        new AlertDialog.Builder(this)
-                .setTitle("Devices in WiFi Range")
-                .setMessage(peersStr.toString())
-                .setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .show();
-    }
-
-    @Override
-    public void onGroupInfoAvailable(SimWifiP2pDeviceList devices,
-                                     SimWifiP2pInfo groupInfo) {
-
-        // compile list of network members
-        StringBuilder peersStr = new StringBuilder();
-        for (String deviceName : groupInfo.getDevicesInNetwork()) {
-            SimWifiP2pDevice device = devices.getByName(deviceName);
-            String devstr = "" + deviceName + " (" +
-                    ((device == null)?"??":device.getVirtIp()) + ")\n";
-            peersStr.append(devstr);
-        }
-
-        // display list of network members
-        new AlertDialog.Builder(this)
-                .setTitle("Devices in WiFi Network")
-                .setMessage(peersStr.toString())
-                .setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .show();
     }
 
     @Override
