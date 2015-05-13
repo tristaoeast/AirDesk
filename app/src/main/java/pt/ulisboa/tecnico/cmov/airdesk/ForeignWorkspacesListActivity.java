@@ -9,11 +9,13 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +24,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,17 +40,23 @@ import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 import pt.inesc.termite.wifidirect.SimWifiP2pManager;
 import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 
 /**
  * Created by mariana on 08-04-2015.
  */
 public class ForeignWorkspacesListActivity extends ActionBarActivity implements SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener {
 
+    public static final String TAG = "ForeignWorkspacesListActivity";
+
     private boolean justCreated;
     private IntentFilter filter;
     private SimWifiP2pBroadcastReceiverForeign receiver;
     private boolean mBound;
+
+    private ArrayList<String> _peersStr;
 
     private ActionBarDrawerToggle _drawerToggle;
 
@@ -185,25 +197,14 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     @Override
     public void onGroupInfoAvailable(SimWifiP2pDeviceList devices,
                                      SimWifiP2pInfo groupInfo) {
-
+        _peersStr.clear();
         // compile list of network members
-        StringBuilder peersStr = new StringBuilder();
+
         for (String deviceName : groupInfo.getDevicesInNetwork()) {
             SimWifiP2pDevice device = devices.getByName(deviceName);
-            String devstr = "" + deviceName + " (" +
-                    ((device == null) ? "??" : device.getVirtIp()) + ")\n";
-            peersStr.append(devstr);
+            String devstr = device.getVirtIp();
+            _peersStr.add(devstr);
         }
-
-        // display list of network members
-        new AlertDialog.Builder(this)
-                .setTitle("Devices in WiFi Network")
-                .setMessage(peersStr.toString())
-                .setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .show();
     }
 
     private Messenger mService;
@@ -247,6 +248,139 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         }
     };
 
+    /*
+	 * Classes implementing chat message exchange
+	 */
+
+    private SimWifiP2pSocketServer mSrvSocket = null;
+    private ReceiveCommTask mComm = null;
+    private SimWifiP2pSocket mCliSocket = null;
+
+    public class IncommingCommTask extends AsyncTask<Void, SimWifiP2pSocket, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            Log.d(TAG, "IncommingCommTask started (" + this.hashCode() + ").");
+
+            try {
+                mSrvSocket = new SimWifiP2pSocketServer(
+                        Integer.parseInt(getString(R.string.port)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    SimWifiP2pSocket sock = mSrvSocket.accept();
+                    if (mCliSocket != null && mCliSocket.isClosed()) {
+                        mCliSocket = null;
+                    }
+                    if (mCliSocket != null) {
+                        Log.d(TAG, "Closing accepted socket because mCliSocket still active.");
+                        sock.close();
+                    } else {
+                        publishProgress(sock);
+                    }
+                } catch (IOException e) {
+                    Log.d("Error accepting socket:", e.getMessage());
+                    break;
+                    //e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(SimWifiP2pSocket... values) {
+            mCliSocket = values[0];
+            mComm = new ReceiveCommTask();
+
+            mComm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mCliSocket);
+        }
+    }
+
+    public class OutgoingCommTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            //mTextOutput.setText("Connecting...");
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                SimWifiP2pSocket cliSocket = new SimWifiP2pSocket(params[0],
+                        Integer.parseInt(getString(R.string.port)));
+
+                try {
+                    cliSocket.getOutputStream().write( ("WS_SHARED_LIST;" + LOCAL_EMAIL + ";" + "\n").getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (UnknownHostException e) {
+                return "Unknown Host:" + e.getMessage();
+            } catch (IOException e) {
+                return "IO error:" + e.getMessage();
+            }
+            return null;
+        }
+    }
+
+    public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
+        SimWifiP2pSocket s;
+
+        @Override
+        protected Void doInBackground(SimWifiP2pSocket... params) {
+            BufferedReader sockIn;
+            String st;
+
+            s = params[0];
+            try {
+                sockIn = new BufferedReader(new InputStreamReader(s.getInputStream()));
+
+                while ((st = sockIn.readLine()) != null) {
+                    publishProgress(st);
+                }
+            } catch (IOException e) {
+                Log.d("Error reading socket:", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            /*mTextOutput.setText("");
+            findViewById(R.id.idSendButton).setEnabled(true);
+            findViewById(R.id.idDisconnectButton).setEnabled(true);
+            findViewById(R.id.idConnectButton).setEnabled(false);
+            mTextInput.setHint("");
+            mTextInput.setText("");*/
+
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            //mTextOutput.append(values[0]+"\n");
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            if (!s.isClosed()) {
+                try {
+                    s.close();
+                }
+                catch (Exception e) {
+                    Log.d("Error closing socket:", e.getMessage());
+                }
+            }
+            s = null;
+            if (mBound) {
+                //guiUpdateDisconnectedState();
+            } else {
+                //guiUpdateInitState();
+            }
+        }
+    }
 
     protected void setupSuper() {
 //        FOREIGN_WORKSPACE_LIST_LAYOUT = R.layout.activity_foreign_workspaces_list;
@@ -286,6 +420,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         _username = _appPrefs.getString("username", "invalid username");
         _email = _appPrefs.getString("email", "invalid email");
         _wsNamesList = new ArrayList<String>();
+        _peersStr = new ArrayList<String>();
         _wsPermissionsList = new ArrayList<String>();
         _wsNamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _wsNamesList);
         // Get ListView object from xml
@@ -313,6 +448,12 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         _wsNamesList.clear();
         //Set<String> wsNames = _userPrefs.getStringSet(getString(R.string.foreign_workspaces_list), new HashSet<String>());
         //TODO pedir nomes de ws aos peers em vez de ir buscar aos sharedprefs
+        mManager.requestGroupInfo(mChannel, (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
+        for (String peer : _peersStr){
+            new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer);
+        }
+
+        /*
         Set<String> privateWorkspaces = _userPrefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
         Set<String> publicWorkspaces = _userPrefs.getStringSet(getString(R.string.own_public_workspaces_list), new HashSet<String>());
 
@@ -342,7 +483,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
             Toast.makeText(this, _username + ", you have no foreign workspaces being shared with you at the moment", Toast.LENGTH_LONG);
         }
         Collections.sort(_wsNamesList);
-        _wsNamesAdapter.notifyDataSetChanged();
+        _wsNamesAdapter.notifyDataSetChanged();*/
     }
 
     @Override
