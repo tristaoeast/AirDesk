@@ -48,5 +48,6 @@
     <string name="bt_edit_tags">Edit</string>
     <string name="tv_tags_title">Tags</string>
     <string name="foreign_workspaces_list">Foreign Workspaces</string>
+    <string name="port">10001</string>
 
 </resources>
