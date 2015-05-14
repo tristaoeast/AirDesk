@@ -141,7 +141,7 @@ public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity 
                             _userPrefsEditor.putStringSet(getString(R.string.own_private_workspaces_list), privateWs);
                             _userPrefsEditor.putStringSet(getString(R.string.own_all_workspaces_list), allWs);
                             _userPrefsEditor.putStringSet(name + "_invitedUsers", wsEmails);
-                            _userPrefsEditor.putBoolean(name+"_private",true);
+                            _userPrefsEditor.putBoolean(name + "_private", true);
                             _wsNamesList.add(name);
                             _wsNamesAdapter.notifyDataSetChanged();
 

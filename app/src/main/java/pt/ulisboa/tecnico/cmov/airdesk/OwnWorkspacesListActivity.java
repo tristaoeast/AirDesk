@@ -82,16 +82,22 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     private IntentFilter filter;
     private SimWifiP2pBroadcastReceiverOwn receiver;
 
+    private GlobalClass mAppContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(OWN_WORKSPACE_LIST_LAYOUT);
+        mAppContext = (GlobalClass) getApplicationContext();
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         _appPrefsEditor = _appPrefs.edit();
         LOCAL_EMAIL = _appPrefs.getString("email", "");
         LOCAL_USERNAME = _appPrefs.getString("username", "");
         Log.d("WS_LIST_ACTIVITY_EMAIL", LOCAL_EMAIL);
         _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
+        mAppContext.setUserPrefs(_userPrefs);
+        mAppContext.setLocalEmail(LOCAL_EMAIL);
+        mAppContext.setLocalUsername(LOCAL_USERNAME);
         _userPrefsEditor = _userPrefs.edit();
         setupWsList();
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(SUBCLASS_LIST_ACTIVITY, SUBCLASS_CONTEXT);

@@ -16,6 +16,8 @@ public class OutgoingCommTask extends AsyncTask<String, Void, String> {
 
     private Context mContext;
 
+    public OutgoingCommTask(){}
+
     public OutgoingCommTask(Context context) {
         mContext = context;
     }

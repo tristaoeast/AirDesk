@@ -40,6 +40,7 @@ public class MainActivity extends ActionBarActivity {
         mAppContext = (GlobalClass) getApplicationContext();
 
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
+        mAppContext.setAppPrefs(_appPrefs);
 
         final EditText et_user = (EditText) findViewById(R.id.et_username);
         final EditText et_email = (EditText) findViewById(R.id.et_email);
@@ -130,10 +131,6 @@ public class MainActivity extends ActionBarActivity {
 
                 Toast.makeText(MainActivity.this, "Logged in as " + username + " with email " + email, Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
-
-
-
-
                 startActivity(intent);
             }
         }
