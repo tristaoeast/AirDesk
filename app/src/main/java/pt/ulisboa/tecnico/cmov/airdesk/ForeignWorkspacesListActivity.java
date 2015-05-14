@@ -116,7 +116,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
-        receiver = new SimWifiP2pBroadcastReceiverForeign(this);
+        receiver = new SimWifiP2pBroadcastReceiverForeign(this, mAppContext);
         registerReceiver(receiver, filter);
     }
 
