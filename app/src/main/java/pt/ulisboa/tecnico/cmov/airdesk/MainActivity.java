@@ -1,8 +1,14 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -11,6 +17,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pManager;
+import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -21,10 +30,14 @@ public class MainActivity extends ActionBarActivity {
     private String LOCAL_USERNAME;
     private String LOCAL_EMAIL;
 
+    GlobalClass mAppContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mAppContext = (GlobalClass) getApplicationContext();
 
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
 
@@ -57,7 +70,48 @@ public class MainActivity extends ActionBarActivity {
                 return false;
             }
         });
+
+        initSimWifiP2p();
+        bindSimWifiP2pService();
+
+
+        new IncomingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
     }
+
+    public void bindSimWifiP2pService() {
+        Intent intent = new Intent(this, SimWifiP2pService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        mAppContext.setBound(true);
+    }
+
+    public void initSimWifiP2p() {
+        // initialize the WDSim API
+        SimWifiP2pSocketManager.Init(getApplicationContext());
+    }
+
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Messenger mService = new Messenger(service);
+            SimWifiP2pManager mManager = new SimWifiP2pManager(mService);
+            SimWifiP2pManager.Channel mChannel = mManager.initialize(getApplication(), getMainLooper(), null);
+            mAppContext.setService(mService);
+            mAppContext.setManager(mManager);
+            mAppContext.setChannel(mChannel);
+            mAppContext.setBound(true);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mAppContext.setService(null);
+            mAppContext.setManager(null);
+            mAppContext.setChannel(null);
+            mAppContext.setBound(false);
+        }
+    };
 
     @Override
     protected void onResume() {
@@ -75,6 +129,10 @@ public class MainActivity extends ActionBarActivity {
 
                 Toast.makeText(MainActivity.this, "Logged in as " + username + " with email " + email, Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
+
+
+
+
                 startActivity(intent);
             }
         }

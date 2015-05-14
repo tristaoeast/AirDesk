@@ -104,7 +104,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         initSimWifiP2p();
         registerSimWifiP2pBcastReceiver();
         bindSimWifiP2pService();
-        new IncommingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
     }
 
     public void bindSimWifiP2pService() {
@@ -187,96 +187,8 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         }
     };
 
-    public class IncommingCommTask extends AsyncTask<Void, SimWifiP2pSocket, Void> {
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            Log.d(TAG, "IncommingCommTask started (" + this.hashCode() + ").");
-            while (true) {
-                try {
-                    mSrvSocket = new SimWifiP2pSocketServer(
-                            Integer.parseInt(getString(R.string.port)));
-                    break;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    continue;
-                } catch (Exception e) {
-                    Log.d("Error server socket:", e.getMessage());
-                    continue;
-                }
-            }
-            while (keepListening) {
-                try {
-                    SimWifiP2pSocket sock = mSrvSocket.accept();
-                    publishProgress(sock);
-                } catch (IOException e) {
-                    Log.d("Error accepting socket:", e.getMessage());
-                    break;
-                    //e.printStackTrace();
-                }
-            }
-            return null;
-        }
 
 
-        @Override
-        protected void onProgressUpdate(SimWifiP2pSocket... values) {
-            Toast.makeText(OwnWorkspacesListActivity.this, "New connection", Toast.LENGTH_SHORT).show();
-            mCliSocket = values[0];
-            mComm = new ReceiveCommTask();
-
-            mComm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mCliSocket);
-        }
-    }
-
-    public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
-        SimWifiP2pSocket s;
-
-        @Override
-        protected Void doInBackground(SimWifiP2pSocket... params) {
-            BufferedReader sockIn;
-            String st;
-            s = params[0];
-            try {
-                sockIn = new BufferedReader(new InputStreamReader(s.getInputStream()));
-//                while ((st = sockIn.readLine()) != null) {
-//                    publishProgress(st);
-//                }
-                st = sockIn.readLine();
-
-                String[] splt = st.split(";");
-
-                if (splt[0].equals("WS_SHARED_LIST")) {
-                    //TODO PROVIDE WS_SHARED_LIST_RESPONSE
-
-                    String email = splt[1];
-                    Set<String> allOwnWS = _userPrefs.getStringSet(getString(R.string.own_all_workspaces_list), null);
-                    if (null != allOwnWS) {
-                        for (String ws : allOwnWS) {
-
-                        }
-                    }
-//                    _userPrefsEditor.putStringSet(getString(R.string.own_all_workspaces_list), allWs);
-//                    _userPrefsEditor.putStringSet(name + "_invitedUsers", wsEmails);
-                } else if (splt[0].equals("WS_SUBSCRIBED_LIST")) {
-                    //TODO PROVIDE WS_SUBSCRIBED_LIST_RESPONSE
-                } else if (splt[0].equals("WS_FILE_LIST")) {
-                    //TODO PROVIDE WS_FILE_LIST_RESPONSE
-                } else if (splt[0].equals("WS_FILE_READ")) {
-                    //TODO PROVIDE GET_WS_FILE_RESPONSE
-                } else if (splt[0].equals("WS_FILE_EDIT")) {
-                    //TODO PROVIDE WS_FILE_EDIT_AUTHORIZATION
-                }
-                s.close();
-            } catch (IOException e) {
-                Log.d("Error reading socket:", e.getMessage());
-            }
-            return null;
-        }
-
-
-    }
 
     protected void setupSuper(int wsListLayout, int wsDir, int wsList, int wsDL, ActionBarActivity subClassListActivity, Class subClassActivity, Context subClassContext) {
         OWN_WORKSPACE_LIST_LAYOUT = wsListLayout;

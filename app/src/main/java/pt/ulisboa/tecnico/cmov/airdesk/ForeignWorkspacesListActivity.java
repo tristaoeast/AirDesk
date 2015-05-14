@@ -59,7 +59,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     private boolean justCreated;
     private IntentFilter filter;
     private SimWifiP2pBroadcastReceiverForeign receiver;
-    private boolean mBound;
 
     private ArrayList<String> _peersStr;
 
@@ -84,6 +83,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     protected SharedPreferences.Editor _appPrefsEditor;
     protected SharedPreferences.Editor _userPrefsEditor;
 
+    private GlobalClass mAppContext;
 
     protected ActionBarActivity SUBCLASS_LIST_ACTIVITY;
 
@@ -100,6 +100,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_foreign_workspaces_list);
+        mAppContext = (GlobalClass) getApplicationContext();
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         _appPrefsEditor = _appPrefs.edit();
         LOCAL_EMAIL = _appPrefs.getString("email", "");
@@ -115,29 +116,10 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
             _appDir.mkdir();
 
         setupTagsList();
-
-        justCreated = true;
-
-        keepListening = true;
-        initSimWifiP2p();
-        registerSimWifiP2pBcastReceiver();
-        bindSimWifiP2pService();
-        new IncommingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        Toast.makeText(this,teste,Toast.LENGTH_LONG).show();
-
         setupWsList();
     }
 
-    public void bindSimWifiP2pService() {
-        Intent intent = new Intent(this, SimWifiP2pService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        mBound = true;
-    }
 
-    public void initSimWifiP2p() {
-        // initialize the WDSim API
-        SimWifiP2pSocketManager.Init(getApplicationContext());
-    }
 
     public void registerSimWifiP2pBcastReceiver() {
         // register broadcast receiver
@@ -153,45 +135,15 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     @Override
     protected void onStart() {
         super.onStart();
-
-//        if (justCreated)
-//            justCreated = false;
-//        else {
-//            initSimWifiP2p();
-//            registerSimWifiP2pBcastReceiver();
-//            bindSimWifiP2pService();
-//        }
-
-        keepListening = true;
-        initSimWifiP2p();
-        registerSimWifiP2pBcastReceiver();
-        bindSimWifiP2pService();
-        new IncommingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-        setupWsList();
+        updateLists();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
-    }
+
 
     @Override
     protected void onStop() {
         super.onStop();
-        Toast.makeText(this, "Stopping Foreign Activity", Toast.LENGTH_LONG).show();
         unregisterReceiver(receiver);
-        keepListening = false;
-        try {
-            mSrvSocket.close();
-            mSrvSocket = null;
-        } catch (IOException e) {
-            Log.d("mSrvSocket close err", e.getMessage());
-        }
     }
 
 
@@ -227,186 +179,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
             String devstr = device.getVirtIp();
             _peersStr.add(devstr);
         }
-    }
-
-    private Messenger mService;
-    private SimWifiP2pManager mManager;
-    private SimWifiP2pManager.Channel mChannel;
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        /**
-         * Called when a connection to the Service has been established, with
-         * the {@link android.os.IBinder} of the communication channel to the
-         * Service.
-         *
-         * @param name    The concrete component name of the service that has
-         *                been connected.
-         * @param service The IBinder of the Service's communication channel,
-         */
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mService = new Messenger(service);
-            mManager = new SimWifiP2pManager(mService);
-            mChannel = mManager.initialize(getApplication(), getMainLooper(), null);
-            mBound = true;
-            teste = "Service Connected";
-        }
-
-        /**
-         * Called when a connection to the Service has been lost.  This typically
-         * happens when the process hosting the service has crashed or been killed.
-         * This does <em>not</em> remove the ServiceConnection itself -- this
-         * binding to the service will remain active, and you will receive a call
-         * to {@link #onServiceConnected} when the Service is next running.
-         *
-         * @param name The concrete component name of the service whose
-         *             connection has been lost.
-         */
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mService = null;
-            mManager = null;
-            mChannel = null;
-            mBound = false;
-            teste = "Service DisConnected";
-        }
-    };
-
-    private SimWifiP2pSocketServer mSrvSocket = null;
-    private ReceiveCommTask mComm = null;
-    private SimWifiP2pSocket mCliSocket = null;
-
-    public class IncommingCommTask extends AsyncTask<Void, SimWifiP2pSocket, Void> {
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            Log.d(TAG, "IncommingCommTask started (" + this.hashCode() + ").");
-
-            while (true) {
-                try {
-                    mSrvSocket = new SimWifiP2pSocketServer(
-                            Integer.parseInt(getString(R.string.port)));
-                    break;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    continue;
-                }
-            }
-            while (keepListening) {
-                try {
-                    SimWifiP2pSocket sock = mSrvSocket.accept();
-                    if (mCliSocket != null && mCliSocket.isClosed()) {
-                        mCliSocket = null;
-                    }
-                    if (mCliSocket != null) {
-                        Log.d(TAG, "Closing accepted socket because mCliSocket still active.");
-                        sock.close();
-                    } else {
-                        publishProgress(sock);
-                    }
-                } catch (IOException e) {
-                    Log.d("Error accepting socket:", e.getMessage());
-                    break;
-                    //e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(SimWifiP2pSocket... values) {
-            mCliSocket = values[0];
-            mComm = new ReceiveCommTask();
-
-            mComm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mCliSocket);
-        }
-    }
-
-    public class OutgoingCommTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected void onPreExecute() {
-            //mTextOutput.setText("Connecting...");
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                SimWifiP2pSocket cliSocket = new SimWifiP2pSocket(params[0],
-                        Integer.parseInt(getString(R.string.port)));
-
-                try {
-
-                    cliSocket.getOutputStream().write((params[1] + "\n").getBytes());
-                    cliSocket.getInputStream().read();
-                    cliSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } catch (UnknownHostException e) {
-                return "Unknown Host:" + e.getMessage();
-            } catch (IOException e) {
-                return "IO error:" + e.getMessage();
-            }
-            return null;
-        }
-    }
-
-    public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
-        SimWifiP2pSocket s;
-
-        @Override
-        protected Void doInBackground(SimWifiP2pSocket... params) {
-            BufferedReader sockIn;
-            String st;
-
-            s = params[0];
-            try {
-                sockIn = new BufferedReader(new InputStreamReader(s.getInputStream()));
-
-                while ((st = sockIn.readLine()) != null) {
-                    publishProgress(st);
-                }
-            } catch (IOException e) {
-                Log.d("Error reading socket:", e.getMessage());
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            /*mTextOutput.setText("");
-            findViewById(R.id.idSendButton).setEnabled(true);
-            findViewById(R.id.idDisconnectButton).setEnabled(true);
-            findViewById(R.id.idConnectButton).setEnabled(false);
-            mTextInput.setHint("");
-            mTextInput.setText("");*/
-
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            //mTextOutput.append(values[0]+"\n");
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            if (!s.isClosed()) {
-                try {
-                    s.close();
-                } catch (Exception e) {
-                    Log.d("Error closing socket:", e.getMessage());
-                }
-            }
-            s = null;
-            if (mBound) {
-                //guiUpdateDisconnectedState();
-            } else {
-                //guiUpdateInitState();
-            }
-        }
-
     }
 
 //    protected void setupSuper() {
@@ -473,23 +245,21 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     }
 
     protected void updateLists() {
-        //_wsNamesList.clear();
+        _wsNamesList.clear();
         //Set<String> wsNames = _userPrefs.getStringSet(getString(R.string.foreign_workspaces_list), new HashSet<String>());
         //TODO pedir nomes de ws aos peers em vez de ir buscar aos sharedprefs
-        if (mBound) {
-            mManager.requestGroupInfo(mChannel, (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
+        if (mAppContext.isBound()) {
+            mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
 
             String myTags = "";
             for (String tag : _tagsList){
                 myTags += ";" + tag;
             }
             String msg_tags = "WS_SUBSCRIBED_LIST;" + myTags;
-
             String msg_email = "WS_SHARED_LIST;" + LOCAL_EMAIL;
-
             for (String peer : _peersStr) {
-                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer ,msg_tags);
-                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email );
+                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer ,msg_tags);
+                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email );
             }
         } else
             Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
