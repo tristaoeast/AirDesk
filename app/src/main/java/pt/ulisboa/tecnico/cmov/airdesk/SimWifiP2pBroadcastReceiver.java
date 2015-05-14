@@ -56,6 +56,9 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver implements Si
 
         } else if (SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION.equals(action)) {
 
+            //TODO: if GO - check uptodate groupmember list and compare with groupinfo and verify if
+            //there are new members or lost members
+
             SimWifiP2pInfo ginfo = (SimWifiP2pInfo) intent.getSerializableExtra(
                     SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
             ginfo.print();

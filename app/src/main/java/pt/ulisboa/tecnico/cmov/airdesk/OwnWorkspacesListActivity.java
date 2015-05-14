@@ -76,7 +76,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     protected SimWifiP2pManager.Channel mChannel;
     private boolean keepListening;
     private IntentFilter filter;
-    private SimWifiP2pBroadcastReceiverOwn receiver;
+    private SimWifiP2pBroadcastReceiver receiver;
 
     private GlobalClass mAppContext;
 
@@ -104,7 +104,6 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
 
         keepListening = true;
         initSimWifiP2p();
-        registerSimWifiP2pBcastReceiver();
         bindSimWifiP2pService();
 
     }
@@ -122,7 +121,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
-        receiver = new SimWifiP2pBroadcastReceiverOwn(this, mAppContext);
+        receiver = new SimWifiP2pBroadcastReceiver(this, mAppContext);
         registerReceiver(receiver, filter);
     }
 
@@ -237,7 +236,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         }
         Collections.sort(_wsNamesList);
         _wsNamesAdapter.notifyDataSetChanged();
-
+        registerSimWifiP2pBcastReceiver();
     }
 
     @Override
@@ -436,5 +435,6 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     protected void onPause() {
         super.onPause();
         _userPrefs.edit().commit();
+        unregisterReceiver(receiver);
     }
 }

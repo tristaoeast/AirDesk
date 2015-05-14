@@ -101,8 +101,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         if (!_appDir.exists())
             _appDir.mkdir();
 
-       registerSimWifiP2pBcastReceiver();
-
         setupTagsList();
         setupWsList();
     }
@@ -117,18 +115,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
         receiver = new SimWifiP2pBroadcastReceiverForeign(this, mAppContext);
         registerReceiver(receiver, filter);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        updateLists();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unregisterReceiver(receiver);
     }
 
     @Override
@@ -273,7 +259,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         super.onResume();
         getSupportActionBar().setTitle(getString(R.string.foreign_workspaces_list));
         updateLists();
-
+        registerSimWifiP2pBcastReceiver();
     }
 
     @Override
@@ -324,6 +310,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     protected void onPause() {
         super.onPause();
         _userPrefs.edit().commit();
+        unregisterReceiver(receiver);
     }
 
     public void editTags(final View view) {
