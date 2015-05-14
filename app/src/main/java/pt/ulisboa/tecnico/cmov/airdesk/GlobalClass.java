@@ -6,6 +6,7 @@ import android.os.Messenger;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -25,6 +26,16 @@ public class GlobalClass extends Application {
 
     private SharedPreferences mAppPrefs;
     private SharedPreferences mUserPrefs;
+
+    public ArrayList<String> getTagsList() {
+        return _tagsList;
+    }
+
+    public void setTagsList(ArrayList<String> _tagsList) {
+        this._tagsList = _tagsList;
+    }
+
+    private ArrayList<String> _tagsList;
 
     private String mLocalUsername;
     private String mLocalEmail;
