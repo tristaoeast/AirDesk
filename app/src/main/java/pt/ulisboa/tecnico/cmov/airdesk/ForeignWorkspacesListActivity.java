@@ -337,7 +337,10 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
                         Integer.parseInt(getString(R.string.port)));
 
                 try {
-                    cliSocket.getOutputStream().write(("WS_SHARED_LIST;" + LOCAL_EMAIL + ";" + "\n").getBytes());
+
+                    cliSocket.getOutputStream().write((params[1] + "\n").getBytes());
+                    cliSocket.getInputStream().read();
+                    cliSocket.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -470,13 +473,23 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     }
 
     protected void updateLists() {
-        _wsNamesList.clear();
+        //_wsNamesList.clear();
         //Set<String> wsNames = _userPrefs.getStringSet(getString(R.string.foreign_workspaces_list), new HashSet<String>());
         //TODO pedir nomes de ws aos peers em vez de ir buscar aos sharedprefs
         if (mBound) {
             mManager.requestGroupInfo(mChannel, (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
+
+            String myTags = "";
+            for (String tag : _tagsList){
+                myTags += ";" + tag;
+            }
+            String msg_tags = "WS_SUBSCRIBED_LIST;" + myTags;
+
+            String msg_email = "WS_SHARED_LIST;" + LOCAL_EMAIL;
+
             for (String peer : _peersStr) {
-                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer);
+                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer ,msg_tags);
+                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email );
             }
         } else
             Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
