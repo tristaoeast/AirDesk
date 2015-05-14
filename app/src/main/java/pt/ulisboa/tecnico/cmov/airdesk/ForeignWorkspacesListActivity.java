@@ -176,10 +176,10 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
 //        final View customView = inflater.inflate(R.layout.activity_own_published_workspace, null);
         _tagsListView = (ListView) findViewById(R.id.lv_tags);
         _tagsListView.setAdapter(_tagsAdapter);
-        Set<String> tags = _userPrefs.getStringSet(getString(R.string.foreign_subscribed_workspaces) + "_tags", new HashSet<String>());
+        /*Set<String> tags = _userPrefs.getStringSet(getString(R.string.foreign_subscribed_workspaces) + "_tags", new HashSet<String>());
         for (String tag : tags) {
             mAppContext.getTagsList().add(tag);
-        }
+        }*/
         Collections.sort(mAppContext.getTagsList());
         _tagsAdapter.notifyDataSetChanged();
     }
@@ -196,6 +196,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         _listView = (ListView) findViewById(R.id.lv_wsList);
         _listView.setAdapter(_wsNamesAdapter);
 
+        requestForeignWNames();
         updateLists();
 
         Collections.sort(_wsNamesList);
@@ -214,6 +215,13 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     }
 
     protected void updateLists() {
+        if (_wsNamesList.isEmpty()) {
+            Toast.makeText(this, _username + ", you have no foreign workspaces being shared with you at the moment", Toast.LENGTH_LONG);
+        }
+        Collections.sort(_wsNamesList);
+        _wsNamesAdapter.notifyDataSetChanged();
+    }
+    protected void requestForeignWNames() {
         //_wsNamesList.clear();
         //Set<String> wsNames = _userPrefs.getStringSet(getString(R.string.foreign_workspaces_list), new HashSet<String>());
         //TODO pedir nomes de ws aos peers em vez de ir buscar aos sharedprefs
@@ -258,11 +266,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
                 }
             }
         }*/
-        if (_wsNamesList.isEmpty()) {
-            Toast.makeText(this, _username + ", you have no foreign workspaces being shared with you at the moment", Toast.LENGTH_LONG);
-        }
-        Collections.sort(_wsNamesList);
-        _wsNamesAdapter.notifyDataSetChanged();
     }
 
     @Override
