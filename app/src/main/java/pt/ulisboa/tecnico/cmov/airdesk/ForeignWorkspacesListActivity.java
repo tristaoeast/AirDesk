@@ -122,7 +122,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     }
 
 
-
     public void registerSimWifiP2pBcastReceiver() {
         // register broadcast receiver
         filter = new IntentFilter();
@@ -139,7 +138,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         super.onStart();
         updateLists();
     }
-
 
 
     @Override
@@ -175,6 +173,12 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
                                      SimWifiP2pInfo groupInfo) {
         _peersStr.clear();
         // compile list of network members
+        if (mAppContext.getVirtualIp() == null) {
+            String myName = groupInfo.getDeviceName();
+            SimWifiP2pDevice myDevice = devices.getByName(myName);
+            mAppContext.setVirtualIp(myDevice.getVirtIp());
+        }
+
 
         for (String deviceName : groupInfo.getDevicesInNetwork()) {
             SimWifiP2pDevice device = devices.getByName(deviceName);
@@ -254,14 +258,14 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
             mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
 
             String myTags = "";
-            for (String tag : _tagsList){
+            for (String tag : _tagsList) {
                 myTags += ";" + tag;
             }
             String msg_tags = "WS_SUBSCRIBED_LIST;" + myTags;
             String msg_email = "WS_SHARED_LIST;" + LOCAL_EMAIL;
             for (String peer : _peersStr) {
-                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer ,msg_tags);
-                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email );
+                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_tags);
+                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email);
             }
         } else
             Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
