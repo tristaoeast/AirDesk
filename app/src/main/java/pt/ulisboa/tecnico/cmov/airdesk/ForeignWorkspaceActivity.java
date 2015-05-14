@@ -3,7 +3,9 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -24,8 +26,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
+import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
+import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
+import pt.inesc.termite.wifidirect.SimWifiP2pManager;
 
-public class ForeignWorkspaceActivity extends ActionBarActivity {
+
+public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWifiP2pManager.GroupInfoListener {
 
     private String WORKSPACE_DIR;
     private String WORKSPACE_NAME;
@@ -40,7 +48,6 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
     private ArrayList<String> _fileNamesList;
     private ArrayAdapter<String> _fileNamesAdapter;
     private ListView _listView;
-    protected ArrayList<String> _tagsList;
     protected ArrayAdapter<String> _tagsAdapter;
     protected ListView _tagsListView;
     protected ArrayList<String> _usernamesList;
@@ -50,10 +57,16 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
     protected String LOCAL_EMAIL;
     protected String LOCAL_USERNAME;
 
+    private ArrayList<String> _peersStr;
+    private GlobalClass mAppContext;
+    private IntentFilter filter;
+    private SimWifiP2pBroadcastReceiverForeign receiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_foreign_workspace);
+        mAppContext = (GlobalClass) getApplicationContext();
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         _appPrefsEditor = _appPrefs.edit();
         LOCAL_EMAIL = _appPrefs.getString("email", "");
@@ -65,21 +78,65 @@ public class ForeignWorkspaceActivity extends ActionBarActivity {
         WORKSPACE_DIR = intent.getExtras().get("workspace_name").toString();
         WORKSPACE_NAME = WORKSPACE_DIR;
         getSupportActionBar().setTitle(WORKSPACE_NAME + " (FOREIGN)");
-        setupFilesList();
         _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
         if(!_appDir.exists())
             _appDir.mkdir();
+
+        registerSimWifiP2pBcastReceiver();
+
+        setupFilesList();
+    }
+
+    public void registerSimWifiP2pBcastReceiver() {
+        // register broadcast receiver
+        filter = new IntentFilter();
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
+        //TODO meter bem o broadcastreceiver para esta
+        //receiver = new SimWifiP2pBroadcastReceiverForeign(this);
+        //registerReceiver(receiver, filter);
+    }
+
+    @Override
+    public void onGroupInfoAvailable(SimWifiP2pDeviceList devices,
+                                     SimWifiP2pInfo groupInfo) {
+        _peersStr.clear();
+        // compile list of network members
+        if (mAppContext.getVirtualIp() == null) {
+            String myName = groupInfo.getDeviceName();
+            SimWifiP2pDevice myDevice = devices.getByName(myName);
+            mAppContext.setVirtualIp(myDevice.getVirtIp());
+        }
+
+
+        for (String deviceName : groupInfo.getDevicesInNetwork()) {
+            SimWifiP2pDevice device = devices.getByName(deviceName);
+            String devstr = device.getVirtIp();
+            _peersStr.add(devstr);
+        }
     }
 
     protected void setupFilesList() {
+
+        if (mAppContext.isBound()) {
+            mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspaceActivity.this);
+
+            String msg_files = mAppContext.getVirtualIp() + ";WS_FILE_LIST;" + WORKSPACE_NAME;
+            for (String peer : _peersStr) {
+                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_files);
+            }
+        } else
+            Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
         _fileNamesList = new ArrayList<String>();
         _fileNamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _fileNamesList);
         _listView = (ListView) findViewById(R.id.lv_filesList);
         _listView.setAdapter(_fileNamesAdapter);
-        Set<String> fileNames = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
+        /*Set<String> fileNames = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
         for (String fileName : fileNames) {
             _fileNamesList.add(fileName);
-        }
+        }*/
         Collections.sort(_fileNamesList);
         _fileNamesAdapter.notifyDataSetChanged();
         _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
