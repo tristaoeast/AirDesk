@@ -107,7 +107,8 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
         if (mAppContext.getVirtualIp() == null) {
             String myName = groupInfo.getDeviceName();
             SimWifiP2pDevice myDevice = devices.getByName(myName);
-            mAppContext.setVirtualIp(myDevice.getVirtIp());
+            if(myDevice != null)
+                mAppContext.setVirtualIp(myDevice.getVirtIp());
         }
 
 
