@@ -135,20 +135,6 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
 //        unbindService(mConnection);
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        Toast.makeText(this, "Stopping Own Activity", Toast.LENGTH_LONG).show();
-        keepListening = false;
-        try {
-            mSrvSocket.close();
-            mSrvSocket = null;
-        } catch (IOException e) {
-            Log.d("mSrvSocket close err", e.getMessage());
-        }
-    }
-
-
     protected ServiceConnection mConnection = new ServiceConnection() {
 
         /**

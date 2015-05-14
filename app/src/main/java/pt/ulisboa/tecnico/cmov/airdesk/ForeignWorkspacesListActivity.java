@@ -115,6 +115,8 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         if (!_appDir.exists())
             _appDir.mkdir();
 
+        registerSimWifiP2pBcastReceiver();
+
         setupTagsList();
         setupWsList();
     }

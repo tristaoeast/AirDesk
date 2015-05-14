@@ -15,7 +15,6 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 public class OutgoingCommTask extends AsyncTask<String, Void, String> {
 
     private Context mContext;
-    private SimWifiP2pSocket mCliSocket;
 
     public OutgoingCommTask(Context context) {
         mContext = context;
@@ -34,15 +33,5 @@ public class OutgoingCommTask extends AsyncTask<String, Void, String> {
             return "IO error:" + e.getMessage();
         }
         return null;
-    }
-
-    @Override
-    protected void onPostExecute(String result) {
-        if (result != null) {
-            Toast.makeText(mContext, result, Toast.LENGTH_LONG).show();
-        } else {
-            ReceiveCommTask comm = new ReceiveCommTask();
-            comm.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mCliSocket);
-        }
     }
 }
