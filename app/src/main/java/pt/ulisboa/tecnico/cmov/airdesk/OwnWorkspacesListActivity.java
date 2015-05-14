@@ -424,6 +424,8 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
                                 wsDir.mkdir();
                             }
                         }
+                        HashSet<String> newTagsSet = new HashSet<String>(tagsList);
+                        _userPrefsEditor.putStringSet(name + "_tags", newTagsSet).commit();
                         _userPrefsEditor.commit();
                     }
                 })
