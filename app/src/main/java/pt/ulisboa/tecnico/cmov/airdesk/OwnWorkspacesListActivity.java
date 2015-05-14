@@ -94,6 +94,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         mAppContext.setUserPrefs(_userPrefs);
         mAppContext.setLocalEmail(LOCAL_EMAIL);
         mAppContext.setLocalUsername(LOCAL_USERNAME);
+
         _userPrefsEditor = _userPrefs.edit();
         setupWsList();
         NavigationDrawerSetupHelper nh = new NavigationDrawerSetupHelper(SUBCLASS_LIST_ACTIVITY, SUBCLASS_CONTEXT);

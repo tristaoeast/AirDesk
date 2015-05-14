@@ -27,14 +27,6 @@ public class GlobalClass extends Application {
     private SharedPreferences mAppPrefs;
     private SharedPreferences mUserPrefs;
 
-    public ArrayList<String> getTagsList() {
-        return _tagsList;
-    }
-
-    public void setTagsList(ArrayList<String> _tagsList) {
-        this._tagsList = _tagsList;
-    }
-
     private ArrayList<String> _tagsList;
 
     private String mLocalUsername;
@@ -47,6 +39,14 @@ public class GlobalClass extends Application {
 
     private Hashtable<String, Long> mSubscribedWorkspaces = new Hashtable<String, Long>();
     private Hashtable<String, Long> mInvitedWorkspaces = new Hashtable<String, Long>();
+
+    public ArrayList<String> getTagsList() {
+        return _tagsList;
+    }
+
+    public void setTagsList(ArrayList<String> _tagsList) {
+        this._tagsList = _tagsList;
+    }
 
     public String getVirtualIp() {
         return mVirtualIp;

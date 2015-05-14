@@ -17,6 +17,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 import pt.inesc.termite.wifidirect.SimWifiP2pManager;
 import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
@@ -131,6 +134,8 @@ public class MainActivity extends ActionBarActivity {
 
                 Toast.makeText(MainActivity.this, "Logged in as " + username + " with email " + email, Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
+                SharedPreferences userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + email, MODE_PRIVATE);
+                mAppContext.setTagsList(new ArrayList<String>(userPrefs.getStringSet(getString(R.string.foreign_subscribed_workspaces) + "_tags", new HashSet<String>())));
                 startActivity(intent);
             }
         }
@@ -169,6 +174,7 @@ public class MainActivity extends ActionBarActivity {
         editor.putBoolean("firstRun", false).commit();
         //Toast.makeText(ListNotesActivity.this, "Title: " + noteTitle + "\nText: " + noteText, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
+        SharedPreferences userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + email, MODE_PRIVATE);
         startActivity(intent);
     }
 

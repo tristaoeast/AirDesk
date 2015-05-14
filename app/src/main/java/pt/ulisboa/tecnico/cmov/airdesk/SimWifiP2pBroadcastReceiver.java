@@ -25,6 +25,7 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver implements Si
         super();
         this.mActBarActivity = actBarActivity;
         mAppContext = appContext;
+        _peersStr = new ArrayList<String>();
     }
 
     @Override
