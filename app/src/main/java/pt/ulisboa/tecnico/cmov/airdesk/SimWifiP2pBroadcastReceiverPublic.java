@@ -4,7 +4,7 @@ import android.support.v7.app.ActionBarActivity;
 
 public class SimWifiP2pBroadcastReceiverPublic extends SimWifiP2pBroadcastReceiver {
 
-    public SimWifiP2pBroadcastReceiverPublic(ActionBarActivity actionBarActivity) {
-        super(actionBarActivity);
+    public SimWifiP2pBroadcastReceiverPublic(ActionBarActivity actionBarActivity, GlobalClass appContext) {
+        super(actionBarActivity, appContext);
     }
 }

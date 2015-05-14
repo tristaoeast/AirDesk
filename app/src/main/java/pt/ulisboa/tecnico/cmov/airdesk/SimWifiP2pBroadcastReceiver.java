@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.widget.Toast;
 
@@ -61,21 +62,21 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver implements Si
             Toast.makeText(mActBarActivity, "Network membership changed",
                     Toast.LENGTH_SHORT).show();
 
-//            if (mAppContext.isBound()) {
-//                mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
-//
-//                String myTags = "";
-//                for (String tag : _tagsList) {
-//                    myTags += ";" + tag;
-//                }
-//                String msg_tags = "WS_SUBSCRIBED_LIST;" + myTags;
-//                String msg_email = "WS_SHARED_LIST;" + LOCAL_EMAIL;
-//                for (String peer : _peersStr) {
-//                    new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_tags);
-//                    new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email);
-//                }
-//            } else
-//                Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
+            if (mAppContext.isBound()) {
+                mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) SimWifiP2pBroadcastReceiver.this);
+
+                String myTags = "";
+                for (String tag : mAppContext.getTagsList()) {
+                    myTags += ";" + tag;
+                }
+                String msg_tags = mAppContext.getVirtualIp() + ";WS_SUBSCRIBED_LIST;" + myTags;
+                String msg_email = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + mAppContext.getLocalEmail();
+                for (String peer : _peersStr) {
+                    new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_tags);
+                    new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email);
+                }
+            } else
+                Toast.makeText(mActBarActivity, "Service not bound", Toast.LENGTH_LONG).show();
 
         } else if (SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION.equals(action)) {
 
@@ -95,7 +96,8 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver implements Si
         if (mAppContext.getVirtualIp() == null) {
             String myName = simWifiP2pInfo.getDeviceName();
             SimWifiP2pDevice myDevice = simWifiP2pDeviceList.getByName(myName);
-            mAppContext.setVirtualIp(myDevice.getVirtIp());
+            if(myDevice != null)
+                mAppContext.setVirtualIp(myDevice.getVirtIp());
         }
 
 

@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
@@ -27,10 +26,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -126,7 +122,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
-        receiver = new SimWifiP2pBroadcastReceiverOwn(this);
+        receiver = new SimWifiP2pBroadcastReceiverOwn(this, mAppContext);
         registerReceiver(receiver, filter);
     }
 
