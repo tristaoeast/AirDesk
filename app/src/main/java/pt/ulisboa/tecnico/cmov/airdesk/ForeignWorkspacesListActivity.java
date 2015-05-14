@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -125,10 +126,14 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         if (mAppContext.getVirtualIp() == null) {
             String myName = groupInfo.getDeviceName();
             SimWifiP2pDevice myDevice = devices.getByName(myName);
-            if(myDevice != null)
+            if (myDevice != null)
                 mAppContext.setVirtualIp(myDevice.getVirtIp());
         }
 
+        if (groupInfo.askIsConnected())
+            mAppContext.setInAGroup(true);
+        else
+            mAppContext.setInAGroup(false);
 
         for (String deviceName : groupInfo.getDevicesInNetwork()) {
             SimWifiP2pDevice device = devices.getByName(deviceName);
@@ -214,10 +219,10 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         mSubscribedWorkspacesNames = mSubscribedWorkspaces.keys();
         mInvitedWorkspacesNames = mInvitedWorkspaces.keys();
 
-        for (String name : Collections.list(mSubscribedWorkspacesNames)){
+        for (String name : Collections.list(mSubscribedWorkspacesNames)) {
             _wsNamesList.add(name);
         }
-        for (String name : Collections.list(mInvitedWorkspacesNames)){
+        for (String name : Collections.list(mInvitedWorkspacesNames)) {
             _wsNamesList.add(name);
         }
 
@@ -227,6 +232,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         Collections.sort(_wsNamesList);
         _wsNamesAdapter.notifyDataSetChanged();
     }
+
     protected void requestForeignWNames() {
         //_wsNamesList.clear();
         //Set<String> wsNames = _userPrefs.getStringSet(getString(R.string.foreign_workspaces_list), new HashSet<String>());
@@ -234,15 +240,19 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         if (mAppContext.isBound()) {
             mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
 
-            String myTags = "";
-            for (String tag : mAppContext.getTagsList()) {
-                myTags += ";" + tag;
-            }
-            String msg_tags = mAppContext.getVirtualIp() + ";WS_SUBSCRIBED_LIST;" + myTags;
-            String msg_email = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + LOCAL_EMAIL;
-            for (String peer : _peersStr) {
-                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_tags);
-                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email);
+            if (mAppContext.isInAGroup()) {
+                String myTags = "";
+                for (String tag : mAppContext.getTagsList()) {
+                    myTags += tag + ";";
+                }
+                String msg_tags = mAppContext.getVirtualIp() + ";WS_SUBSCRIBED_LIST;" + myTags;
+                String msg_email = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + LOCAL_EMAIL + ";";
+                Log.w("ForeignList", msg_email);
+                Log.w("ForeignList", msg_tags);
+                for (String peer : _peersStr) {
+                    new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_tags);
+                    new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email);
+                }
             }
         } else
             Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
@@ -358,7 +368,8 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
                 else if (mAppContext.getTagsList().contains(tag))
                     Toast.makeText(ForeignWorkspacesListActivity.this, "Tag already exists.", Toast.LENGTH_LONG).show();
                 else {
-                    mAppContext.getTagsList().add(tag);
+//                    mAppContext.getTagsList().add(tag);
+                    mAppContext.addTag(tag);
 //                    tagsSet.add(tag);
                     addedTagsSet.add(tag);
                     Collections.sort(mAppContext.getTagsList());
@@ -381,7 +392,8 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 removedTagsSet.add(mAppContext.getTagsList().get(position));
-                mAppContext.getTagsList().remove(position);
+//                mAppContext.getTagsList().remove(position);
+                mAppContext.removeTagPosition(position);
                 _tagsAdapter.notifyDataSetChanged();
             }
         });
@@ -405,12 +417,14 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 for (String removedTag : removedTagsSet) {
-                    mAppContext.getTagsList().add(removedTag);
+//                    mAppContext.getTagsList().add(removedTag);
+                    mAppContext.addTag(removedTag);
                     Collections.sort(mAppContext.getTagsList());
                     _tagsAdapter.notifyDataSetChanged();
                 }
                 for (String removedTag : addedTagsSet) {
-                    mAppContext.getTagsList().remove(removedTag);
+//                    mAppContext.getTagsList().remove(removedTag);
+                    mAppContext.removeTag(removedTag);
                     Collections.sort(mAppContext.getTagsList());
                     _tagsAdapter.notifyDataSetChanged();
                 }

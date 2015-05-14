@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class OutgoingCommTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params) {
         try {
             SimWifiP2pSocket cliSocket = new SimWifiP2pSocket(params[0], 10001);
+            Log.w("OutCommTask", params[1]);
             cliSocket.getOutputStream().write((params[1] + "\n").getBytes());
             cliSocket.getInputStream().read();
             cliSocket.close();

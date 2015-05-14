@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -15,11 +16,13 @@ import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 import pt.inesc.termite.wifidirect.SimWifiP2pManager;
 
-public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver implements SimWifiP2pManager.GroupInfoListener{
+public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver {
 
     protected ActionBarActivity mActBarActivity;
     protected GlobalClass mAppContext;
     protected ArrayList<String> _peersStr;
+
+    protected boolean gotGroupInfo = false;
 
     public SimWifiP2pBroadcastReceiver(ActionBarActivity actBarActivity, GlobalClass appContext) {
         super();
@@ -46,6 +49,7 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver implements Si
                         Toast.LENGTH_SHORT).show();
             }
 
+
         } else if (SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
 
             // Request available peers from the wifi p2p manager. This is an
@@ -62,23 +66,39 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver implements Si
 
             SimWifiP2pInfo ginfo = (SimWifiP2pInfo) intent.getSerializableExtra(
                     SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
-            ginfo.print();
-            Toast.makeText(mActBarActivity, "Network membership changed",
-                    Toast.LENGTH_SHORT).show();
+            SimWifiP2pDeviceList deviceList = (SimWifiP2pDeviceList) intent.getSerializableExtra(SimWifiP2pBroadcast.EXTRA_DEVICE_LIST);
+            Toast.makeText(mActBarActivity, "Network membership changed", Toast.LENGTH_SHORT).show();
 
-            if (mAppContext.isBound()) {
-                mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) SimWifiP2pBroadcastReceiver.this);
+            if (mAppContext.isBound() && ginfo.askIsConnected()) {
+                Toast.makeText(mActBarActivity, "BCAST: isBound", Toast.LENGTH_SHORT).show();
 
+                _peersStr.clear();
+
+                if (mAppContext.getVirtualIp() == null) {
+                    String myName = ginfo.getDeviceName();
+                    SimWifiP2pDevice myDevice = deviceList.getByName(myName);
+                    if (myDevice != null)
+                        mAppContext.setVirtualIp(myDevice.getVirtIp());
+                }
+
+                for (String deviceName : ginfo.getDevicesInNetwork()) {
+                    SimWifiP2pDevice device = deviceList.getByName(deviceName);
+                    String devstr = device.getVirtIp();
+                    _peersStr.add(devstr);
+                }
+
+                mAppContext.setInAGroup(true);
                 String myTags = "";
                 for (String tag : mAppContext.getTagsList()) {
-                    myTags += ";" + tag;
+                    myTags += tag + ";";
                 }
                 String msg_tags = mAppContext.getVirtualIp() + ";WS_SUBSCRIBED_LIST;" + myTags;
-                String msg_email = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + mAppContext.getLocalEmail();
+                String msg_email = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + mAppContext.getLocalEmail() + ";";
                 for (String peer : _peersStr) {
                     new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_tags);
                     new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email);
                 }
+
             } else
                 Toast.makeText(mActBarActivity, "Service not bound", Toast.LENGTH_LONG).show();
 
@@ -91,24 +111,5 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver implements Si
                     Toast.LENGTH_SHORT).show();
         }
 
-    }
-
-    @Override
-    public void onGroupInfoAvailable(SimWifiP2pDeviceList simWifiP2pDeviceList, SimWifiP2pInfo simWifiP2pInfo) {
-        _peersStr.clear();
-        // compile list of network members
-        if (mAppContext.getVirtualIp() == null) {
-            String myName = simWifiP2pInfo.getDeviceName();
-            SimWifiP2pDevice myDevice = simWifiP2pDeviceList.getByName(myName);
-            if(myDevice != null)
-                mAppContext.setVirtualIp(myDevice.getVirtIp());
-        }
-
-
-        for (String deviceName : simWifiP2pInfo.getDevicesInNetwork()) {
-            SimWifiP2pDevice device = simWifiP2pDeviceList.getByName(deviceName);
-            String devstr = device.getVirtIp();
-            _peersStr.add(devstr);
-        }
     }
 }

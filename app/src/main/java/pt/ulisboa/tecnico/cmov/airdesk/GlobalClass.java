@@ -20,6 +20,8 @@ import pt.inesc.termite.wifidirect.SimWifiP2pManager;
  */
 public class GlobalClass extends Application {
 
+    private boolean mInAGroup = false;
+
     private ActionBarActivity mCurrentActivity;
 
     private String mVirtualIp = null;
@@ -40,12 +42,32 @@ public class GlobalClass extends Application {
     private Hashtable<String, Long> mSubscribedWorkspaces = new Hashtable<String, Long>();
     private Hashtable<String, Long> mInvitedWorkspaces = new Hashtable<String, Long>();
 
+    public boolean isInAGroup() {
+        return mInAGroup;
+    }
+
+    public void setInAGroup(boolean mInAGroup) {
+        this.mInAGroup = mInAGroup;
+    }
+
     public ArrayList<String> getTagsList() {
         return _tagsList;
     }
 
     public void setTagsList(ArrayList<String> _tagsList) {
         this._tagsList = _tagsList;
+    }
+
+    public void addTag(String tag) {
+        _tagsList.add(tag);
+    }
+
+    public void removeTag(String tag) {
+        _tagsList.remove(tag);
+    }
+
+    public void removeTagPosition(int pos) {
+        _tagsList.remove(pos);
     }
 
     public String getVirtualIp() {

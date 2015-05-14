@@ -38,6 +38,7 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
         try {
             sockIn = new BufferedReader(new InputStreamReader(s.getInputStream()));
             st = sockIn.readLine();
+            Log.w("RecCommTask",st);
             sockIn.close();
             s.close();
             String[] splt = st.split(";");
