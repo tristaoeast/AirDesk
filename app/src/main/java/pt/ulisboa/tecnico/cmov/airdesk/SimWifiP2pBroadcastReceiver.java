@@ -18,8 +18,8 @@ import pt.inesc.termite.wifidirect.SimWifiP2pManager;
 public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver implements SimWifiP2pManager.GroupInfoListener{
 
     protected ActionBarActivity mActBarActivity;
-    private GlobalClass mAppContext;
-    private ArrayList<String> _peersStr;
+    protected GlobalClass mAppContext;
+    protected ArrayList<String> _peersStr;
 
     public SimWifiP2pBroadcastReceiver(ActionBarActivity actBarActivity, GlobalClass appContext) {
         super();
