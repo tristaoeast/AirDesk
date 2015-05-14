@@ -261,4 +261,8 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
                 .setNegativeButton("Cancel", null).create();
         dialog.show();
     }
+
+    public void isOwnerGone(){
+        //TODO: act as described in the BroadcastReceiverForeignActivity.onReceive method
+    }
 }
