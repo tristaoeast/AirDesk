@@ -121,25 +121,36 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     @Override
     public void onGroupInfoAvailable(SimWifiP2pDeviceList devices,
                                      SimWifiP2pInfo groupInfo) {
-        _peersStr.clear();
-        // compile list of network members
-        if (mAppContext.getVirtualIp() == null) {
-            String myName = groupInfo.getDeviceName();
-            SimWifiP2pDevice myDevice = devices.getByName(myName);
-            if (myDevice != null)
-                mAppContext.setVirtualIp(myDevice.getVirtIp());
-        }
+//        _peersStr.clear();
+        if (mAppContext.isBound() && groupInfo.askIsConnected()) {
+            // compile list of network members
+            if (mAppContext.getVirtualIp() == null) {
+                String myName = groupInfo.getDeviceName();
+                SimWifiP2pDevice myDevice = devices.getByName(myName);
+                if (myDevice != null)
+                    mAppContext.setVirtualIp(myDevice.getVirtIp());
+            }
+            String myTags = "";
+            for (String tag : mAppContext.getTagsList()) {
+                myTags += tag + ";";
+            }
+            String msg_tags = mAppContext.getVirtualIp() + ";WS_SUBSCRIBED_LIST;" + myTags;
+            String msg_email = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + LOCAL_EMAIL + ";";
+            Log.w("ForeignList", msg_email);
+            Log.w("ForeignList", msg_tags);
 
-        if (groupInfo.askIsConnected())
-            mAppContext.setInAGroup(true);
-        else
-            mAppContext.setInAGroup(false);
+            for (String deviceName : groupInfo.getDevicesInNetwork()) {
+                SimWifiP2pDevice device = devices.getByName(deviceName);
+                String peer = device.getVirtIp();
+//                _peersStr.add(peer);
+                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_tags);
+                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email);
+            }
 
-        for (String deviceName : groupInfo.getDevicesInNetwork()) {
-            SimWifiP2pDevice device = devices.getByName(deviceName);
-            String devstr = device.getVirtIp();
-            _peersStr.add(devstr);
-        }
+
+        } else
+            Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
+
     }
 
 //    protected void setupSuper() {
@@ -237,25 +248,27 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         //_wsNamesList.clear();
         //Set<String> wsNames = _userPrefs.getStringSet(getString(R.string.foreign_workspaces_list), new HashSet<String>());
         //TODO pedir nomes de ws aos peers em vez de ir buscar aos sharedprefs
-        if (mAppContext.isBound()) {
-            mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
+        mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
 
-            if (mAppContext.isInAGroup()) {
-                String myTags = "";
-                for (String tag : mAppContext.getTagsList()) {
-                    myTags += tag + ";";
-                }
-                String msg_tags = mAppContext.getVirtualIp() + ";WS_SUBSCRIBED_LIST;" + myTags;
-                String msg_email = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + LOCAL_EMAIL + ";";
-                Log.w("ForeignList", msg_email);
-                Log.w("ForeignList", msg_tags);
-                for (String peer : _peersStr) {
-                    new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_tags);
-                    new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email);
-                }
-            }
-        } else
-            Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
+//        if (mAppContext.isBound()) {
+//            mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
+//
+//            if (mAppContext.isInAGroup()) {
+//                String myTags = "";
+//                for (String tag : mAppContext.getTagsList()) {
+//                    myTags += tag + ";";
+//                }
+//                String msg_tags = mAppContext.getVirtualIp() + ";WS_SUBSCRIBED_LIST;" + myTags;
+//                String msg_email = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + LOCAL_EMAIL + ";";
+//                Log.w("ForeignList", msg_email);
+//                Log.w("ForeignList", msg_tags);
+//                for (String peer : _peersStr) {
+//                    new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_tags);
+//                    new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email);
+//                }
+//            }
+//        } else
+//            Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
 
         /*Set<String> privateWorkspaces = _userPrefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
         Set<String> publicWorkspaces = _userPrefs.getStringSet(getString(R.string.own_public_workspaces_list), new HashSet<String>());
