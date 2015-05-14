@@ -25,7 +25,9 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Set;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
@@ -79,8 +81,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
 
     protected String LOCAL_EMAIL;
     protected String LOCAL_USERNAME;
-
-    private String teste;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -201,6 +201,26 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     }
 
     protected void updateLists() {
+
+        _wsNamesList.clear();
+
+        Hashtable<String, Long> mSubscribedWorkspaces;
+        Hashtable<String, Long> mInvitedWorkspaces;
+        mSubscribedWorkspaces = mAppContext.getSubscribedWorkspaces();
+        mInvitedWorkspaces = mAppContext.getInvitedWorkspaces();
+
+        Enumeration<String> mSubscribedWorkspacesNames;
+        Enumeration<String> mInvitedWorkspacesNames;
+        mSubscribedWorkspacesNames = mSubscribedWorkspaces.keys();
+        mInvitedWorkspacesNames = mInvitedWorkspaces.keys();
+
+        for (String name : Collections.list(mSubscribedWorkspacesNames)){
+            _wsNamesList.add(name);
+        }
+        for (String name : Collections.list(mInvitedWorkspacesNames)){
+            _wsNamesList.add(name);
+        }
+
         if (_wsNamesList.isEmpty()) {
             Toast.makeText(this, _username + ", you have no foreign workspaces being shared with you at the moment", Toast.LENGTH_LONG);
         }
