@@ -3,15 +3,10 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.os.Messenger;
-import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Set;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pManager;
 
@@ -41,6 +36,9 @@ public class GlobalClass extends Application {
 
     private Hashtable<String, Long> mSubscribedWorkspaces = new Hashtable<String, Long>();
     private Hashtable<String, Long> mInvitedWorkspaces = new Hashtable<String, Long>();
+
+    private Hashtable<String, Long> mWsOwners = new Hashtable<String, Long>();
+    private Hashtable<Long, String> mOwnersWs = new Hashtable<Long, String>();
 
     public boolean isInAGroup() {
         return mInAGroup;
@@ -132,6 +130,30 @@ public class GlobalClass extends Application {
 
     public void setLocalEmail(String mLocalEmail) {
         this.mLocalEmail = mLocalEmail;
+    }
+
+    public Hashtable<String, Long> getWsOwners() {
+        return mWsOwners;
+    }
+
+    public void addWsOwners(String mWs, Long mOwnerIp) {
+        this.mWsOwners.put(mWs, mOwnerIp);
+    }
+
+    public void removeWsOwners(Long mOwnerIp) {
+        this.mWsOwners.remove(mOwnerIp);
+    }
+
+    public Hashtable<Long, String> getOwnersWs() {
+        return mOwnersWs;
+    }
+
+    public void addOwnersWs(Long mOwnerIp, String mWs) {
+        this.mOwnersWs.put(mOwnerIp, mWs);
+    }
+
+    public void removeOwnersWs(String mWs) {
+        this.mOwnersWs.remove(mWs);
     }
 
     public boolean isBound() {
