@@ -75,12 +75,15 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        initSimWifiP2p();
-        bindSimWifiP2pService();
-
-        IncomingCommTask inCommTask = new IncomingCommTask();
-        inCommTask.setApplicationContext(mAppContext);
-        inCommTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        if (mAppContext.isBound()) {
+            Toast.makeText(MainActivity.this, "Binding SimWifiP2p service", Toast.LENGTH_LONG).show();
+            initSimWifiP2p();
+            bindSimWifiP2pService();
+            Toast.makeText(MainActivity.this, "Initializing inCommTasks ThreadPool", Toast.LENGTH_LONG).show();
+            IncomingCommTask inCommTask = new IncomingCommTask();
+            inCommTask.setApplicationContext(mAppContext);
+            inCommTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
 
     }
 
@@ -144,7 +147,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-       // getMenuInflater().inflate(R.menu.menu_main, menu);
+        // getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -175,6 +178,7 @@ public class MainActivity extends ActionBarActivity {
         //Toast.makeText(ListNotesActivity.this, "Title: " + noteTitle + "\nText: " + noteText, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(MainActivity.this, OwnPrivateWorkspacesListActivity.class);
         SharedPreferences userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + email, MODE_PRIVATE);
+        mAppContext.setTagsList(new ArrayList<String>(userPrefs.getStringSet(getString(R.string.foreign_subscribed_workspaces) + "_tags", new HashSet<String>())));
         startActivity(intent);
     }
 

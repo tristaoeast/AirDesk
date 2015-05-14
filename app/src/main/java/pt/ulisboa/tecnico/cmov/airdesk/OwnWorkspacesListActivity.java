@@ -74,7 +74,6 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     protected Messenger mService;
     protected SimWifiP2pManager mManager;
     protected SimWifiP2pManager.Channel mChannel;
-    private boolean keepListening;
     private IntentFilter filter;
     private SimWifiP2pBroadcastReceiver receiver;
 
@@ -103,9 +102,8 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         if (!_appDir.exists())
             _appDir.mkdir();
 
-        keepListening = true;
-        initSimWifiP2p();
-        bindSimWifiP2pService();
+//        initSimWifiP2p();
+//        bindSimWifiP2pService();
 
     }
 
