@@ -21,6 +21,8 @@ public class GlobalClass extends Application {
 
     private ActionBarActivity mCurrentActivity;
 
+    private String mVirtualIp = null;
+
     private SharedPreferences mAppPrefs;
     private SharedPreferences mUserPrefs;
 
@@ -34,6 +36,14 @@ public class GlobalClass extends Application {
 
     private Hashtable<String, Long> mSubscribedWorspaces = new Hashtable<String, Long>();
     private Hashtable<String, Long> mInvitedWorspaces = new Hashtable<String, Long>();
+
+    public String getVirtualIp() {
+        return mVirtualIp;
+    }
+
+    public void setVirtualIp(String mVirtualIp) {
+        this.mVirtualIp = mVirtualIp;
+    }
 
     public ActionBarActivity getCurrentActivity() {
         return mCurrentActivity;
