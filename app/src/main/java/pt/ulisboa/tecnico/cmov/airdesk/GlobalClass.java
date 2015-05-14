@@ -45,8 +45,8 @@ public class GlobalClass extends Application {
     private SimWifiP2pManager mManager;
     private SimWifiP2pManager.Channel mChannel;
 
-    private Hashtable<String, Long> mSubscribedWorspaces = new Hashtable<String, Long>();
-    private Hashtable<String, Long> mInvitedWorspaces = new Hashtable<String, Long>();
+    private Hashtable<String, Long> mSubscribedWorkspaces = new Hashtable<String, Long>();
+    private Hashtable<String, Long> mInvitedWorkspaces = new Hashtable<String, Long>();
 
     public String getVirtualIp() {
         return mVirtualIp;
@@ -64,20 +64,20 @@ public class GlobalClass extends Application {
         this.mCurrentActivity = mCurrentActivity;
     }
 
-    public Hashtable<String, Long> getInvitedWorspaces() {
-        return mInvitedWorspaces;
+    public Hashtable<String, Long> getInvitedWorkspaces() {
+        return mInvitedWorkspaces;
     }
 
-    public void addInvitedWorspace(String invitedWorspace, long quota) {
-        this.mInvitedWorspaces.put(invitedWorspace, quota);
+    public void addInvitedWorkspace(String invitedWorkspace, long quota) {
+        this.mInvitedWorkspaces.put(invitedWorkspace, quota);
     }
 
-    public Hashtable<String, Long> getSubscribedWorspaces() {
-        return mSubscribedWorspaces;
+    public Hashtable<String, Long> getSubscribedWorkspaces() {
+        return mSubscribedWorkspaces;
     }
 
-    public void addSubscribedWorspace(String subscribedWorkspace, long quota) {
-        this.mSubscribedWorspaces.put(subscribedWorkspace,quota);
+    public void addSubscribedWorkspace(String subscribedWorkspace, long quota) {
+        this.mSubscribedWorkspaces.put(subscribedWorkspace,quota);
     }
 
     public SharedPreferences getAppPrefs() {
