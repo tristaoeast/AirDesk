@@ -36,9 +36,18 @@ public class GlobalClass extends Application {
 
     private Hashtable<String, Long> mSubscribedWorkspaces = new Hashtable<String, Long>();
     private Hashtable<String, Long> mInvitedWorkspaces = new Hashtable<String, Long>();
+    private Hashtable<String, Long> mForeignWorkspaces = new Hashtable<String, Long>();
 
     private Hashtable<String, String> mWsOwners = new Hashtable<String, String>();
     private Hashtable<String, ArrayList<String>> mOwnersWs = new Hashtable<String, ArrayList<String>>();
+
+    public Hashtable<String, Long> getForeignWorkspaces() {
+        return mForeignWorkspaces;
+    }
+
+    public void setForeignWorkspaces(Hashtable<String, Long> mForeignWorkspaces) {
+        this.mForeignWorkspaces = mForeignWorkspaces;
+    }
 
     public void clearSubscribedWorkspaces() {
         mSubscribedWorkspaces = new Hashtable<String, Long>();
@@ -46,6 +55,9 @@ public class GlobalClass extends Application {
 
     public void clearInvitedWorkspaces() {
         mInvitedWorkspaces = new Hashtable<String, Long>();
+    }
+    public void clearForeignWorkspaces() {
+        mForeignWorkspaces = new Hashtable<String, Long>();
     }
 
     private Hashtable<String, ArrayList<String>> mOwnersWsFiles = new Hashtable<String, ArrayList<String>>();
@@ -55,14 +67,13 @@ public class GlobalClass extends Application {
     }
 
     public void addOwnersWsFiles(String wsName, String fileName) {
-        if(!mOwnersWsFiles.containsKey(wsName)){
+        if (!mOwnersWsFiles.containsKey(wsName)) {
             ArrayList<String> values = new ArrayList<String>();
             values.add(fileName);
             this.mOwnersWsFiles.put(wsName, values);
-        }
-        else {
+        } else {
             ArrayList<String> moreValues = mOwnersWsFiles.get(wsName);
-            if(!moreValues.contains(fileName)) {
+            if (!moreValues.contains(fileName)) {
                 moreValues.add(fileName);
                 this.mOwnersWsFiles.put(wsName, moreValues);
             }
@@ -126,7 +137,11 @@ public class GlobalClass extends Application {
     }
 
     public void addSubscribedWorkspace(String subscribedWorkspace, long quota) {
-        this.mSubscribedWorkspaces.put(subscribedWorkspace,quota);
+        this.mSubscribedWorkspaces.put(subscribedWorkspace, quota);
+    }
+
+    public void addForeignWorkspace(String foreignWorkspace, long quota) {
+        this.mForeignWorkspaces.put(foreignWorkspace, quota);
     }
 
     public SharedPreferences getAppPrefs() {
@@ -166,7 +181,7 @@ public class GlobalClass extends Application {
     }
 
     public void addWsOwners(String mWs, String mOwnerIp) {
-            this.mWsOwners.put(mWs, mOwnerIp);
+        this.mWsOwners.put(mWs, mOwnerIp);
     }
 
     public void removeWsOwners(Long mOwnerIp) {
@@ -178,14 +193,13 @@ public class GlobalClass extends Application {
     }
 
     public void addOwnersWs(String mOwnerIp, String mWs) {
-        if(!mWsOwners.containsKey(mOwnerIp)){
+        if (!mWsOwners.containsKey(mOwnerIp)) {
             ArrayList<String> values = new ArrayList<String>();
             values.add(mWs);
             this.mOwnersWs.put(mOwnerIp, values);
-        }
-        else {
+        } else {
             ArrayList<String> moreValues = mOwnersWs.get(mOwnerIp);
-            if(!moreValues.contains(mWs)) {
+            if (!moreValues.contains(mWs)) {
                 moreValues.add(mWs);
                 this.mOwnersWs.put(mOwnerIp, moreValues);
             }

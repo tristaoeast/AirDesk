@@ -135,8 +135,8 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
             for (String tag : mAppContext.getTagsList()) {
                 myTags += tag + ";";
             }
-            String msg_tags = mAppContext.getVirtualIp() + ";WS_SUBSCRIBED_LIST;" + myTags;
-            String msg_email = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + LOCAL_EMAIL + ";";
+            String msg_tags = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + LOCAL_EMAIL + ";" + myTags;
+//            String msg_email = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + LOCAL_EMAIL + ";";
 //            Log.w("ForeignList", msg_email);
 //            Log.w("ForeignList", msg_tags);
             for (String deviceName : groupInfo.getDevicesInNetwork()) {
@@ -150,8 +150,9 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
             }
         } else {
             Toast.makeText(this, "Not in a group or service not bound", Toast.LENGTH_LONG).show();
-            mAppContext.clearInvitedWorkspaces();
-            mAppContext.clearSubscribedWorkspaces();
+//            mAppContext.clearInvitedWorkspaces();
+//            mAppContext.clearSubscribedWorkspaces();
+            mAppContext.clearForeignWorkspaces();
         }
 
     }
@@ -223,20 +224,23 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
 
         _wsNamesList.clear();
 
-        Hashtable<String, Long> mSubscribedWorkspaces;
-        Hashtable<String, Long> mInvitedWorkspaces;
-        mSubscribedWorkspaces = mAppContext.getSubscribedWorkspaces();
-        mInvitedWorkspaces = mAppContext.getInvitedWorkspaces();
-
-        Enumeration<String> mSubscribedWorkspacesNames;
-        Enumeration<String> mInvitedWorkspacesNames;
-        mSubscribedWorkspacesNames = mSubscribedWorkspaces.keys();
-        mInvitedWorkspacesNames = mInvitedWorkspaces.keys();
-
-        for (String name : Collections.list(mSubscribedWorkspacesNames)) {
-            _wsNamesList.add(name);
-        }
-        for (String name : Collections.list(mInvitedWorkspacesNames)) {
+//        Hashtable<String, Long> mSubscribedWorkspaces;
+//        Hashtable<String, Long> mInvitedWorkspaces;
+//        mSubscribedWorkspaces = mAppContext.getSubscribedWorkspaces();
+//        mInvitedWorkspaces = mAppContext.getInvitedWorkspaces();
+//
+//        Enumeration<String> mSubscribedWorkspacesNames;
+//        Enumeration<String> mInvitedWorkspacesNames;
+//        mSubscribedWorkspacesNames = mSubscribedWorkspaces.keys();
+//        mInvitedWorkspacesNames = mInvitedWorkspaces.keys();
+//
+//        for (String name : Collections.list(mSubscribedWorkspacesNames)) {
+//            _wsNamesList.add(name);
+//        }
+//        for (String name : Collections.list(mInvitedWorkspacesNames)) {
+//            _wsNamesList.add(name);
+//        }
+        for (String name : mAppContext.getForeignWorkspaces().keySet()) {
             _wsNamesList.add(name);
         }
 

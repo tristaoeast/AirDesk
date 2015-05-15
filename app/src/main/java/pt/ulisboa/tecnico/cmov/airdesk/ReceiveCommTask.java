@@ -43,13 +43,14 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, String>
             st = sockIn.readLine();
             Log.w("RecCommTask", st);
 //            sockIn.close();
+//            s.getOutputStream().write(("ACK" + "\n").getBytes());
             s.close();
             String[] splt = st.split(";");
             String response = mAppContext.getVirtualIp() + ";";
 
             Log.w("RecCommTask", "Processing: " + splt[1]);
             if (splt[1].equals("WS_SHARED_LIST")) {
-                // IP;COM;EMAIL
+                // IP;COM;EMAIL;TAGS;
                 response += "WS_SHARED_LIST_RESPONSE" + ";";
                 String email = splt[2];
                 Set<String> allOwnWS = userPrefs.getStringSet("All Owned Workspaces", new HashSet<String>());
@@ -61,34 +62,8 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, String>
                         response += ws + ";" + quota.toString() + ";";
                     }
                 }
-                Log.w("RecCommTask", "Sending response: " + response);
-                publishProgress(splt[0], response);
-
-                Log.w("RecCommTask", "Response sent");
-                return "DO NOTHING";
-            } else if (splt[1].equals("WS_SHARED_LIST_RESPONSE")) {
-                // IP;COM;WS1;Q1;WS2;Q2;
-                String wsOwnList = null;
-                for (int i = 2; i < splt.length; i += 2) {
-                    mAppContext.addInvitedWorkspace(splt[i], Long.parseLong(splt[i + 1]));
-                    mAppContext.addOwnersWs(splt[0], splt[i]);
-                    wsOwnList += splt[i];
-                }
-                ActionBarActivity act = mAppContext.getCurrentActivity();
-                if (act instanceof ForeignWorkspacesListActivity) {
-//                    ((ForeignWorkspacesListActivity) act).updateLists();
-                    return "UPDATE_FOREIGN_WS_LIST";
-                }
-                return "DO NOTHING";
-
-            } else if (splt[1].equals("WS_SUBSCRIBED_LIST")) {
-
-                //IP;COM;TAGS...
-                response += "WS_SUBSCRIBED_LIST_RESPONSE" + ";";
                 Set<String> ownPublishedWs = userPrefs.getStringSet("Own Public Workspaces", new HashSet<String>());
-                Log.w("RecCommTask", "ownPublishedWS isEmpty: " + ownPublishedWs.isEmpty());
-
-                for (int i = 2; i < splt.length; i++) {
+                for (int i = 3; i < splt.length; i++) {
                     for (String ws : ownPublishedWs) {
                         Set<String> tags = userPrefs.getStringSet(ws + "_tags", new HashSet<String>());
                         String l = ws + ";";
@@ -104,24 +79,65 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, String>
                 }
                 Log.w("RecCommTask", "Sending response: " + response);
                 publishProgress(splt[0], response);
-//                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, splt[0], response);
+
                 Log.w("RecCommTask", "Response sent");
                 return "DO NOTHING";
-            } else if (splt[1].equals("WS_SUBSCRIBED_LIST_RESPONSE")) {
-                String wsOwnList = null;
+            } else if (splt[1].equals("WS_SHARED_LIST_RESPONSE")) {
                 // IP;COM;WS1;Q1;WS2;Q2;
+                String wsOwnList = null;
                 for (int i = 2; i < splt.length; i += 2) {
-                    mAppContext.addSubscribedWorkspace(splt[i], Long.parseLong(splt[i + 1]));
+                    mAppContext.addForeignWorkspace(splt[i], Long.parseLong(splt[i + 1]));
                     mAppContext.addOwnersWs(splt[0], splt[i]);
                     wsOwnList += splt[i];
                 }
-                mAppContext.addWsOwners(wsOwnList, splt[0]);
-                if (mAppContext.getCurrentActivity() instanceof ForeignWorkspacesListActivity) {
-                    Log.w("RecCommTask", "Current activity is a ForeignWSList");
+                ActionBarActivity act = mAppContext.getCurrentActivity();
+                if (act instanceof ForeignWorkspacesListActivity) {
 //                    ((ForeignWorkspacesListActivity) act).updateLists();
                     return "UPDATE_FOREIGN_WS_LIST";
                 }
                 return "DO NOTHING";
+
+//            } else if (splt[1].equals("WS_SUBSCRIBED_LIST")) {
+//
+//                //IP;COM;TAGS...
+//                response += "WS_SUBSCRIBED_LIST_RESPONSE" + ";";
+//                Set<String> ownPublishedWs = userPrefs.getStringSet("Own Public Workspaces", new HashSet<String>());
+//                Log.w("RecCommTask", "ownPublishedWS isEmpty: " + ownPublishedWs.isEmpty());
+//
+//                for (int i = 2; i < splt.length; i++) {
+//                    for (String ws : ownPublishedWs) {
+//                        Set<String> tags = userPrefs.getStringSet(ws + "_tags", new HashSet<String>());
+//                        String l = ws + ";";
+//                        for (String tag : tags) {
+//                            l += tag + ";";
+//                        }
+//                        Log.w("RecCommTask", l);
+//                        if (tags.contains(splt[i])) {
+//                            Long quota = userPrefs.getLong(ws + "_quota", -1);
+//                            response += ws + ";" + quota.toString() + ";";
+//                        }
+//                    }
+//                }
+//                Log.w("RecCommTask", "Sending response: " + response);
+//                publishProgress(splt[0], response);
+////                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, splt[0], response);
+//                Log.w("RecCommTask", "Response sent");
+//                return "DO NOTHING";
+//            } else if (splt[1].equals("WS_SUBSCRIBED_LIST_RESPONSE")) {
+//                String wsOwnList = null;
+//                // IP;COM;WS1;Q1;WS2;Q2;
+//                for (int i = 2; i < splt.length; i += 2) {
+//                    mAppContext.addSubscribedWorkspace(splt[i], Long.parseLong(splt[i + 1]));
+//                    mAppContext.addOwnersWs(splt[0], splt[i]);
+//                    wsOwnList += splt[i];
+//                }
+//                mAppContext.addWsOwners(wsOwnList, splt[0]);
+//                if (mAppContext.getCurrentActivity() instanceof ForeignWorkspacesListActivity) {
+//                    Log.w("RecCommTask", "Current activity is a ForeignWSList");
+////                    ((ForeignWorkspacesListActivity) act).updateLists();
+//                    return "UPDATE_FOREIGN_WS_LIST";
+//                }
+//                return "DO NOTHING";
             } else if (splt[1].equals("WS_FILE_LIST")) {
                 //recebe -> IP;WS_FILE_LIST;WSNAME;
                 response += "WS_FILE_LIST_RESPONSE;" + splt[2] + ";";
