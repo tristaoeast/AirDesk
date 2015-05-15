@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -23,6 +24,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+
 
 public class ReadTextFileActivity extends ActionBarActivity {
 
@@ -37,6 +40,8 @@ public class ReadTextFileActivity extends ActionBarActivity {
     private File _appDir;
 
     protected GlobalClass mAppContext;
+    private IntentFilter filter;
+    private SimWifiP2pBroadcastReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +61,23 @@ public class ReadTextFileActivity extends ActionBarActivity {
         WORKSPACE_QUOTA = _userPrefs.getLong(WORKSPACE_NAME + "_quota", 0);
     }
 
+    public void registerSimWifiP2pBcastReceiver() {
+        // register broadcast receiver
+        filter = new IntentFilter();
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
+        filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
+        receiver = new SimWifiP2pBroadcastReceiver(this, mAppContext);
+        registerReceiver(receiver, filter);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         updateText(FILENAME);
         mAppContext.setCurrentActivity(this);
+        registerSimWifiP2pBcastReceiver();
 
     }
 
@@ -188,5 +205,11 @@ public class ReadTextFileActivity extends ActionBarActivity {
 //        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
     }
 }

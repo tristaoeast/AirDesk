@@ -1,17 +1,13 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
@@ -33,11 +29,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
-import pt.inesc.termite.wifidirect.SimWifiP2pManager;
-import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
-import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
-import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
-import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 
 /**
  * Created by ist167092 on 24-03-2015.
@@ -67,13 +58,6 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     protected String LOCAL_EMAIL;
     protected String LOCAL_USERNAME;
 
-    protected SimWifiP2pSocketServer mSrvSocket;
-    protected SimWifiP2pSocket mCliSocket;
-    protected ReceiveCommTask mComm;
-    protected boolean mBound;
-    protected Messenger mService;
-    protected SimWifiP2pManager mManager;
-    protected SimWifiP2pManager.Channel mChannel;
     private IntentFilter filter;
     private SimWifiP2pBroadcastReceiver receiver;
 
@@ -102,16 +86,9 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         if (!_appDir.exists())
             _appDir.mkdir();
 
-//        initSimWifiP2p();
-//        bindSimWifiP2pService();
 
     }
 
-    public void bindSimWifiP2pService() {
-        Intent intent = new Intent(this, SimWifiP2pService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        mBound = true;
-    }
 
     public void registerSimWifiP2pBcastReceiver() {
         // register broadcast receiver
@@ -123,58 +100,6 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
         receiver = new SimWifiP2pBroadcastReceiver(this, mAppContext);
         registerReceiver(receiver, filter);
     }
-
-    public void initSimWifiP2p() {
-        // initialize the WDSim API
-        SimWifiP2pSocketManager.Init(getApplicationContext());
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-//        unbindService(mConnection);
-    }
-
-    protected ServiceConnection mConnection = new ServiceConnection() {
-
-        /**
-         * Called when a connection to the Service has been established, with
-         * the {@link android.os.IBinder} of the communication channel to the
-         * Service.
-         *
-         * @param name    The concrete component name of the service that has
-         *                been connected.
-         * @param service The IBinder of the Service's communication channel,
-         */
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mService = new Messenger(service);
-            mManager = new SimWifiP2pManager(mService);
-            mChannel = mManager.initialize(getApplication(), getMainLooper(), null);
-            mBound = true;
-        }
-
-        /**
-         * Called when a connection to the Service has been lost.  This typically
-         * happens when the process hosting the service has crashed or been killed.
-         * This does <em>not</em> remove the ServiceConnection itself -- this
-         * binding to the service will remain active, and you will receive a call
-         * to {@link #onServiceConnected} when the Service is next running.
-         *
-         * @param name The concrete component name of the service whose
-         *             connection has been lost.
-         */
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mService = null;
-            mManager = null;
-            mChannel = null;
-            mBound = false;
-        }
-    };
-
-
-
 
     protected void setupSuper(int wsListLayout, int wsDir, int wsList, int wsDL, ActionBarActivity subClassListActivity, Class subClassActivity, Context subClassContext) {
         OWN_WORKSPACE_LIST_LAYOUT = wsListLayout;
