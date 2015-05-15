@@ -392,5 +392,9 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity implements 
         }
     }
 
+    public void userLeft(String email) {
+        _emailsList.remove(email);
+        _emailsAdapter.notifyDataSetChanged();
+    }
 
 }

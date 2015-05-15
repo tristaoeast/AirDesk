@@ -198,7 +198,7 @@ public class ReceiveCommTaskThread implements Runnable {
                         }
                     });
                 }
-            } else if(splt[1].equals("REFRESH_LIST")) {
+            } else if (splt[1].equals("REFRESH_LIST")) {
                 mCurrentActivity = mAppContext.getCurrentActivity();
                 if (mCurrentActivity instanceof ForeignWorkspacesListActivity) {
                     String myTags = "";
@@ -213,6 +213,21 @@ public class ReceiveCommTaskThread implements Runnable {
                         }
                     });
                 }
+            } else if (splt[1].equals("LEAVE_WORKSPACE")) {
+
+                Set<String> invitedUsers = userPrefs.getStringSet(splt[3] + "_invitedUsers", new HashSet<String>());
+                invitedUsers.remove(splt[2]);
+                userPrefs.edit().putStringSet(splt[3] + "_invitedUsers", invitedUsers);
+                mCurrentActivity = mAppContext.getCurrentActivity();
+                if (mCurrentActivity instanceof OwnWorkspaceActivity) {
+                    mCurrentActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((OwnWorkspaceActivity) mCurrentActivity).userLeft(splt[2]);
+                        }
+                    });
+                }
+
             }
 
             if (!mCliSocket.isClosed()) {
