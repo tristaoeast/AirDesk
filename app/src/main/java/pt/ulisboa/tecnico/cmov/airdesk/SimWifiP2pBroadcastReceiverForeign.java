@@ -2,7 +2,6 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -10,7 +9,6 @@ import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
-import pt.inesc.termite.wifidirect.SimWifiP2pManager;
 
 public class SimWifiP2pBroadcastReceiverForeign extends SimWifiP2pBroadcastReceiver {
 
@@ -35,6 +33,14 @@ public class SimWifiP2pBroadcastReceiverForeign extends SimWifiP2pBroadcastRecei
     @Override
     public void onGroupInfoAvailable(SimWifiP2pDeviceList devices,
                                      SimWifiP2pInfo groupInfo) {
+
+        mAppContext.clearForeignWorkspaces();
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mActivity.updateLists();
+            }
+        });
 //        _peersStr.clear();
         if (mAppContext.isBound() && groupInfo.askIsConnected()) {
             if (groupInfo.askIsConnected())
@@ -76,7 +82,14 @@ public class SimWifiP2pBroadcastReceiverForeign extends SimWifiP2pBroadcastRecei
             Toast.makeText(mActBarActivity, "Not in a group or service not bound", Toast.LENGTH_LONG).show();
 //            mAppContext.clearInvitedWorkspaces();
 //            mAppContext.clearSubscribedWorkspaces();
-            mAppContext.clearForeignWorkspaces();
+//            mAppContext.clearForeignWorkspaces();
+//            mActivity.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mActivity.updateLists();
+//                }
+//            });
+
         }
 
     }
