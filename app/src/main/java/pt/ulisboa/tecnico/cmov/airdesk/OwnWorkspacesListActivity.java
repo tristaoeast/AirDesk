@@ -423,8 +423,12 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
                             }
                         }
                         HashSet<String> newTagsSet = new HashSet<String>(tagsList);
+                        HashSet<String> wsEmails = new HashSet<String>(emailsList);
+
+                        _userPrefsEditor.putStringSet(name + "_invitedUsers", wsEmails);
                         _userPrefsEditor.putStringSet(name + "_tags", newTagsSet).commit();
                         _userPrefsEditor.commit();
+
                     }
                 })
                 .setNegativeButton("Cancel", null).create();
