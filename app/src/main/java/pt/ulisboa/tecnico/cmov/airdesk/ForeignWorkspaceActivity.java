@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -108,7 +107,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
 
 
         _peersStr.clear();
-        if (mAppContext.isBound()) {
+        if (mAppContext.isBound() && groupInfo.askIsConnected()) {
             // compile list of network members
             if (mAppContext.getVirtualIp() == null) {
                 String myName = groupInfo.getDeviceName();
@@ -168,8 +167,10 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
             }*/
         _fileNamesList.clear();
         ArrayList<String> mOwnersWsFiles = mAppContext.getWsNameFiles(WORKSPACE_NAME);
-        for (String fileName : mOwnersWsFiles) {
-            _fileNamesList.add(fileName);
+        if( mOwnersWsFiles != null) {
+            for (String fileName : mOwnersWsFiles) {
+                _fileNamesList.add(fileName);
+            }
         }
         Collections.sort(_fileNamesList);
         _fileNamesAdapter.notifyDataSetChanged();
