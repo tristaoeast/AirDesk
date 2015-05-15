@@ -95,7 +95,6 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
-        //TODO meter bem o broadcastreceiver para esta
         receiver = new SimWifiP2pBroadcastReceiverForeignActivity(this, mAppContext);
         registerReceiver(receiver, filter);
     }
@@ -105,7 +104,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
                                      SimWifiP2pInfo groupInfo) {
 
         mDevicesInNetwork.clear();
-        if (mAppContext.isBound()) {
+        if (mAppContext.isBound() && groupInfo.askIsConnected()) {
             // compile list of network members
             if (mAppContext.getVirtualIp() == null) {
                 String myName = groupInfo.getDeviceName();
@@ -115,7 +114,6 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
             }
 
             String msg_files = mAppContext.getVirtualIp() + ";WS_FILE_LIST;" + WORKSPACE_NAME + ";";
-
             for (String deviceName : groupInfo.getDevicesInNetwork()) {
                 SimWifiP2pDevice device = devices.getByName(deviceName);
                 String peer = device.getVirtIp();
@@ -135,22 +133,18 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
 
         } else
             Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
-        _fileNamesList = new ArrayList<String>();
+        /*_fileNamesList = new ArrayList<String>();
         _fileNamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _fileNamesList);
         _listView = (ListView) findViewById(R.id.lv_filesList);
         _listView.setAdapter(_fileNamesAdapter);
-            /*Set<String> fileNames = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
-            for (String fileName : fileNames) {
-                _fileNamesList.add(fileName);
-            }*/
         Collections.sort(_fileNamesList);
         _fileNamesAdapter.notifyDataSetChanged();
         _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                openTextFile(position);
+                getTextFile(position);
             }
-        });
+        });*/
     }
 
     protected void setupFilesList() {
@@ -182,7 +176,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
 
     private void openTextFile(int position) {
         String filename = _fileNamesList.get(position);
-        Intent intent = new Intent(ForeignWorkspaceActivity.this, ReadTextFileActivity.class);
+        Intent intent = new Intent(ForeignWorkspaceActivity.this, ReadTextFileActivityForeign.class);
         intent.putExtra("FILENAME", filename);
         intent.putExtra("WORKSPACE_DIR", WORKSPACE_DIR);
         intent.putExtra("WORKSPACE_NAME", WORKSPACE_NAME);

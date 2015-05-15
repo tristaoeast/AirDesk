@@ -5,6 +5,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
@@ -156,7 +157,34 @@ public class ReceiveCommTaskThread implements Runnable {
 
             } else if (splt[1].equals("WS_FILE_READ")) {
                 //TODO PROVIDE GET_WS_FILE_RESPONSE
+                mCurrentActivity = mAppContext.getCurrentActivity();
+                File appDir = new File(mCurrentActivity.getApplicationContext().getFilesDir(), mAppContext.getLocalEmail());
+                Log.w("RecCommTask", "FILEDIR: " + appDir );
+                String FilePath = appDir + "/" + splt[2] +".txt";
 
+                File file = new File( FilePath );
+                Log.w("RecCommTask", "FILE TEXT: " + file.toString() );
+                response += "WS_FILE_READ_RESPONSE;" + file.toString() + ";";
+
+                mResponse = response;
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        (new Thread(new OutgoingCommTaskThread(mAppContext, mActivity, mDestIp, mResponse))).start();
+                    }
+                });
+
+            }else if(splt[1].equals("WS_FILE_READ_RESPONSE")){
+                mCurrentActivity = mAppContext.getCurrentActivity();
+                if (mCurrentActivity instanceof ForeignWorkspaceActivity) {
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                           // ((ForeignWorkspaceActivity) mCurrentActivity).openTextFile();
+
+                        }
+                    });
+                }
 
             } else if (splt[1].equals("WS_FILE_EDIT")) {
                 //TODO PROVIDE WS_FILE_EDIT_AUTHORIZATION
