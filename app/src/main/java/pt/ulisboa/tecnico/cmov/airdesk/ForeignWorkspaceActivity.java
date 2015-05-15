@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Set;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
@@ -102,42 +103,58 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
     @Override
     public void onGroupInfoAvailable(SimWifiP2pDeviceList devices,
                                      SimWifiP2pInfo groupInfo) {
+
+
         _peersStr.clear();
-        // compile list of network members
-        if (mAppContext.getVirtualIp() == null) {
-            String myName = groupInfo.getDeviceName();
-            SimWifiP2pDevice myDevice = devices.getByName(myName);
-            if(myDevice != null)
-                mAppContext.setVirtualIp(myDevice.getVirtIp());
-        }
-
-
-        for (String deviceName : groupInfo.getDevicesInNetwork()) {
-            SimWifiP2pDevice device = devices.getByName(deviceName);
-            String devstr = device.getVirtIp();
-            _peersStr.add(devstr);
-        }
-    }
-
-    protected void setupFilesList() {
-
         if (mAppContext.isBound()) {
-            mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspaceActivity.this);
+            // compile list of network members
+            if (mAppContext.getVirtualIp() == null) {
+                String myName = groupInfo.getDeviceName();
+                SimWifiP2pDevice myDevice = devices.getByName(myName);
+                if(myDevice != null)
+                    mAppContext.setVirtualIp(myDevice.getVirtIp());
+            }
 
-            String msg_files = mAppContext.getVirtualIp() + ";WS_FILE_LIST;" + WORKSPACE_NAME;
-            for (String peer : _peersStr) {
+            String msg_files = mAppContext.getVirtualIp() + ";WS_FILE_LIST;" + WORKSPACE_NAME + ";";
+
+            for (String deviceName : groupInfo.getDevicesInNetwork()) {
+                SimWifiP2pDevice device = devices.getByName(deviceName);
+                String peer = device.getVirtIp();
+                _peersStr.add(peer);
                 new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_files);
             }
+
         } else
-            Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
         _fileNamesList = new ArrayList<String>();
         _fileNamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _fileNamesList);
         _listView = (ListView) findViewById(R.id.lv_filesList);
         _listView.setAdapter(_fileNamesAdapter);
-        /*Set<String> fileNames = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
-        for (String fileName : fileNames) {
-            _fileNamesList.add(fileName);
-        }*/
+            /*Set<String> fileNames = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
+            for (String fileName : fileNames) {
+                _fileNamesList.add(fileName);
+            }*/
+        Collections.sort(_fileNamesList);
+        _fileNamesAdapter.notifyDataSetChanged();
+        _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                openTextFile(position);
+            }
+        });
+    }
+
+    protected void setupFilesList() {
+        mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspaceActivity.this);
+    }
+
+    protected void updateFilesList() {
+        //TODO chamar isto quando existirem altera��es na lista de ficheiros, e teremos de ter uma coisa no global com os nomes dos ficheiros de cada ws....
+        _listView.setAdapter(_fileNamesAdapter);
+            /*Set<String> fileNames = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
+            for (String fileName : fileNames) {
+                _fileNamesList.add(fileName);
+            }*/
         Collections.sort(_fileNamesList);
         _fileNamesAdapter.notifyDataSetChanged();
         _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -263,6 +280,20 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
     }
 
     public void isOwnerGone(){
-        //TODO: act as described in the BroadcastReceiverForeignActivity.onReceive method
+        String wsName = WORKSPACE_NAME;
+        Long owner;
+        Hashtable<String, Long> owners = mAppContext.getWsOwners();
+        if(owners.containsKey(wsName)) {
+            owner = owners.get(wsName);
+
+            //check peers and see if owner is still there
+            if (!_peersStr.contains(owner.toString())) {
+                //go back to foreignactivitylist
+                Intent intent = new Intent(getApplicationContext(), ForeignWorkspacesListActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+
+        }
     }
 }
