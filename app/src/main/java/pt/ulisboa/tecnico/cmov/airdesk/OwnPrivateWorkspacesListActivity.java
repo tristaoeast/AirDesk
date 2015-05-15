@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pManager;
+
 /**
  * Created by ist167092 on 24-03-2015.
  */
@@ -153,6 +155,7 @@ public class OwnPrivateWorkspacesListActivity extends OwnWorkspacesListActivity 
                             }
                         }
                         _userPrefsEditor.commit();
+                        mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) OwnPrivateWorkspacesListActivity.this);
                     }
                 })
                 .setNegativeButton("Cancel", null).create();
