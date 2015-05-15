@@ -80,9 +80,10 @@ public class MainActivity extends ActionBarActivity {
             initSimWifiP2p();
             bindSimWifiP2pService();
             Toast.makeText(MainActivity.this, "Initializing inCommTasks ThreadPool", Toast.LENGTH_LONG).show();
-            IncomingCommTask inCommTask = new IncomingCommTask();
-            inCommTask.setApplicationContext(mAppContext);
-            inCommTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//            IncomingCommTask inCommTask = new IncomingCommTask();
+//            inCommTask.setApplicationContext(mAppContext);
+//            inCommTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            (new Thread(new IncomingCommTaskThread(mAppContext, this))).start();
         }
 
     }

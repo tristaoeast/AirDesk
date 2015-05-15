@@ -15,6 +15,8 @@ import pt.inesc.termite.wifidirect.SimWifiP2pManager;
 public class SimWifiP2pBroadcastReceiverForeign extends SimWifiP2pBroadcastReceiver {
 
     private ForeignWorkspacesListActivity mActivity;
+    private String mDestIp;
+    private String mMsg;
 
     public SimWifiP2pBroadcastReceiverForeign(ForeignWorkspacesListActivity actionBarActivity, GlobalClass appContext) {
         super(actionBarActivity, appContext);
@@ -23,10 +25,10 @@ public class SimWifiP2pBroadcastReceiverForeign extends SimWifiP2pBroadcastRecei
 
     @Override
     public void onReceive(Context context, Intent intent) {
-       super.onReceive(context, intent);
+        super.onReceive(context, intent);
         String action = intent.getAction();
         if (SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION.equals(action)) {
-            mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) SimWifiP2pBroadcastReceiverForeign.this);
+//            mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) SimWifiP2pBroadcastReceiverForeign.this);
         }
     }
 
@@ -51,12 +53,22 @@ public class SimWifiP2pBroadcastReceiverForeign extends SimWifiP2pBroadcastRecei
 //            Log.w("ForeignList", msg_email);
 //            Log.w("ForeignList", msg_tags);
             Integer s = groupInfo.getDevicesInNetwork().size();
-             Log.w("BrCastFor", s.toString());
+            Log.w("BrCastFor", s.toString());
             for (String deviceName : groupInfo.getDevicesInNetwork()) {
                 SimWifiP2pDevice device = devices.getByName(deviceName);
                 String deviceIP = device.getVirtIp();
 //                _peersStr.add(peer);
-                new OutgoingCommTask(mAppContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_tags);
+                mMsg = msg_tags;
+                mDestIp = deviceIP;
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        (new Thread(new OutgoingCommTaskThread(mAppContext, mAppContext.getCurrentActivity(), mDestIp, mMsg))).start();
+
+                    }
+                });
+
+//                new OutgoingCommTask(mAppContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_tags);
                 Log.w("BrCastFor", "Mesg: " + msg_tags + " submitted to OutTask with destIP: " + deviceIP);
 
             }

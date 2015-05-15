@@ -62,6 +62,8 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
     private GlobalClass mAppContext;
     private IntentFilter filter;
     private SimWifiP2pBroadcastReceiverForeign receiver;
+    private String mMsg;
+    private String mDestIp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +123,17 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
                 SimWifiP2pDevice device = devices.getByName(deviceName);
                 String peer = device.getVirtIp();
                 _peersStr.add(peer);
-                new OutgoingCommTask(mAppContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_files);
+                mMsg = msg_files;
+                mDestIp = peer;
+                this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        (new Thread(new OutgoingCommTaskThread(mAppContext, ForeignWorkspaceActivity.this, mDestIp, mMsg))).start();
+
+                    }
+                });
+                Log.w("ForeignList", "Mesg: " + mMsg + " submitted to OutTask with destIP: " + mDestIp);
+//                new OutgoingCommTask(mAppContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_files);
             }
 
         } else

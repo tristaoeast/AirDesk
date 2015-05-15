@@ -82,6 +82,8 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
 
     protected String LOCAL_EMAIL;
     protected String LOCAL_USERNAME;
+    private String mMsg;
+    private String mDestIp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,15 +145,23 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
                 SimWifiP2pDevice device = devices.getByName(deviceName);
                 String deviceIP = device.getVirtIp();
 //                _peersStr.add(peer);
-                new OutgoingCommTask(mAppContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_tags);
+                mMsg = msg_tags;
+                mDestIp = deviceIP;
+                this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        (new Thread(new OutgoingCommTaskThread(mAppContext, ForeignWorkspacesListActivity.this, mDestIp, mMsg))).start();
+                        (new Thread(new OutgoingCommTaskThread(mAppContext, ForeignWorkspacesListActivity.this, mDestIp, mMsg))).start();
+                        (new Thread(new OutgoingCommTaskThread(mAppContext, ForeignWorkspacesListActivity.this, mDestIp, mMsg))).start();
+
+                    }
+                });
+//                new OutgoingCommTask(mAppContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_tags);
                 Log.w("ForeignList", "Mesg: " + msg_tags + " submitted to OutTask with destIP: " + deviceIP);
-//                new OutgoingCommTask(mAppContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_email);
-//                Log.w("ForeignList", "Mesg: " + msg_email + " submitted to OutTask with destIP: " + deviceIP);
+
             }
         } else {
             Toast.makeText(this, "Not in a group or service not bound", Toast.LENGTH_LONG).show();
-//            mAppContext.clearInvitedWorkspaces();
-//            mAppContext.clearSubscribedWorkspaces();
             mAppContext.clearForeignWorkspaces();
         }
 
@@ -224,22 +234,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
 
         _wsNamesList.clear();
 
-//        Hashtable<String, Long> mSubscribedWorkspaces;
-//        Hashtable<String, Long> mInvitedWorkspaces;
-//        mSubscribedWorkspaces = mAppContext.getSubscribedWorkspaces();
-//        mInvitedWorkspaces = mAppContext.getInvitedWorkspaces();
-//
-//        Enumeration<String> mSubscribedWorkspacesNames;
-//        Enumeration<String> mInvitedWorkspacesNames;
-//        mSubscribedWorkspacesNames = mSubscribedWorkspaces.keys();
-//        mInvitedWorkspacesNames = mInvitedWorkspaces.keys();
-//
-//        for (String name : Collections.list(mSubscribedWorkspacesNames)) {
-//            _wsNamesList.add(name);
-//        }
-//        for (String name : Collections.list(mInvitedWorkspacesNames)) {
-//            _wsNamesList.add(name);
-//        }
         for (String name : mAppContext.getForeignWorkspaces().keySet()) {
             _wsNamesList.add(name);
         }
@@ -258,51 +252,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         Log.w("ForeignWSList", "ENTREI");
         mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
 
-//        if (mAppContext.isBound()) {
-//            mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
-//
-//            if (mAppContext.isInAGroup()) {
-//                String myTags = "";
-//                for (String tag : mAppContext.getTagsList()) {
-//                    myTags += tag + ";";
-//                }
-//                String msg_tags = mAppContext.getVirtualIp() + ";WS_SUBSCRIBED_LIST;" + myTags;
-//                String msg_email = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + LOCAL_EMAIL + ";";
-//                Log.w("ForeignList", msg_email);
-//                Log.w("ForeignList", msg_tags);
-//                for (String peer : _peersStr) {
-//                    new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_tags);
-//                    new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email);
-//                }
-//            }
-//        } else
-//            Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
-
-        /*Set<String> privateWorkspaces = _userPrefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
-        Set<String> publicWorkspaces = _userPrefs.getStringSet(getString(R.string.own_public_workspaces_list), new HashSet<String>());
-
-        //For private Ws
-        for (String wsName : privateWorkspaces) {
-
-            Set<String> invitedUsersListPrivateWs = _userPrefs.getStringSet(wsName + "_invitedUsers", new HashSet<String>());
-            for (String email : invitedUsersListPrivateWs) {
-                if (_email.equalsIgnoreCase(email)) {
-                    _wsNamesList.add(wsName);
-                    //_userPrefsEditor.putStringSet(getString(R.string.foreign_workspaces_list), wsNames);
-                }
-            }
-
-        }
-        //For public WS
-        for (String wsName : publicWorkspaces) {
-            Set<String> invitedUsersListPublicWs = _userPrefs.getStringSet(wsName + "_invitedUsers", new HashSet<String>());
-            for (String email : invitedUsersListPublicWs) {
-                if (_email.equalsIgnoreCase(email)) {
-                    _wsNamesList.add(wsName);
-                    //_userPrefsEditor.putStringSet(getString(R.string.foreign_workspaces_list), wsNames);
-                }
-            }
-        }*/
     }
 
     @Override
