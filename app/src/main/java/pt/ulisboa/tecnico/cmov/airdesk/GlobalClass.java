@@ -38,7 +38,7 @@ public class GlobalClass extends Application {
     private Hashtable<String, Long> mInvitedWorkspaces = new Hashtable<String, Long>();
 
     private Hashtable<String, Long> mWsOwners = new Hashtable<String, Long>();
-    private Hashtable<Long, String> mOwnersWs = new Hashtable<Long, String>();
+    private Hashtable<Long, ArrayList<String>> mOwnersWs = new Hashtable<Long, ArrayList<String>>();
 
     public boolean isInAGroup() {
         return mInAGroup;
@@ -144,17 +144,22 @@ public class GlobalClass extends Application {
         this.mWsOwners.remove(mOwnerIp);
     }
 
-    public Hashtable<Long, String> getOwnersWs() {
+    public Hashtable<Long, ArrayList<String>> getOwnersWs() {
         return mOwnersWs;
     }
 
     public void addOwnersWs(Long mOwnerIp, String mWs) {
-        if(!mWsOwners.containsKey(mOwnerIp))
-            this.mOwnersWs.put(mOwnerIp, mWs);
+        if(!mWsOwners.containsKey(mOwnerIp)){
+            ArrayList<String> values = new ArrayList<String>();
+            values.add(mWs);
+            this.mOwnersWs.put(mOwnerIp, values);
+        }
         else {
-            String values = mOwnersWs.get(mOwnerIp);
-            values += mWs;
-            this.mOwnersWs.put(mOwnerIp, mWs);
+            ArrayList<String> moreValues = mOwnersWs.get(mOwnerIp);
+            if(!moreValues.contains(mWs)) {
+                moreValues.add(mWs);
+                this.mOwnersWs.put(mOwnerIp, moreValues);
+            }
         }
     }
 
