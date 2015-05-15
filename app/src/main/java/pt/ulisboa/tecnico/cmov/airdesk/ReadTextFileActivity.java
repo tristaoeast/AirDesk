@@ -115,13 +115,7 @@ public class ReadTextFileActivity extends ActionBarActivity {
                 editTextFileInDialog(filename, textFile, text);
             }
         });
-//        Button bt_delete_file = (Button) findViewById(R.id.bt_delete_file);
-//        bt_delete_file.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                deleteFile(filename, textFile, text);
-//            }
-//        });
+
 
     }
 
@@ -181,49 +175,22 @@ public class ReadTextFileActivity extends ActionBarActivity {
         return false;
     }
 
-//    public void deleteFile() {
-//
-//        LayoutInflater inflater = LayoutInflater.from(this);
-//        final View customView = inflater.inflate(R.layout.dialog_edit_text_file, null);
-//
-//        AlertDialog dialog = new AlertDialog.Builder(this)
-//                .setTitle("Edit " + filename)
-//                .setView(customView)
-//                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int whichButton) {
-//                        String newText = et_text.getText().toString().trim();
-//                        try {
-//                            if (!textFile.exists()) {
-//                                textFile.createNewFile();
-//                            }
-//
-//                            FileWriter fileWritter = new FileWriter(textFile, false);
-//                            BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
-//                            bufferWritter.write(newText);
-//                            bufferWritter.close();
-//                            if (quotaExceeded()) {
-//                                FileWriter fileWriterOld = new FileWriter(textFile, false);
-//                                BufferedWriter bufferWriterOld = new BufferedWriter(fileWriterOld);
-//                                bufferWriterOld.write(oldText);
-//                                bufferWriterOld.close();
-//                                Toast.makeText(ReadTextFileActivity.this, "Workspace quota exceeded. Please write a shorter text or delete some files.", Toast.LENGTH_LONG).show();
-//                                editTextFileInDialog(filename, textFile, newText);
-//                            }
-//                            updateText(filename);
-//                            //TODO VERIFY IF SAVING FILES GOES ABOVE WS QUOTA
-//                            return;
-//
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                            Toast.makeText(ReadTextFileActivity.this, "Error saving file. Try again", Toast.LENGTH_LONG).show();
-//                            editTextFileInDialog(filename, textFile, newText);
-//                            return;
-//                        }
-//                    }
-//                })
-//                .setNegativeButton("Cancel", null).create();
-//        dialog.show();
-//    }
+    public void deleteFile(View v) {
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        final View customView = inflater.inflate(R.layout.dialog_edit_text_file, null);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Delete " + FILENAME + "?")
+                .setView(customView)
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                    }
+                })
+                .setNegativeButton("Cancel", null).create();
+        dialog.show();
+    }
 
     public static long folderSize(File directory) {
         long length = 0;
