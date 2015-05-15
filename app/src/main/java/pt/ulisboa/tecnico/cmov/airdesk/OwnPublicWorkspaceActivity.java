@@ -19,8 +19,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
+import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
+import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
+import pt.inesc.termite.wifidirect.SimWifiP2pManager;
 
-public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
+
+public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity implements SimWifiP2pManager.GroupInfoListener {
 
     private SharedPreferences _appPrefs;
     private SharedPreferences _userPrefs;
@@ -74,6 +79,17 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
                         Set<String> ownPrivateWs = _userPrefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
                         ownPrivateWs.add(getWorkspaceName());
                         _userPrefsEditor.putStringSet(getString(R.string.own_private_workspaces_list), ownPrivateWs).commit();
+
+                        String tags = "";
+                        for (String tag : mAppContext.getTagsList()) {
+                            tags += tag + ";";
+                        }
+                        for (String email : _emailsList) {
+                            Log.w("PrivateWS", "Removed email: " + email);
+                            String destIp = mAppContext.getVirtIpByEmail().get(email);
+                            (new Thread(new OutgoingCommTaskThread(mAppContext, OwnPublicWorkspaceActivity.this, destIp, mAppContext.getVirtualIp() + ";EMAIL_REMOVED_FROM_WS;" + tags))).start();
+                        }
+
                         Intent intent = new Intent(OwnPublicWorkspaceActivity.this, OwnPrivateWorkspaceActivity.class);
                         intent.putExtra("workspace_name", getWorkspaceName());
                         startActivity(intent);
@@ -151,6 +167,7 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
 
                 HashSet<String> newTagsSet = new HashSet<String>(_tagsList);
                 _userPrefs.edit().putStringSet(getWorkspaceName() + "_tags", newTagsSet).commit();
+                mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) OwnPublicWorkspaceActivity.this);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -253,6 +270,11 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
                     String destIp = mAppContext.getVirtIpByEmail().get(email);
                     (new Thread(new OutgoingCommTaskThread(mAppContext, OwnPublicWorkspaceActivity.this, destIp, mAppContext.getVirtualIp() + ";EMAIL_REMOVED_FROM_WS;" + tags))).start();
                 }
+                for (String email : addedEmailsSet) {
+                    Log.w("PrivateWS", "Added email: " + email);
+                    String destIp = mAppContext.getVirtIpByEmail().get(email);
+                    (new Thread(new OutgoingCommTaskThread(mAppContext, OwnPublicWorkspaceActivity.this, destIp, mAppContext.getVirtualIp() + ";EMAIL_ADDED_TO_WS;" + tags))).start();
+                }
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -280,5 +302,23 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
 
+    }
+
+    @Override
+    public void onGroupInfoAvailable(SimWifiP2pDeviceList simWifiP2pDeviceList, SimWifiP2pInfo simWifiP2pInfo) {
+        if (simWifiP2pInfo.askIsConnected()) {
+            for (String deviceName : simWifiP2pInfo.getDevicesInNetwork()) {
+                SimWifiP2pDevice device = simWifiP2pDeviceList.getByName(deviceName);
+                final String destIp = device.getVirtIp();
+
+                OwnPublicWorkspaceActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.w("BCast", "sending refresh lists to" + destIp);
+                        (new Thread(new OutgoingCommTaskThread(mAppContext, OwnPublicWorkspaceActivity.this, destIp, mAppContext.getVirtualIp() + ";REFRESH_LIST;" + mAppContext.getLocalEmail() + ";"))).start();
+                    }
+                });
+            }
+        }
     }
 }

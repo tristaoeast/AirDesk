@@ -25,8 +25,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
+import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
+import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
+import pt.inesc.termite.wifidirect.SimWifiP2pManager;
 
-public abstract class OwnWorkspaceActivity extends ActionBarActivity {
+
+public abstract class OwnWorkspaceActivity extends ActionBarActivity implements SimWifiP2pManager.GroupInfoListener {
 
     private int SUBCLASS_ACTIVITY_LAYOUT;
 
@@ -144,44 +149,6 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
             }
         });
     }
-
-//    private void openTextFileInDialog(final int position) {
-//
-//        final String filename = _fileNamesList.get(position);
-//        File dir = new File(_appDir, WORKSPACE_DIR);
-//        final File textFile = new File(dir, filename);
-////        Toast.makeText(SUBCLASS_CONTEXT,dir.getName()+" size: "+Double.toString(MemoryHelper.fileSizeInKB(textFile)),Toast.LENGTH_LONG).show();
-//        //Read text from file
-//        final StringBuilder text = new StringBuilder();
-//
-//        try {
-//            BufferedReader br = new BufferedReader(new FileReader(textFile));
-//            String line;
-//            while ((line = br.readLine()) != null) {
-//                text.append(line);
-//                text.append('\n');
-//            }
-//            br.close();
-//        } catch (IOException e) {
-//            Log.d("IOException", e.toString());
-//        }
-//
-//        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
-//        final View customView = inflater.inflate(R.layout.dialog_read_text_file, null);
-//        final TextView tv_text = (TextView) customView.findViewById(R.id.tv_text);
-//        tv_text.setText(text);
-//
-//        AlertDialog dialog = new AlertDialog.Builder(this)
-//                .setTitle(filename)
-//                .setView(customView)
-//                .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int whichButton) {
-//                        editTextFileInDialog(filename, textFile, text.toString(), position);
-//                    }
-//                })
-//                .setNegativeButton("Back", null).create();
-//        dialog.show();
-//    }
 
     private void openTextFile(int position) {
         String filename = _fileNamesList.get(position);
@@ -350,6 +317,18 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
                         Set<String> allWs = _userPrefs.getStringSet(getString(R.string.own_all_workspaces_list), new HashSet<String>());
                         allWs.remove(WORKSPACE_NAME);
                         _userPrefsEditor.putStringSet(getString(R.string.own_all_workspaces_list), allWs).commit();
+
+                        String tags = "";
+                        for (String tag : mAppContext.getTagsList()) {
+                            tags += tag + ";";
+                        }
+                        for (String email : _emailsList) {
+                            Log.w("PrivateWS", "Removed email: " + email);
+                            String destIp = mAppContext.getVirtIpByEmail().get(email);
+                            (new Thread(new OutgoingCommTaskThread(mAppContext, OwnWorkspaceActivity.this, destIp, mAppContext.getVirtualIp() + ";EMAIL_REMOVED_FROM_WS;" + tags))).start();
+                        }
+
+
                         Intent intent = new Intent(SUBCLASS_CONTEXT, OwnPrivateWorkspacesListActivity.class);
                         startActivity(intent);
                         finish();
@@ -395,6 +374,27 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
 
 
     }
+    @Override
+    public void onGroupInfoAvailable(SimWifiP2pDeviceList simWifiP2pDeviceList, SimWifiP2pInfo simWifiP2pInfo) {
+        if (simWifiP2pInfo.askIsConnected()) {
+            for (String deviceName : simWifiP2pInfo.getDevicesInNetwork()) {
+                SimWifiP2pDevice device = simWifiP2pDeviceList.getByName(deviceName);
+                final String destIp = device.getVirtIp();
 
+                OwnWorkspaceActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.w("BCast", "sending refresh lists to" + destIp);
+                        (new Thread(new OutgoingCommTaskThread(mAppContext, OwnWorkspaceActivity.this, destIp, mAppContext.getVirtualIp() + ";REFRESH_LIST;" + mAppContext.getLocalEmail() + ";"))).start();
+                    }
+                });
+            }
+        }
+    }
+
+    public void userLeft(String email) {
+        _emailsList.remove(email);
+        _emailsAdapter.notifyDataSetChanged();
+    }
 
 }

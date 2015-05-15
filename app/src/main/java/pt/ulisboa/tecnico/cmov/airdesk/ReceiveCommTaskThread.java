@@ -55,7 +55,7 @@ public class ReceiveCommTaskThread implements Runnable {
 //            sockIn.close();
 //            s.getOutputStream().write(("ACK" + "\n").getBytes());
             mCliSocket.close();
-            String[] splt = st.split(";");
+            final String[] splt = st.split(";");
             String response = mAppContext.getVirtualIp() + ";";
             mDestIp = splt[0];
             Log.w("RecCommTask", "Processing: " + splt[1]);
@@ -226,6 +226,36 @@ public class ReceiveCommTaskThread implements Runnable {
                         }
                     });
                 }
+            } else if (splt[1].equals("REFRESH_LIST")) {
+                mCurrentActivity = mAppContext.getCurrentActivity();
+                if (mCurrentActivity instanceof ForeignWorkspacesListActivity) {
+                    String myTags = "";
+                    for (String tag : mAppContext.getTagsList()) {
+                        myTags += tag + ";";
+                    }
+                    final String msg_tags = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + mAppContext.getLocalEmail() + ";" + myTags;
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            (new Thread(new OutgoingCommTaskThread(mAppContext, mCurrentActivity, splt[0], msg_tags))).start();
+                        }
+                    });
+                }
+            } else if (splt[1].equals("LEAVE_WORKSPACE")) {
+
+                Set<String> invitedUsers = userPrefs.getStringSet(splt[3] + "_invitedUsers", new HashSet<String>());
+                invitedUsers.remove(splt[2]);
+                userPrefs.edit().putStringSet(splt[3] + "_invitedUsers", invitedUsers);
+                mCurrentActivity = mAppContext.getCurrentActivity();
+                if (mCurrentActivity instanceof OwnWorkspaceActivity) {
+                    mCurrentActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((OwnWorkspaceActivity) mCurrentActivity).userLeft(splt[2]);
+                        }
+                    });
+                }
+
             }
 
             if (!mCliSocket.isClosed()) {
