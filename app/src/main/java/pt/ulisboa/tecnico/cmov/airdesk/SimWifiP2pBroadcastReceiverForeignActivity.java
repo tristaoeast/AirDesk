@@ -19,7 +19,8 @@ public class SimWifiP2pBroadcastReceiverForeignActivity extends SimWifiP2pBroadc
        super.onReceive(context, intent);
         String action = intent.getAction();
         if (SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION.equals(action)) {
-            //TODO: check if the owner of the ws I'm in has left! If so, get back to the foreign activity list, if not let it be
+            //check if the owner of the ws I'm in has left! If so, get back to the foreign activity list,
+            //if not let it be
             mActivity.isOwnerGone();
         }
     }

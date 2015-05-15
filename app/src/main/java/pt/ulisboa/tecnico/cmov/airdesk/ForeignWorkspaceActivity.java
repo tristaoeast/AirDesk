@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Set;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
@@ -104,7 +105,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
                                      SimWifiP2pInfo groupInfo) {
 
 
-        //_peersStr.clear();
+        _peersStr.clear();
         if (mAppContext.isBound()) {
             // compile list of network members
             if (mAppContext.getVirtualIp() == null) {
@@ -119,7 +120,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
             for (String deviceName : groupInfo.getDevicesInNetwork()) {
                 SimWifiP2pDevice device = devices.getByName(deviceName);
                 String peer = device.getVirtIp();
-                //_peersStr.add(devstr);
+                _peersStr.add(peer);
                 new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_files);
             }
 
@@ -148,7 +149,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
     }
 
     protected void updateFilesList() {
-        //TODO chamar isto quando existirem alterações na lista de ficheiros, e teremos de ter uma coisa no global com os nomes dos ficheiros de cada ws....
+        //TODO chamar isto quando existirem alteraï¿½ï¿½es na lista de ficheiros, e teremos de ter uma coisa no global com os nomes dos ficheiros de cada ws....
         _listView.setAdapter(_fileNamesAdapter);
             /*Set<String> fileNames = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
             for (String fileName : fileNames) {
@@ -279,6 +280,20 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
     }
 
     public void isOwnerGone(){
-        //TODO: act as described in the BroadcastReceiverForeignActivity.onReceive method
+        String wsName = WORKSPACE_NAME;
+        Long owner;
+        Hashtable<String, Long> owners = mAppContext.getWsOwners();
+        if(owners.containsKey(wsName)) {
+            owner = owners.get(wsName);
+
+            //check peers and see if owner is still there
+            if (!_peersStr.contains(owner.toString())) {
+                //go back to foreignactivitylist
+                Intent intent = new Intent(getApplicationContext(), ForeignWorkspacesListActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+
+        }
     }
 }
