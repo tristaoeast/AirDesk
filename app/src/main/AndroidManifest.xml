@@ -69,7 +69,11 @@
             android:label="@string/title_activity_read_text_file">
 
         </activity>
+        <activity
+            android:name=".ReadTextFileActivityForeign"
+            android:label="@string/title_activity_read_text_file">
 
+        </activity>
         <service android:name="pt.inesc.termite.wifidirect.service.SimWifiP2pService" />
     </application>
 

@@ -3,9 +3,11 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
@@ -156,15 +158,27 @@ public class ReceiveCommTaskThread implements Runnable {
                 }
 
             } else if (splt[1].equals("WS_FILE_READ")) {
-                //TODO PROVIDE GET_WS_FILE_RESPONSE
+                //IP;WS_FILE_READ;WORKSPACENAME;FILENAME
                 mCurrentActivity = mAppContext.getCurrentActivity();
-                File appDir = new File(mCurrentActivity.getApplicationContext().getFilesDir(), mAppContext.getLocalEmail());
-                Log.w("RecCommTask", "FILEDIR: " + appDir );
-                String FilePath = appDir + "/" + splt[2] +".txt";
+                File appDir = new File(mAppContext.getFilesDir(), mAppContext.getLocalEmail());
+                File wsDir = new File(appDir, splt[2]);
+                File textFile = new File(wsDir, splt[3]);
 
-                File file = new File( FilePath );
-                Log.w("RecCommTask", "FILE TEXT: " + file.toString() );
-                response += "WS_FILE_READ_RESPONSE;" + file.toString() + ";";
+                final StringBuilder builtText = new StringBuilder();
+
+                try {
+                    BufferedReader br = new BufferedReader(new FileReader(textFile));
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        builtText.append(line);
+                        builtText.append('\n');
+                    }
+                    br.close();
+                } catch (IOException e) {
+                    Toast.makeText(mActivity, "Error opening " + splt[3] + ". Please try again.", Toast.LENGTH_LONG).show();
+                }
+
+                response += "WS_FILE_READ_RESPONSE;" + builtText.toString() + ";";
 
                 mResponse = response;
                 mActivity.runOnUiThread(new Runnable() {
@@ -176,11 +190,11 @@ public class ReceiveCommTaskThread implements Runnable {
 
             }else if(splt[1].equals("WS_FILE_READ_RESPONSE")){
                 mCurrentActivity = mAppContext.getCurrentActivity();
-                if (mCurrentActivity instanceof ForeignWorkspaceActivity) {
+                if (mCurrentActivity instanceof ReadTextFileActivityForeign) {
                     mActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                           // ((ForeignWorkspaceActivity) mCurrentActivity).openTextFile();
+                            ((ReadTextFileActivityForeign) mCurrentActivity).updateText(splt[2]);
 
                         }
                     });

@@ -1,7 +1,5 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -9,21 +7,14 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Set;
@@ -56,7 +47,7 @@ public class ReadTextFileActivityForeign extends ActionBarActivity implements Si
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_read_text_file);
+        setContentView(R.layout.activity_read_text_file_foreign);
         mAppContext = (GlobalClass) getApplicationContext();
         Intent intent = getIntent();
         FILENAME = intent.getExtras().getString("FILENAME");
@@ -66,10 +57,11 @@ public class ReadTextFileActivityForeign extends ActionBarActivity implements Si
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         LOCAL_EMAIL = _appPrefs.getString("email", "");
         _userPrefs = getSharedPreferences(getString(R.string.app_preferences) + "_" + LOCAL_EMAIL, MODE_PRIVATE);
-        _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
-        WORKSPACE_DIR_FILE = new File(_appDir, WORKSPACE_DIR_STRING);
-        WORKSPACE_QUOTA = _userPrefs.getLong(WORKSPACE_NAME + "_quota", 0);
+        //_appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
+        //WORKSPACE_DIR_FILE = new File(_appDir, WORKSPACE_DIR_STRING);
+        //WORKSPACE_QUOTA = _userPrefs.getLong(WORKSPACE_NAME + "_quota", 0);
         mDevicesInNetwork = new ArrayList<String>();
+        requestTextFileContent();
     }
 
     public void isOwnerGone(Set<String> devicesInNetwork) {
@@ -106,16 +98,14 @@ public class ReadTextFileActivityForeign extends ActionBarActivity implements Si
                 if (myDevice != null)
                     mAppContext.setVirtualIp(myDevice.getVirtIp());
             }
-            //TODO
-            //String msg_readFile = mAppContext.getVirtualIp() + ";WS_FILE_READ;" + _fileNamesList.get(fileName_index) + ";
+            String msg_readFile = mAppContext.getVirtualIp() + ";WS_FILE_READ;" + WORKSPACE_NAME + ";" + FILENAME + ";";
 
             for (String deviceName : groupInfo.getDevicesInNetwork()) {
                 SimWifiP2pDevice device = devices.getByName(deviceName);
                 String peer = device.getVirtIp();
                 mDevicesInNetwork.add(peer);
                 mDestIp = peer;
-                //TODO
-                //mMsg = msg_readFile;
+                mMsg = msg_readFile;
                 this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -155,45 +145,31 @@ public class ReadTextFileActivityForeign extends ActionBarActivity implements Si
         unregisterReceiver(receiver);
     }
 
-    public void updateText(final String filename) {
+    protected void requestTextFileContent() {
+        Log.w("ReadTextFileActForeign", "ENTREI");
+        mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ReadTextFileActivityForeign.this);
 
+    }
 
-        final File textFile = new File(this.WORKSPACE_DIR_FILE, filename);
-//        Toast.makeText(SUBCLASS_CONTEXT,dir.getName()+" size: "+Double.toString(MemoryHelper.fileSizeInKB(textFile)),Toast.LENGTH_LONG).show();
-        //Read text from file
-        final StringBuilder builtText = new StringBuilder();
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(textFile));
-            String line;
-            while ((line = br.readLine()) != null) {
-                builtText.append(line);
-                builtText.append('\n');
-            }
-            br.close();
-        } catch (IOException e) {
-//            Log.d("IOException", e.);
-            Toast.makeText(this, "Error opening " + filename + ". Please try again.", Toast.LENGTH_LONG).show();
-            this.finish();
-        }
+    public void updateText(final String t) {
 
         TextView tv_text = (TextView) findViewById(R.id.tv_text);
         tv_text.setMovementMethod(new ScrollingMovementMethod());
-        tv_text.setText(builtText);
+        tv_text.setText(t);
 
-        final String text = builtText.toString();
+        final String text = t.toString();
         Button bt_edit_file = (Button) findViewById(R.id.bt_edit_file);
         bt_edit_file.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editTextFileInDialog(filename, textFile, text);
+                editTextFileInDialog(t);
             }
         });
 
     }
 
-    private void editTextFileInDialog(final String filename, final File textFile, final String oldText) {
-
+    private void editTextFileInDialog(final String t) {
+/*
         LayoutInflater inflater = LayoutInflater.from(this);
         final View customView = inflater.inflate(R.layout.dialog_edit_text_file, null);
         final EditText et_text = (EditText) customView.findViewById(R.id.et_text);
@@ -235,7 +211,7 @@ public class ReadTextFileActivityForeign extends ActionBarActivity implements Si
                     }
                 })
                 .setNegativeButton("Cancel", null).create();
-        dialog.show();
+        dialog.show();*/
     }
 
     public boolean quotaExceeded() {

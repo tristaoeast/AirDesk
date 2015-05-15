@@ -133,7 +133,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
 
         } else
             Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
-        /*_fileNamesList = new ArrayList<String>();
+        _fileNamesList = new ArrayList<String>();
         _fileNamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _fileNamesList);
         _listView = (ListView) findViewById(R.id.lv_filesList);
         _listView.setAdapter(_fileNamesAdapter);
@@ -142,9 +142,9 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
         _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                getTextFile(position);
+                openTextFile(position);
             }
-        });*/
+        });
     }
 
     protected void setupFilesList() {
