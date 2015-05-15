@@ -102,42 +102,37 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
     @Override
     public void onGroupInfoAvailable(SimWifiP2pDeviceList devices,
                                      SimWifiP2pInfo groupInfo) {
-        _peersStr.clear();
-        // compile list of network members
-        if (mAppContext.getVirtualIp() == null) {
-            String myName = groupInfo.getDeviceName();
-            SimWifiP2pDevice myDevice = devices.getByName(myName);
-            if(myDevice != null)
-                mAppContext.setVirtualIp(myDevice.getVirtIp());
-        }
 
 
-        for (String deviceName : groupInfo.getDevicesInNetwork()) {
-            SimWifiP2pDevice device = devices.getByName(deviceName);
-            String devstr = device.getVirtIp();
-            _peersStr.add(devstr);
-        }
-    }
-
-    protected void setupFilesList() {
-
+        //_peersStr.clear();
         if (mAppContext.isBound()) {
-            mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspaceActivity.this);
+            // compile list of network members
+            if (mAppContext.getVirtualIp() == null) {
+                String myName = groupInfo.getDeviceName();
+                SimWifiP2pDevice myDevice = devices.getByName(myName);
+                if(myDevice != null)
+                    mAppContext.setVirtualIp(myDevice.getVirtIp());
+            }
 
-            String msg_files = mAppContext.getVirtualIp() + ";WS_FILE_LIST;" + WORKSPACE_NAME;
-            for (String peer : _peersStr) {
+            String msg_files = mAppContext.getVirtualIp() + ";WS_FILE_LIST;" + WORKSPACE_NAME + ";";
+
+            for (String deviceName : groupInfo.getDevicesInNetwork()) {
+                SimWifiP2pDevice device = devices.getByName(deviceName);
+                String peer = device.getVirtIp();
+                //_peersStr.add(devstr);
                 new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_files);
             }
+
         } else
-            Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
         _fileNamesList = new ArrayList<String>();
         _fileNamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _fileNamesList);
         _listView = (ListView) findViewById(R.id.lv_filesList);
         _listView.setAdapter(_fileNamesAdapter);
-        /*Set<String> fileNames = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
-        for (String fileName : fileNames) {
-            _fileNamesList.add(fileName);
-        }*/
+            /*Set<String> fileNames = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
+            for (String fileName : fileNames) {
+                _fileNamesList.add(fileName);
+            }*/
         Collections.sort(_fileNamesList);
         _fileNamesAdapter.notifyDataSetChanged();
         _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -146,6 +141,10 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
                 openTextFile(position);
             }
         });
+    }
+
+    protected void setupFilesList() {
+        mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspaceActivity.this);
     }
 
     private void openTextFile(int position){
