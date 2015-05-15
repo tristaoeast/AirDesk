@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -26,9 +25,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Set;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
@@ -124,6 +121,13 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
     public void onGroupInfoAvailable(SimWifiP2pDeviceList devices,
                                      SimWifiP2pInfo groupInfo) {
 //        _peersStr.clear();
+        mAppContext.clearForeignWorkspaces();
+        ForeignWorkspacesListActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ForeignWorkspacesListActivity.this.updateLists();
+            }
+        });
         if (mAppContext.isBound() && groupInfo.askIsConnected()) {
             if (groupInfo.askIsConnected())
                 // compile list of network members
@@ -379,6 +383,8 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
 
                 HashSet<String> newTagsSet = new HashSet<String>(mAppContext.getTagsList());
                 _userPrefs.edit().putStringSet(getString(R.string.foreign_subscribed_workspaces) + "_tags", newTagsSet).commit();
+                requestForeignWNames();
+
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
