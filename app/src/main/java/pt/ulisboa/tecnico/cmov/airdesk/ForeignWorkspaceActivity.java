@@ -84,7 +84,6 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
         if (!_appDir.exists())
             _appDir.mkdir();
 
-        registerSimWifiP2pBcastReceiver();
         mDevicesInNetwork = new ArrayList<String>();
         setupFilesList();
     }
@@ -194,6 +193,13 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
         super.onResume();
 //        _fileNamesAdapter.notifyDataSetChanged();
         mAppContext.setCurrentActivity(this);
+        registerSimWifiP2pBcastReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
     }
 
     @Override

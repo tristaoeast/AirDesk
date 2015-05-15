@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
@@ -30,9 +29,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
-import pt.inesc.termite.wifidirect.SimWifiP2pManager;
-import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
-import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 
 /**
  * Created by ist167092 on 24-03-2015.
@@ -62,13 +58,6 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     protected String LOCAL_EMAIL;
     protected String LOCAL_USERNAME;
 
-    protected SimWifiP2pSocketServer mSrvSocket;
-    protected SimWifiP2pSocket mCliSocket;
-    protected ReceiveCommTask mComm;
-    protected boolean mBound;
-    protected Messenger mService;
-    protected SimWifiP2pManager mManager;
-    protected SimWifiP2pManager.Channel mChannel;
     private IntentFilter filter;
     private SimWifiP2pBroadcastReceiver receiver;
 
