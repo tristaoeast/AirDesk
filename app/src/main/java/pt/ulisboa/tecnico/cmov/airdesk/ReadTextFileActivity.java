@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 
@@ -171,21 +173,28 @@ public class ReadTextFileActivity extends ActionBarActivity {
 
         if(wsSize > WORKSPACE_QUOTA)
             return true;
-
         return false;
     }
 
     public void deleteFile(View v) {
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        final View customView = inflater.inflate(R.layout.dialog_edit_text_file, null);
+        final View customView = inflater.inflate(R.layout.dialog_delete_file, null);
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Delete " + FILENAME + "?")
                 .setView(customView)
                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-
+                        final File textFile = new File(WORKSPACE_DIR_FILE, FILENAME);
+                        textFile.delete();
+                        Set<String> wsFiles = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
+                        wsFiles.remove(FILENAME);
+                        _userPrefs.edit().putStringSet(WORKSPACE_NAME + "_files", wsFiles).commit();
+                        Intent intent = new Intent(ReadTextFileActivity.this, OwnPrivateWorkspacesListActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                        finish();
                     }
                 })
                 .setNegativeButton("Cancel", null).create();
