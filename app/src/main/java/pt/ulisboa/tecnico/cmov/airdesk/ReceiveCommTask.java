@@ -101,7 +101,25 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
                     ((ForeignWorkspacesListActivity) act).updateLists();
                 }
             } else if (splt[1].equals("WS_FILE_LIST")) {
-                //TODO PROVIDE WS_FILE_LIST_RESPONSE
+                //recebe -> IP;WS_FILE_LIST;WSNAME;
+                response += "WS_FILE_LIST_RESPONSE;" + splt[2] + ";";
+                Set<String> fileNames = userPrefs.getStringSet(splt[2] + "_files", new HashSet<String>());
+
+                for (String file : fileNames) {
+                    response += file + ";";
+                }
+                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, splt[0], response);
+            } else if (splt[1].equals("WS_FILE_LIST_RESPONSE")) {
+                //recebe -> IP;WS_FILE_LIST_RESPONSE;WSNAME;FILENAME1;FILENAME2....;
+                for(int i = 3; i < splt.length; i++) {
+                    mAppContext.addOwnersWsFiles(splt[2], splt[i]);
+                }
+                ActionBarActivity act = mAppContext.getCurrentActivity();
+                if(act instanceof ForeignWorkspaceActivity){
+                    //TODO fazer este metodo bem
+                    //((ForeignWorkspaceActivity) act).updateFilesList();
+                }
+
             } else if (splt[1].equals("WS_FILE_READ")) {
                 //TODO PROVIDE GET_WS_FILE_RESPONSE
             } else if (splt[1].equals("WS_FILE_EDIT")) {
