@@ -143,9 +143,9 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
                 SimWifiP2pDevice device = devices.getByName(deviceName);
                 String deviceIP = device.getVirtIp();
 //                _peersStr.add(peer);
-                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_tags);
+                new OutgoingCommTask(mAppContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_tags);
                 Log.w("ForeignList", "Mesg: " + msg_tags + " submitted to OutTask with destIP: " + deviceIP);
-//                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, deviceIP, msg_email);
+//                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_email);
 //                Log.w("ForeignList", "Mesg: " + msg_email + " submitted to OutTask with destIP: " + deviceIP);
             }
         } else {
@@ -251,6 +251,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         //_wsNamesList.clear();
         //Set<String> wsNames = _userPrefs.getStringSet(getString(R.string.foreign_workspaces_list), new HashSet<String>());
         //TODO pedir nomes de ws aos peers em vez de ir buscar aos sharedprefs
+        Log.w("ForeignWSList", "ENTREI");
         mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspacesListActivity.this);
 
 //        if (mAppContext.isBound()) {
@@ -306,6 +307,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
         getSupportActionBar().setTitle(getString(R.string.foreign_workspaces_list));
         updateLists();
         registerSimWifiP2pBcastReceiver();
+        mAppContext.setCurrentActivity(this);
     }
 
     @Override

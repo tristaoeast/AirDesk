@@ -124,6 +124,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        mAppContext.setCurrentActivity(this);
         if (_appPrefs.getBoolean(getString(R.string.event_back_button_pressed), false)) { //HACK MANHOSO PARA QUANDO CARREGAR NO BOTAO PARA TRAS SAIR DA APLICAÇÃO EM VEZ DE VIR PARA A ACTIVITIDADE DE LOGIN
             _appPrefs.edit().putBoolean(getString(R.string.event_back_button_pressed), false).commit();
             Toast.makeText(MainActivity.this, "Exit AirDesk", Toast.LENGTH_LONG).show();

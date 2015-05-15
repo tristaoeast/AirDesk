@@ -20,4 +20,10 @@ public class ReadTextFileActivityForeign extends ReadTextFileActivity {
 //
 //        }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mAppContext.setCurrentActivity(this);
+    }
 }

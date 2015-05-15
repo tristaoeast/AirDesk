@@ -121,7 +121,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
                 SimWifiP2pDevice device = devices.getByName(deviceName);
                 String peer = device.getVirtIp();
                 _peersStr.add(peer);
-                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_files);
+                new OutgoingCommTask(mAppContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_files);
             }
 
         } else
@@ -179,6 +179,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
     public void onResume() {
         super.onResume();
         _fileNamesAdapter.notifyDataSetChanged();
+        mAppContext.setCurrentActivity(this);
     }
 
     @Override

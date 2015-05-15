@@ -19,4 +19,9 @@ public class OwnPublicWorkspacesListActivity extends OwnWorkspacesListActivity {
         super.onCreate(savedInstanceState);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mAppContext.setCurrentActivity(this);
+    }
 }

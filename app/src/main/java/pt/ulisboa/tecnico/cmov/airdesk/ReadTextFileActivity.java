@@ -36,10 +36,13 @@ public class ReadTextFileActivity extends ActionBarActivity {
     private long WORKSPACE_QUOTA;
     private File _appDir;
 
+    protected GlobalClass mAppContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read_text_file);
+        mAppContext = (GlobalClass) getApplicationContext();
         Intent intent = getIntent();
         FILENAME = intent.getExtras().getString("FILENAME");
         getSupportActionBar().setTitle(FILENAME);
@@ -57,6 +60,8 @@ public class ReadTextFileActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
         updateText(FILENAME);
+        mAppContext.setCurrentActivity(this);
+
     }
 
     public void updateText(final String filename) {

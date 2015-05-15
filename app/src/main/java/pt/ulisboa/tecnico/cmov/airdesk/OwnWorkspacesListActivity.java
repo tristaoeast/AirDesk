@@ -77,7 +77,7 @@ public abstract class OwnWorkspacesListActivity extends ActionBarActivity {
     private IntentFilter filter;
     private SimWifiP2pBroadcastReceiver receiver;
 
-    private GlobalClass mAppContext;
+    protected GlobalClass mAppContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

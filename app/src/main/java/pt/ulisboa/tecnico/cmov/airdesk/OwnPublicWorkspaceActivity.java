@@ -50,6 +50,7 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
         super.setupTagsList();
         _tagsAdapter.notifyDataSetChanged();
         super.onResume();
+        mAppContext.setCurrentActivity(this);
     }
 
 

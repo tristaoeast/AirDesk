@@ -16,7 +16,7 @@ import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 /**
  * Created by ist167092 on 14-05-2015.
  */
-public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, Void, Void> {
+public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, String> {
 
     private GlobalClass mAppContext;
 
@@ -28,7 +28,7 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(SimWifiP2pSocket... params) {
+    protected String doInBackground(SimWifiP2pSocket... params) {
         Log.w("RecCommTask", "Received socket");
 
         BufferedReader sockIn;
@@ -62,7 +62,8 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, Void, Void> {
                     }
                 }
                 Log.w("RecCommTask", "Sending response: " + response);
-                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, splt[0], response);
+                publishProgress(splt[0], response);
+
                 Log.w("RecCommTask", "Response sent");
 
             } else if (splt[1].equals("WS_SHARED_LIST_RESPONSE")) {
@@ -100,7 +101,8 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, Void, Void> {
                     }
                 }
                 Log.w("RecCommTask", "Sending response: " + response);
-                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, splt[0], response);
+                publishProgress(splt[0], response);
+//                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, splt[0], response);
                 Log.w("RecCommTask", "Response sent");
 
             } else if (splt[1].equals("WS_SUBSCRIBED_LIST_RESPONSE")) {
@@ -112,9 +114,10 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, Void, Void> {
                     wsOwnList += splt[i];
                 }
                 mAppContext.addWsOwners(wsOwnList, splt[0]);
-                ActionBarActivity act = mAppContext.getCurrentActivity();
-                if (act instanceof ForeignWorkspacesListActivity) {
-                    ((ForeignWorkspacesListActivity) act).updateLists();
+                if (mAppContext.getCurrentActivity() instanceof ForeignWorkspacesListActivity) {
+                    Log.w("RecCommTask", "Current activity is a ForeignWSList");
+//                    ((ForeignWorkspacesListActivity) act).updateLists();
+                    return "UPDATE_FOREIGN_WS_LIST";
                 }
             } else if (splt[1].equals("WS_FILE_LIST")) {
                 //recebe -> IP;WS_FILE_LIST;WSNAME;
@@ -124,16 +127,17 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, Void, Void> {
                 for (String file : fileNames) {
                     response += file + ";";
                 }
-                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, splt[0], response);
+                publishProgress(splt[0], response);
+//                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, splt[0], response);
             } else if (splt[1].equals("WS_FILE_LIST_RESPONSE")) {
                 //recebe -> IP;WS_FILE_LIST_RESPONSE;WSNAME;FILENAME1;FILENAME2....;
-                for(int i = 3; i < splt.length; i++) {
+                for (int i = 3; i < splt.length; i++) {
                     mAppContext.addOwnersWsFiles(splt[2], splt[i]);
                 }
-                ActionBarActivity act = mAppContext.getCurrentActivity();
-                if(act instanceof ForeignWorkspaceActivity){
-                    //TODO fazer este metodo bem
-                    //((ForeignWorkspaceActivity) act).updateFilesList();
+                if (mAppContext.getCurrentActivity() instanceof ForeignWorkspacesListActivity) {
+                    Log.w("RecCommTask", "Current activity is a ForeignWSList");
+//                    ((ForeignWorkspacesListActivity) act).updateLists();
+                    return "UPDATE_FOREIGN_WS_LIST";
                 }
 
             } else if (splt[1].equals("WS_FILE_READ")) {
@@ -149,7 +153,20 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, Void, Void> {
             Log.w("RecCommTask", "Exception: " + e.getMessage());
         }
 
-        return null;
+        return "DO NOTHING";
     }
 
+    @Override
+    protected void onProgressUpdate(String... params) {
+        new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, params[0], params[1]);
+        Log.w("InCommTask", "Started new RecCommTask");
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+        if (s.equals("UPDATE_FOREIGN_WS_LIST")) {
+            ActionBarActivity act = mAppContext.getCurrentActivity();
+            ((ForeignWorkspacesListActivity) act).updateLists();
+        }
+    }
 }

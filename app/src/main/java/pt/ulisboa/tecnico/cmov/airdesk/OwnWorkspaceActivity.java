@@ -54,10 +54,13 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity {
     protected String LOCAL_EMAIL;
     protected String LOCAL_USERNAME;
 
+    protected GlobalClass mAppContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(SUBCLASS_ACTIVITY_LAYOUT);
+        mAppContext = (GlobalClass) getApplicationContext();
         _appPrefs = getSharedPreferences(getString(R.string.app_preferences), MODE_PRIVATE);
         _appPrefsEditor = _appPrefs.edit();
         LOCAL_EMAIL = _appPrefs.getString("email", "");
