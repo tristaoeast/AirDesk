@@ -32,7 +32,7 @@ public class ReadTextFileActivity extends ActionBarActivity {
     private String LOCAL_EMAIL;
     private String FILENAME;
     private File WORKSPACE_DIR_FILE;
-    private String WORKSPACE_NAME;
+    protected String WORKSPACE_NAME;
     private long WORKSPACE_QUOTA;
     private File _appDir;
 
