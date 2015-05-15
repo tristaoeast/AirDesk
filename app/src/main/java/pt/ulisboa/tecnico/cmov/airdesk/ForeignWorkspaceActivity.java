@@ -80,11 +80,11 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
         WORKSPACE_NAME = WORKSPACE_DIR;
         getSupportActionBar().setTitle(WORKSPACE_NAME + " (FOREIGN)");
         _appDir = new File(getApplicationContext().getFilesDir(), LOCAL_EMAIL);
-        if(!_appDir.exists())
+        if (!_appDir.exists())
             _appDir.mkdir();
 
         registerSimWifiP2pBcastReceiver();
-
+        _peersStr = new ArrayList<String>();
         setupFilesList();
     }
 
@@ -111,7 +111,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
             if (mAppContext.getVirtualIp() == null) {
                 String myName = groupInfo.getDeviceName();
                 SimWifiP2pDevice myDevice = devices.getByName(myName);
-                if(myDevice != null)
+                if (myDevice != null)
                     mAppContext.setVirtualIp(myDevice.getVirtIp());
             }
 
@@ -125,7 +125,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
             }
 
         } else
-                Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
         _fileNamesList = new ArrayList<String>();
         _fileNamesAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, _fileNamesList);
         _listView = (ListView) findViewById(R.id.lv_filesList);
@@ -156,7 +156,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
             }*/
         _fileNamesList.clear();
         ArrayList<String> mOwnersWsFiles = mAppContext.getWsNameFiles(WORKSPACE_NAME);
-        for(String fileName : mOwnersWsFiles){
+        for (String fileName : mOwnersWsFiles) {
             _fileNamesList.add(fileName);
         }
         Collections.sort(_fileNamesList);
@@ -169,11 +169,11 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
         });
     }
 
-    private void openTextFile(int position){
+    private void openTextFile(int position) {
         String filename = _fileNamesList.get(position);
         Intent intent = new Intent(ForeignWorkspaceActivity.this, ReadTextFileActivity.class);
-        intent.putExtra("FILENAME",filename);
-        intent.putExtra("WORKSPACE_DIR",WORKSPACE_DIR);
+        intent.putExtra("FILENAME", filename);
+        intent.putExtra("WORKSPACE_DIR", WORKSPACE_DIR);
         intent.putExtra("WORKSPACE_NAME", WORKSPACE_NAME);
         startActivity(intent);
     }
@@ -182,7 +182,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
     @Override
     public void onResume() {
         super.onResume();
-        _fileNamesAdapter.notifyDataSetChanged();
+//        _fileNamesAdapter.notifyDataSetChanged();
         mAppContext.setCurrentActivity(this);
     }
 
@@ -203,7 +203,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
-        }  else if(id == R.id.action_logout){
+        } else if (id == R.id.action_logout) {
             _appPrefs.edit().putBoolean("firstRun", true).commit();
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -270,7 +270,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
                 .setView(customView)
                 .setPositiveButton("Leave", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        Set<String> invitedUsersList = _userPrefs.getStringSet( WORKSPACE_NAME + "_invitedUsers", new HashSet<String>());
+                        Set<String> invitedUsersList = _userPrefs.getStringSet(WORKSPACE_NAME + "_invitedUsers", new HashSet<String>());
                         invitedUsersList.remove(LOCAL_EMAIL);
                         _userPrefsEditor.putStringSet(WORKSPACE_NAME + "_invitedUsers", invitedUsersList);
                         _userPrefsEditor.commit();
@@ -284,11 +284,11 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
         dialog.show();
     }
 
-    public void isOwnerGone(){
+    public void isOwnerGone() {
         String wsName = WORKSPACE_NAME;
         String owner;
         Hashtable<String, String> owners = mAppContext.getWsOwners();
-        if(owners.containsKey(wsName)) {
+        if (owners.containsKey(wsName)) {
             owner = owners.get(wsName);
 
             //check peers and see if owner is still there
