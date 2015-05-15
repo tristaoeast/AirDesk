@@ -150,44 +150,6 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity implements 
         });
     }
 
-//    private void openTextFileInDialog(final int position) {
-//
-//        final String filename = _fileNamesList.get(position);
-//        File dir = new File(_appDir, WORKSPACE_DIR);
-//        final File textFile = new File(dir, filename);
-////        Toast.makeText(SUBCLASS_CONTEXT,dir.getName()+" size: "+Double.toString(MemoryHelper.fileSizeInKB(textFile)),Toast.LENGTH_LONG).show();
-//        //Read text from file
-//        final StringBuilder text = new StringBuilder();
-//
-//        try {
-//            BufferedReader br = new BufferedReader(new FileReader(textFile));
-//            String line;
-//            while ((line = br.readLine()) != null) {
-//                text.append(line);
-//                text.append('\n');
-//            }
-//            br.close();
-//        } catch (IOException e) {
-//            Log.d("IOException", e.toString());
-//        }
-//
-//        LayoutInflater inflater = LayoutInflater.from(SUBCLASS_CONTEXT);
-//        final View customView = inflater.inflate(R.layout.dialog_read_text_file, null);
-//        final TextView tv_text = (TextView) customView.findViewById(R.id.tv_text);
-//        tv_text.setText(text);
-//
-//        AlertDialog dialog = new AlertDialog.Builder(this)
-//                .setTitle(filename)
-//                .setView(customView)
-//                .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int whichButton) {
-//                        editTextFileInDialog(filename, textFile, text.toString(), position);
-//                    }
-//                })
-//                .setNegativeButton("Back", null).create();
-//        dialog.show();
-//    }
-
     private void openTextFile(int position) {
         String filename = _fileNamesList.get(position);
         Intent intent = new Intent(SUBCLASS_CONTEXT, ReadTextFileActivity.class);
@@ -344,7 +306,6 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity implements 
                 .setView(customView)
                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) OwnWorkspaceActivity.this);
                         File dir = new File(_appDir, WORKSPACE_DIR);
                         deleteRecursive(dir);
                         _userPrefsEditor.remove(WORKSPACE_NAME + "_files");
@@ -356,6 +317,18 @@ public abstract class OwnWorkspaceActivity extends ActionBarActivity implements 
                         Set<String> allWs = _userPrefs.getStringSet(getString(R.string.own_all_workspaces_list), new HashSet<String>());
                         allWs.remove(WORKSPACE_NAME);
                         _userPrefsEditor.putStringSet(getString(R.string.own_all_workspaces_list), allWs).commit();
+
+                        String tags = "";
+                        for (String tag : mAppContext.getTagsList()) {
+                            tags += tag + ";";
+                        }
+                        for (String email : _emailsList) {
+                            Log.w("PrivateWS", "Removed email: " + email);
+                            String destIp = mAppContext.getVirtIpByEmail().get(email);
+                            (new Thread(new OutgoingCommTaskThread(mAppContext, OwnWorkspaceActivity.this, destIp, mAppContext.getVirtualIp() + ";EMAIL_REMOVED_FROM_WS;" + tags))).start();
+                        }
+
+
                         Intent intent = new Intent(SUBCLASS_CONTEXT, OwnPrivateWorkspacesListActivity.class);
                         startActivity(intent);
                         finish();

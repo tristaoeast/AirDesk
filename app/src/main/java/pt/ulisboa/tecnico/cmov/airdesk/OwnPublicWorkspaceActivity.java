@@ -72,7 +72,6 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity implements 
                 .setView(customView)
                 .setPositiveButton("Unpublish", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) OwnPublicWorkspaceActivity.this);
                         _userPrefsEditor.remove(getWorkspaceName() + "_tags");
                         Set<String> ownPublishedWs = _userPrefs.getStringSet(getString(R.string.own_public_workspaces_list), new HashSet<String>());
                         ownPublishedWs.remove(getWorkspaceName());
@@ -80,6 +79,17 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity implements 
                         Set<String> ownPrivateWs = _userPrefs.getStringSet(getString(R.string.own_private_workspaces_list), new HashSet<String>());
                         ownPrivateWs.add(getWorkspaceName());
                         _userPrefsEditor.putStringSet(getString(R.string.own_private_workspaces_list), ownPrivateWs).commit();
+
+                        String tags = "";
+                        for (String tag : mAppContext.getTagsList()) {
+                            tags += tag + ";";
+                        }
+                        for (String email : _emailsList) {
+                            Log.w("PrivateWS", "Removed email: " + email);
+                            String destIp = mAppContext.getVirtIpByEmail().get(email);
+                            (new Thread(new OutgoingCommTaskThread(mAppContext, OwnPublicWorkspaceActivity.this, destIp, mAppContext.getVirtualIp() + ";EMAIL_REMOVED_FROM_WS;" + tags))).start();
+                        }
+
                         Intent intent = new Intent(OwnPublicWorkspaceActivity.this, OwnPrivateWorkspaceActivity.class);
                         intent.putExtra("workspace_name", getWorkspaceName());
                         startActivity(intent);

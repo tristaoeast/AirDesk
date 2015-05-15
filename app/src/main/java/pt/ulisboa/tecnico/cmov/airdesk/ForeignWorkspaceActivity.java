@@ -314,6 +314,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
             //check peers and see if owner is still there
             if (!devicesInNetwork.contains(owner.toString())) {
                 //go back to foreignactivitylist
+                Toast.makeText(this, "Workspace no longer available.", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(getApplicationContext(), ForeignWorkspacesListActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
@@ -328,6 +329,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
             if(remTagSet.contains(localTag))
                 return;
         }
+        Toast.makeText(this, "Workspace no longer available.", Toast.LENGTH_LONG).show();
         Intent intent = new Intent(getApplicationContext(), ForeignWorkspacesListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
