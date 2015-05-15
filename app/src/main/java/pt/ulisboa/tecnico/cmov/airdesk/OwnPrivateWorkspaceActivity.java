@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.cmov.airdesk;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,7 +16,7 @@ import java.util.Collections;
 import java.util.HashSet;
 
 
-public class OwnPrivateWorkspaceActivity extends OwnWorkspaceActivity  {
+public class OwnPrivateWorkspaceActivity extends OwnWorkspaceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +121,20 @@ public class OwnPrivateWorkspaceActivity extends OwnWorkspaceActivity  {
 //                }
                 HashSet<String> newEmailsSet = new HashSet<String>(_emailsList);
                 _userPrefsEditor.putStringSet(getWorkspaceName() + "_invitedUsers", newEmailsSet).commit();
+                String tags = "";
+                for (String tag : mAppContext.getTagsList()) {
+                    tags += tag + ";";
+                }
+                for (String email : removedEmailsSet) {
+                    Log.w("PrivateWS", "Removed email: " + email);
+                    String destIp = mAppContext.getVirtIpByEmail().get(email);
+                    (new Thread(new OutgoingCommTaskThread(mAppContext, OwnPrivateWorkspaceActivity.this, destIp, mAppContext.getVirtualIp() + ";EMAIL_REMOVED_FROM_WS;" + tags))).start();
+                }
+                for (String email : addedEmailsSet) {
+                    Log.w("PrivateWS", "Added email: " + email);
+                    String destIp = mAppContext.getVirtIpByEmail().get(email);
+                    (new Thread(new OutgoingCommTaskThread(mAppContext, OwnPrivateWorkspaceActivity.this, destIp, mAppContext.getVirtualIp() + ";EMAIL_ADDED_TO_WS;" + tags))).start();
+                }
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

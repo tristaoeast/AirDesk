@@ -88,7 +88,7 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver implements Si
     @Override
     public void onGroupInfoAvailable(SimWifiP2pDeviceList simWifiP2pDeviceList, SimWifiP2pInfo simWifiP2pInfo) {
         if (mAppContext.isBound() && simWifiP2pInfo.askIsConnected()) {
-            Toast.makeText(mActBarActivity, "BCAST: isBound", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(mActBarActivity, "BCAST: isBound", Toast.LENGTH_SHORT).show();
 
             mAppContext.setInAGroup(true);
 

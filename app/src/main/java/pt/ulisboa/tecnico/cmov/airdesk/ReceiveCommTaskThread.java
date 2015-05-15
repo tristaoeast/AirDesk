@@ -60,6 +60,7 @@ public class ReceiveCommTaskThread implements Runnable {
             Log.w("RecCommTask", "Processing: " + splt[1]);
             if (splt[1].equals("WS_SHARED_LIST")) {
                 // IP;COM;EMAIL;TAGS;
+                mAppContext.addVirtIpByEmail(splt[2], splt[0]);
                 response += "WS_SHARED_LIST_RESPONSE" + ";";
                 String email = splt[2];
                 Set<String> allOwnWS = userPrefs.getStringSet("All Owned Workspaces", new HashSet<String>());
@@ -160,7 +161,45 @@ public class ReceiveCommTaskThread implements Runnable {
             } else if (splt[1].equals("WS_FILE_EDIT")) {
                 //TODO PROVIDE WS_FILE_EDIT_AUTHORIZATION
 
+            } else if (splt[1].equals("WHO_AM_I")) {
+                // splt -> IP;COMMAND;EMAIL
+                mAppContext.addVirtIpByEmail(splt[2], splt[0]);
+            } else if (splt[1].equals("EMAIL_REMOVED_FROM_WS")) {
+
+                mCurrentActivity = mAppContext.getCurrentActivity();
+                if (mCurrentActivity instanceof ForeignWorkspacesListActivity) {
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((ForeignWorkspacesListActivity) mCurrentActivity).requestForeignWNames();
+                        }
+                    });
+                } else if (mCurrentActivity instanceof ForeignWorkspaceActivity) {
+                    final Set<String> tagSet = new HashSet<String>();
+                    for (int i = 2; i < splt.length; i++) {
+                        tagSet.add(splt[i]);
+                    }
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((ForeignWorkspaceActivity) mCurrentActivity).keepWsOpen(tagSet);
+                        }
+                    });
+                }
+
+            } else if (splt[1].equals("EMAIL_ADDED_TO_WS")) {
+
+                mCurrentActivity = mAppContext.getCurrentActivity();
+                if (mCurrentActivity instanceof ForeignWorkspacesListActivity) {
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((ForeignWorkspacesListActivity) mCurrentActivity).requestForeignWNames();
+                        }
+                    });
+                }
             }
+
             if (!mCliSocket.isClosed()) {
                 mCliSocket.close();
             }
