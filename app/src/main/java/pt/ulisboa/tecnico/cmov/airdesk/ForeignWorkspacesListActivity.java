@@ -145,7 +145,7 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
 //                _peersStr.add(peer);
                 new OutgoingCommTask(mAppContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_tags);
                 Log.w("ForeignList", "Mesg: " + msg_tags + " submitted to OutTask with destIP: " + deviceIP);
-//                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_email);
+//                new OutgoingCommTask(mAppContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_email);
 //                Log.w("ForeignList", "Mesg: " + msg_email + " submitted to OutTask with destIP: " + deviceIP);
             }
         } else {

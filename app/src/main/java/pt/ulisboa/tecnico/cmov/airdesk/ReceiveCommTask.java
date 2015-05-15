@@ -43,7 +43,7 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, String>
             st = sockIn.readLine();
             Log.w("RecCommTask", st);
 //            sockIn.close();
-//            s.close();
+            s.close();
             String[] splt = st.split(";");
             String response = mAppContext.getVirtualIp() + ";";
 
@@ -65,7 +65,7 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, String>
                 publishProgress(splt[0], response);
 
                 Log.w("RecCommTask", "Response sent");
-
+                return "DO NOTHING";
             } else if (splt[1].equals("WS_SHARED_LIST_RESPONSE")) {
                 // IP;COM;WS1;Q1;WS2;Q2;
                 String wsOwnList = null;
@@ -76,8 +76,10 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, String>
                 }
                 ActionBarActivity act = mAppContext.getCurrentActivity();
                 if (act instanceof ForeignWorkspacesListActivity) {
-                    ((ForeignWorkspacesListActivity) act).updateLists();
+//                    ((ForeignWorkspacesListActivity) act).updateLists();
+                    return "UPDATE_FOREIGN_WS_LIST";
                 }
+                return "DO NOTHING";
 
             } else if (splt[1].equals("WS_SUBSCRIBED_LIST")) {
 
@@ -104,7 +106,7 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, String>
                 publishProgress(splt[0], response);
 //                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, splt[0], response);
                 Log.w("RecCommTask", "Response sent");
-
+                return "DO NOTHING";
             } else if (splt[1].equals("WS_SUBSCRIBED_LIST_RESPONSE")) {
                 String wsOwnList = null;
                 // IP;COM;WS1;Q1;WS2;Q2;
@@ -119,6 +121,7 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, String>
 //                    ((ForeignWorkspacesListActivity) act).updateLists();
                     return "UPDATE_FOREIGN_WS_LIST";
                 }
+                return "DO NOTHING";
             } else if (splt[1].equals("WS_FILE_LIST")) {
                 //recebe -> IP;WS_FILE_LIST;WSNAME;
                 response += "WS_FILE_LIST_RESPONSE;" + splt[2] + ";";
@@ -128,7 +131,8 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, String>
                     response += file + ";";
                 }
                 publishProgress(splt[0], response);
-//                new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, splt[0], response);
+                return "DO NOTHING";
+
             } else if (splt[1].equals("WS_FILE_LIST_RESPONSE")) {
                 //recebe -> IP;WS_FILE_LIST_RESPONSE;WSNAME;FILENAME1;FILENAME2....;
                 for (int i = 3; i < splt.length; i++) {
@@ -139,34 +143,46 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, String>
 //                    ((ForeignWorkspacesListActivity) act).updateLists();
                     return "UPDATE_FOREIGN_WS_LIST";
                 }
+                return "DO NOTHING";
 
             } else if (splt[1].equals("WS_FILE_READ")) {
                 //TODO PROVIDE GET_WS_FILE_RESPONSE
+
+                return "DO NOTHING";
+
             } else if (splt[1].equals("WS_FILE_EDIT")) {
                 //TODO PROVIDE WS_FILE_EDIT_AUTHORIZATION
+
+                return "DO NOTHING";
             }
-            if (!s.isClosed())
+            if (!s.isClosed()) {
                 s.close();
+            }
+            return "DO NOTHING";
         } catch (IOException e) {
             Log.w("Error reading socket:", e.getMessage());
+            return "DO NOTHING";
+
         } catch (Exception e) {
             Log.w("RecCommTask", "Exception: " + e.getMessage());
+            return "DO NOTHING";
         }
 
-        return "DO NOTHING";
     }
 
     @Override
     protected void onProgressUpdate(String... params) {
         new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, params[0], params[1]);
-        Log.w("InCommTask", "Started new RecCommTask");
+        Log.w("RecCommTask", "Started new OutCommTask to: " + params[0] + " with message: " + params[1]);
     }
 
     @Override
     protected void onPostExecute(String s) {
+        Log.w("RecCommTask", "Finished 1");
         if (s.equals("UPDATE_FOREIGN_WS_LIST")) {
             ActionBarActivity act = mAppContext.getCurrentActivity();
             ((ForeignWorkspacesListActivity) act).updateLists();
         }
+        Log.w("RecCommTask", "Finished 2");
     }
 }
