@@ -74,8 +74,8 @@ public class MainActivity extends ActionBarActivity {
                 return false;
             }
         });
-
-        if (mAppContext.isBound()) {
+        Toast.makeText(MainActivity.this, "isBound: " + mAppContext.isBound(), Toast.LENGTH_LONG).show();
+        if (!mAppContext.isBound()) {
             Toast.makeText(MainActivity.this, "Binding SimWifiP2p service", Toast.LENGTH_LONG).show();
             initSimWifiP2p();
             bindSimWifiP2pService();
