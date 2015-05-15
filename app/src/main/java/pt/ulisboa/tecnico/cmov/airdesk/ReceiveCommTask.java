@@ -22,12 +22,15 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
 
     SimWifiP2pSocket s;
 
-    public void setApplicationContext(GlobalClass appContext) {
+    public ReceiveCommTask(GlobalClass appContext) {
         mAppContext = appContext;
+        Log.w("RecCommTask", "Constructed");
     }
 
     @Override
     protected Void doInBackground(SimWifiP2pSocket... params) {
+        Log.w("RecCommTask", "Received socket");
+
         BufferedReader sockIn;
         String st;
         s = params[0];
@@ -38,7 +41,7 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
         try {
             sockIn = new BufferedReader(new InputStreamReader(s.getInputStream()));
             st = sockIn.readLine();
-            Log.w("RecCommTask",st);
+            Log.w("RecCommTask", st);
             sockIn.close();
             s.close();
             String[] splt = st.split(";");
@@ -57,38 +60,48 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
                         response += ws + ";" + quota.toString() + ";";
                     }
                 }
+                Log.w("RecCommTask", "Sending response: " + response);
                 new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, splt[0], response);
+                Log.w("RecCommTask", "Response sent");
 
-            }else if(splt[1].equals("WS_SHARED_LIST_RESPONSE")){
+            } else if (splt[1].equals("WS_SHARED_LIST_RESPONSE")) {
                 // IP;COM;WS1;Q1;WS2;Q2;
-                for(int i = 2; i < splt.length; i +=2) {
-                    mAppContext.addInvitedWorkspace(splt[i], Long.parseLong(splt[i+1]));
+                for (int i = 2; i < splt.length - 1; i += 2) {
+                    mAppContext.addInvitedWorkspace(splt[i], Long.parseLong(splt[i + 1]));
                 }
                 ActionBarActivity act = mAppContext.getCurrentActivity();
-                if(act instanceof ForeignWorkspacesListActivity) {
+                if (act instanceof ForeignWorkspacesListActivity) {
                     ((ForeignWorkspacesListActivity) act).updateLists();
                 }
+
             } else if (splt[1].equals("WS_SUBSCRIBED_LIST")) {
                 //IP;COM;TAGS...
                 response += "WS_SUBSCRIBED_LIST_RESPONSE" + ";";
                 Set<String> ownPublishedWs = userPrefs.getStringSet("Own Public Workspaces", new HashSet<String>());
-                for(int i = 2 ; i < splt.length; i++) {
-                    for(String ws : ownPublishedWs) {
+                for (int i = 2; i < splt.length - 1; i++) {
+                    for (String ws : ownPublishedWs) {
                         Set<String> tags = userPrefs.getStringSet(ws + "_tags", new HashSet<String>());
-                        if (tags.contains(splt[i])){
-                            Long quota = userPrefs.getLong(ws+"_quota", -1);
+                        String l = ws + ";";
+                        for(String tag : tags){
+
+                        }
+                        if (tags.contains(splt[i])) {
+                            Long quota = userPrefs.getLong(ws + "_quota", -1);
                             response += ws + ";" + quota.toString() + ";";
                         }
                     }
                 }
+                Log.w("RecCommTask", "Sending response: " + response);
                 new OutgoingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, splt[0], response);
+                Log.w("RecCommTask", "Response sent");
+
             } else if (splt[1].equals("WS_SUBSCRIBED_LIST_RESPONSE")) {
                 // IP;COM;WS1;Q1;WS2;Q2;
-                for(int i = 2; i < splt.length; i +=2) {
-                    mAppContext.addSubscribedWorkspace(splt[i], Long.parseLong(splt[i+1]));
+                for (int i = 2; i < splt.length; i += 2) {
+                    mAppContext.addSubscribedWorkspace(splt[i], Long.parseLong(splt[i + 1]));
                 }
                 ActionBarActivity act = mAppContext.getCurrentActivity();
-                if(act instanceof ForeignWorkspacesListActivity) {
+                if (act instanceof ForeignWorkspacesListActivity) {
                     ((ForeignWorkspacesListActivity) act).updateLists();
                 }
             } else if (splt[1].equals("WS_FILE_LIST")) {
@@ -99,12 +112,8 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, String, Void> {
                 //TODO PROVIDE WS_FILE_EDIT_AUTHORIZATION
             }
 //            s.close();
-        } catch (
-                IOException e
-                )
-
-        {
-            Log.d("Error reading socket:", e.getMessage());
+        } catch (IOException e) {
+            Log.w("Error reading socket:", e.getMessage());
         }
 
         return null;

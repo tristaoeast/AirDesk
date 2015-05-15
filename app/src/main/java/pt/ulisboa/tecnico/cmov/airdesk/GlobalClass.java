@@ -40,6 +40,14 @@ public class GlobalClass extends Application {
     private Hashtable<String, Long> mWsOwners = new Hashtable<String, Long>();
     private Hashtable<Long, String> mOwnersWs = new Hashtable<Long, String>();
 
+    public void clearSubscribedWorkspaces() {
+        mSubscribedWorkspaces = new Hashtable<String, Long>();
+    }
+
+    public void clearInvitedWorkspaces() {
+        mInvitedWorkspaces = new Hashtable<String, Long>();
+    }
+
     public boolean isInAGroup() {
         return mInAGroup;
     }

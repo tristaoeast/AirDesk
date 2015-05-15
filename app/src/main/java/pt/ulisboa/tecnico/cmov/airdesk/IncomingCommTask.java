@@ -1,9 +1,7 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -34,9 +32,10 @@ public class IncomingCommTask extends AsyncTask<Void, SimWifiP2pSocket, Void> {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 SimWifiP2pSocket sock = mSrvSocket.accept();
+                Log.w("InCommTask", "Socket accepted");
                 publishProgress(sock);
             } catch (IOException e) {
-                Log.d("Error accepting socket:", e.getMessage());
+                Log.w("InCommTask","Error accepting socket:"+ e.getMessage());
                 break;
                 //e.printStackTrace();
             }
@@ -46,8 +45,8 @@ public class IncomingCommTask extends AsyncTask<Void, SimWifiP2pSocket, Void> {
 
     @Override
     protected void onProgressUpdate(SimWifiP2pSocket... values) {
-        ReceiveCommTask recCommTask = new ReceiveCommTask();
-        recCommTask.setApplicationContext(mAppContext);
+        ReceiveCommTask recCommTask = new ReceiveCommTask(mAppContext);
         recCommTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, values[0]);
+        Log.w("InCommTask","Started new RecCommTask");
     }
 }

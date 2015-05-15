@@ -123,31 +123,36 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
                                      SimWifiP2pInfo groupInfo) {
 //        _peersStr.clear();
         if (mAppContext.isBound() && groupInfo.askIsConnected()) {
-            // compile list of network members
-            if (mAppContext.getVirtualIp() == null) {
-                String myName = groupInfo.getDeviceName();
-                SimWifiP2pDevice myDevice = devices.getByName(myName);
-                if (myDevice != null)
-                    mAppContext.setVirtualIp(myDevice.getVirtIp());
-            }
+            if (groupInfo.askIsConnected())
+                // compile list of network members
+                if (mAppContext.getVirtualIp() == null) {
+                    String myName = groupInfo.getDeviceName();
+                    SimWifiP2pDevice myDevice = devices.getByName(myName);
+                    if (myDevice != null)
+                        mAppContext.setVirtualIp(myDevice.getVirtIp());
+                }
             String myTags = "";
             for (String tag : mAppContext.getTagsList()) {
                 myTags += tag + ";";
             }
             String msg_tags = mAppContext.getVirtualIp() + ";WS_SUBSCRIBED_LIST;" + myTags;
             String msg_email = mAppContext.getVirtualIp() + ";WS_SHARED_LIST;" + LOCAL_EMAIL + ";";
-            Log.w("ForeignList", msg_email);
-            Log.w("ForeignList", msg_tags);
-
+//            Log.w("ForeignList", msg_email);
+//            Log.w("ForeignList", msg_tags);
             for (String deviceName : groupInfo.getDevicesInNetwork()) {
                 SimWifiP2pDevice device = devices.getByName(deviceName);
-                String peer = device.getVirtIp();
+                String deviceIP = device.getVirtIp();
 //                _peersStr.add(peer);
-                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_tags);
-                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email);
+                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_tags);
+                Log.w("ForeignList", "Mesg: " + msg_tags + " submitted to OutTask with destIP: " + deviceIP);
+                new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_email);
+                Log.w("ForeignList", "Mesg: " + msg_email + " submitted to OutTask with destIP: " + deviceIP);
             }
-        } else
+        } else {
             Toast.makeText(this, "Not in a group or service not bound", Toast.LENGTH_LONG).show();
+            mAppContext.clearInvitedWorkspaces();
+            mAppContext.clearSubscribedWorkspaces();
+        }
 
     }
 
