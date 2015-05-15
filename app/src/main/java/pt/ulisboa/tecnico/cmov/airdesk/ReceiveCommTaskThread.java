@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.cmov.airdesk;
 
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 
@@ -104,6 +103,7 @@ public class ReceiveCommTaskThread implements Runnable {
                 for (int i = 2; i < splt.length; i += 2) {
                     mAppContext.addForeignWorkspace(splt[i], Long.parseLong(splt[i + 1]));
                     mAppContext.addOwnersWs(splt[0], splt[i]);
+                    mAppContext.addWsOwners(splt[i], splt[0]);
                     wsOwnList += splt[i];
                 }
                 mCurrentActivity = mAppContext.getCurrentActivity();
