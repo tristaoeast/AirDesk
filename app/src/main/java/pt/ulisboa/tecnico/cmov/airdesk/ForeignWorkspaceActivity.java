@@ -165,8 +165,10 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
             }*/
         _fileNamesList.clear();
         ArrayList<String> mOwnersWsFiles = mAppContext.getWsNameFiles(WORKSPACE_NAME);
-        for (String fileName : mOwnersWsFiles) {
-            _fileNamesList.add(fileName);
+        if( mOwnersWsFiles != null) {
+            for (String fileName : mOwnersWsFiles) {
+                _fileNamesList.add(fileName);
+            }
         }
         Collections.sort(_fileNamesList);
         _fileNamesAdapter.notifyDataSetChanged();
