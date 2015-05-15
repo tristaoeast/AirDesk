@@ -151,9 +151,6 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
                     @Override
                     public void run() {
                         (new Thread(new OutgoingCommTaskThread(mAppContext, ForeignWorkspacesListActivity.this, mDestIp, mMsg))).start();
-                        (new Thread(new OutgoingCommTaskThread(mAppContext, ForeignWorkspacesListActivity.this, mDestIp, mMsg))).start();
-                        (new Thread(new OutgoingCommTaskThread(mAppContext, ForeignWorkspacesListActivity.this, mDestIp, mMsg))).start();
-
                     }
                 });
 //                new OutgoingCommTask(mAppContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, deviceIP, msg_tags);
