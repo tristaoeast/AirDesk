@@ -147,6 +147,23 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
         mAppContext.getManager().requestGroupInfo(mAppContext.getChannel(), (SimWifiP2pManager.GroupInfoListener) ForeignWorkspaceActivity.this);
     }
 
+    protected void updateFilesList() {
+        //TODO chamar isto quando existirem alterações na lista de ficheiros, e teremos de ter uma coisa no global com os nomes dos ficheiros de cada ws....
+        _listView.setAdapter(_fileNamesAdapter);
+            /*Set<String> fileNames = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
+            for (String fileName : fileNames) {
+                _fileNamesList.add(fileName);
+            }*/
+        Collections.sort(_fileNamesList);
+        _fileNamesAdapter.notifyDataSetChanged();
+        _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                openTextFile(position);
+            }
+        });
+    }
+
     private void openTextFile(int position){
         String filename = _fileNamesList.get(position);
         Intent intent = new Intent(ForeignWorkspaceActivity.this, ReadTextFileActivity.class);
