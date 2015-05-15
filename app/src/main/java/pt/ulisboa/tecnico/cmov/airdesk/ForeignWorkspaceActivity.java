@@ -314,4 +314,16 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
 
         }
     }
+
+    public void keepWsOpen(Set<String> remTagSet){
+        for(String localTag : mAppContext.getTagsList()) {
+            if(remTagSet.contains(localTag))
+                return;
+        }
+        Intent intent = new Intent(getApplicationContext(), ForeignWorkspacesListActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
+
 }

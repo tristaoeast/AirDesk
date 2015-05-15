@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -243,6 +244,15 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
 //                }
                 HashSet<String> newEmailsSet = new HashSet<String>(_emailsList);
                 _userPrefsEditor.putStringSet(getWorkspaceName() + "_invitedUsers", newEmailsSet).commit();
+                String tags = "";
+                for (String tag : mAppContext.getTagsList()) {
+                    tags += tag + ";";
+                }
+                for (String email : removedEmailsSet) {
+                    Log.w("PrivateWS", "Removed email: " + email);
+                    String destIp = mAppContext.getVirtIpByEmail().get(email);
+                    (new Thread(new OutgoingCommTaskThread(mAppContext, OwnPublicWorkspaceActivity.this, destIp, mAppContext.getVirtualIp() + ";EMAIL_REMOVED_FROM_WS;" + tags))).start();
+                }
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

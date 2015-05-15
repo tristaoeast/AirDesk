@@ -5,8 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 
-import org.apache.commons.logging.Log;
-
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -26,7 +24,7 @@ public class GlobalClass extends Application {
     private SharedPreferences mAppPrefs;
     private SharedPreferences mUserPrefs;
 
-    private ArrayList<String> _tagsList = new ArrayList<String>();
+    private ArrayList<String> mForeignTagsList = new ArrayList<String>();
 
     private String mLocalUsername;
     private String mLocalEmail;
@@ -43,10 +41,25 @@ public class GlobalClass extends Application {
     private Hashtable<String, String> mWsOwners = new Hashtable<String, String>();
     private Hashtable<String, ArrayList<String>> mOwnersWs = new Hashtable<String, ArrayList<String>>();
 
+    private Hashtable<String, ArrayList<String>> mOwnersWsFiles = new Hashtable<String, ArrayList<String>>();
+
+    private Hashtable<String,String> mVirtIpByEmail = new Hashtable<String,String>();
+
+    public Hashtable<String, String> getVirtIpByEmail() {
+        return mVirtIpByEmail;
+    }
+
+    public void setVirtIpByEmail(Hashtable<String, String> mVirtIpByEmail) {
+        this.mVirtIpByEmail = mVirtIpByEmail;
+    }
+
+    public String addVirtIpByEmail(String email, String ip){
+        return mVirtIpByEmail.put(email,ip);
+    }
+
     public Hashtable<String, Long> getForeignWorkspaces() {
         return mForeignWorkspaces;
     }
-    private Hashtable<String, ArrayList<String>> mOwnersWsFiles = new Hashtable<String, ArrayList<String>>();
 
     public void setForeignWorkspaces(Hashtable<String, Long> mForeignWorkspaces) {
         this.mForeignWorkspaces = mForeignWorkspaces;
@@ -92,23 +105,23 @@ public class GlobalClass extends Application {
     }
 
     public ArrayList<String> getTagsList() {
-        return _tagsList;
+        return mForeignTagsList;
     }
 
     public void setTagsList(ArrayList<String> _tagsList) {
-        this._tagsList = _tagsList;
+        this.mForeignTagsList = _tagsList;
     }
 
     public void addTag(String tag) {
-        _tagsList.add(tag);
+        mForeignTagsList.add(tag);
     }
 
     public void removeTag(String tag) {
-        _tagsList.remove(tag);
+        mForeignTagsList.remove(tag);
     }
 
     public void removeTagPosition(int pos) {
-        _tagsList.remove(pos);
+        mForeignTagsList.remove(pos);
     }
 
     public String getVirtualIp() {
