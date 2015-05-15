@@ -48,6 +48,27 @@ public class GlobalClass extends Application {
         mInvitedWorkspaces = new Hashtable<String, Long>();
     }
 
+    private Hashtable<String, ArrayList<String>> mOwnersWsFiles = new Hashtable<String, ArrayList<String>>();
+
+    public Hashtable<String, ArrayList<String>> getmOwnersWsFiles() {
+        return mOwnersWsFiles;
+    }
+
+    public void addOwnersWsFiles(String wsName, String fileName) {
+        if(!mOwnersWsFiles.containsKey(wsName)){
+            ArrayList<String> values = new ArrayList<String>();
+            values.add(fileName);
+            this.mOwnersWsFiles.put(wsName, values);
+        }
+        else {
+            ArrayList<String> moreValues = mOwnersWsFiles.get(wsName);
+            if(!moreValues.contains(fileName)) {
+                moreValues.add(fileName);
+                this.mOwnersWsFiles.put(wsName, moreValues);
+            }
+        }
+    }
+
     public boolean isInAGroup() {
         return mInAGroup;
     }
