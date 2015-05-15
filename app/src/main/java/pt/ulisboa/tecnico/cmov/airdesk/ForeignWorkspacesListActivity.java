@@ -146,10 +146,8 @@ public class ForeignWorkspacesListActivity extends ActionBarActivity implements 
                 new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_tags);
                 new OutgoingCommTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, peer, msg_email);
             }
-
-
         } else
-            Toast.makeText(this, "Service not bound", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Not in a group or service not bound", Toast.LENGTH_LONG).show();
 
     }
 

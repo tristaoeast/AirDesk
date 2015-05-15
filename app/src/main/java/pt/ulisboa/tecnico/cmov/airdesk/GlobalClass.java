@@ -24,11 +24,11 @@ public class GlobalClass extends Application {
     private SharedPreferences mAppPrefs;
     private SharedPreferences mUserPrefs;
 
-    private ArrayList<String> _tagsList;
+    private ArrayList<String> _tagsList = new ArrayList<String>();
 
     private String mLocalUsername;
     private String mLocalEmail;
-    private boolean mBound;
+    private boolean mBound = false;
 
     private Messenger mService;
     private SimWifiP2pManager mManager;
