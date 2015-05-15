@@ -253,6 +253,11 @@ public class OwnPublicWorkspaceActivity extends OwnWorkspaceActivity {
                     String destIp = mAppContext.getVirtIpByEmail().get(email);
                     (new Thread(new OutgoingCommTaskThread(mAppContext, OwnPublicWorkspaceActivity.this, destIp, mAppContext.getVirtualIp() + ";EMAIL_REMOVED_FROM_WS;" + tags))).start();
                 }
+                for (String email : addedEmailsSet) {
+                    Log.w("PrivateWS", "Added email: " + email);
+                    String destIp = mAppContext.getVirtIpByEmail().get(email);
+                    (new Thread(new OutgoingCommTaskThread(mAppContext, OwnPublicWorkspaceActivity.this, destIp, mAppContext.getVirtualIp() + ";EMAIL_ADDED_TO_WS;" + tags))).start();
+                }
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
