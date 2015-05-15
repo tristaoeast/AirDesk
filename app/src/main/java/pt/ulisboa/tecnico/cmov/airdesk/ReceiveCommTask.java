@@ -132,8 +132,7 @@ public class ReceiveCommTask extends AsyncTask<SimWifiP2pSocket, Void, Void> {
                 }
                 ActionBarActivity act = mAppContext.getCurrentActivity();
                 if(act instanceof ForeignWorkspaceActivity){
-                    //TODO fazer este metodo bem
-                    //((ForeignWorkspaceActivity) act).updateFilesList();
+                    ((ForeignWorkspaceActivity) act).updateFilesList();
                 }
 
             } else if (splt[1].equals("WS_FILE_READ")) {

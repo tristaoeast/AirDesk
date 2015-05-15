@@ -149,12 +149,16 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
     }
 
     protected void updateFilesList() {
-        //TODO chamar isto quando existirem altera��es na lista de ficheiros, e teremos de ter uma coisa no global com os nomes dos ficheiros de cada ws....
         _listView.setAdapter(_fileNamesAdapter);
             /*Set<String> fileNames = _userPrefs.getStringSet(WORKSPACE_NAME + "_files", new HashSet<String>());
             for (String fileName : fileNames) {
                 _fileNamesList.add(fileName);
             }*/
+        _fileNamesList.clear();
+        ArrayList<String> mOwnersWsFiles = mAppContext.getWsNameFiles(WORKSPACE_NAME);
+        for(String fileName : mOwnersWsFiles){
+            _fileNamesList.add(fileName);
+        }
         Collections.sort(_fileNamesList);
         _fileNamesAdapter.notifyDataSetChanged();
         _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

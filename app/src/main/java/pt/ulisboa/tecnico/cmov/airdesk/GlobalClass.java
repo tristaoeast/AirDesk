@@ -50,8 +50,8 @@ public class GlobalClass extends Application {
 
     private Hashtable<String, ArrayList<String>> mOwnersWsFiles = new Hashtable<String, ArrayList<String>>();
 
-    public Hashtable<String, ArrayList<String>> getmOwnersWsFiles() {
-        return mOwnersWsFiles;
+    public ArrayList<String> getWsNameFiles(String wsName) {
+        return mOwnersWsFiles.get(wsName);
     }
 
     public void addOwnersWsFiles(String wsName, String fileName) {
