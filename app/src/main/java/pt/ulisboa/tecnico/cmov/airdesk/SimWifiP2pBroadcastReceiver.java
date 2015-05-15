@@ -90,7 +90,7 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver implements Si
         if (mAppContext.isBound() && simWifiP2pInfo.askIsConnected()) {
             Toast.makeText(mActBarActivity, "BCAST: isBound", Toast.LENGTH_SHORT).show();
 
-//            mAppContext.setInAGroup(true);
+            mAppContext.setInAGroup(true);
 
             if (mAppContext.getVirtualIp() == null) {
                 String myName = simWifiP2pInfo.getDeviceName();
@@ -99,12 +99,18 @@ public class SimWifiP2pBroadcastReceiver extends BroadcastReceiver implements Si
                     mAppContext.setVirtualIp(myDevice.getVirtIp());
             }
 
-//            _peersStr.clear();
-//            for (String deviceName : simWifiP2pInfo.getDevicesInNetwork()) {
-//                SimWifiP2pDevice device = simWifiP2pDeviceList.getByName(deviceName);
-//                String devstr = device.getVirtIp();
-//                _peersStr.add(devstr);
-//            }
+            for (String deviceName : simWifiP2pInfo.getDevicesInNetwork()) {
+                SimWifiP2pDevice device = simWifiP2pDeviceList.getByName(deviceName);
+                final String destIp = device.getVirtIp();
+
+                mActBarActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.w("BCast", "sending whoami to" + destIp);
+                        (new Thread(new OutgoingCommTaskThread(mAppContext, mActBarActivity, destIp, mAppContext.getVirtualIp() + ";WHO_AM_I;" + mAppContext.getLocalEmail() + ";"))).start();
+                    }
+                });
+            }
 //
 //            String myTags = "";
 //            for (String tag : mAppContext.getTagsList()) {

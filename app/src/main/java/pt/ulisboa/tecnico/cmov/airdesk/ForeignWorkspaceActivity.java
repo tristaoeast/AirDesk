@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -58,10 +57,10 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
     protected String LOCAL_EMAIL;
     protected String LOCAL_USERNAME;
 
-    private ArrayList<String> _peersStr;
+    private ArrayList<String> mDevicesInNetwork;
     private GlobalClass mAppContext;
     private IntentFilter filter;
-    private SimWifiP2pBroadcastReceiverForeign receiver;
+    private SimWifiP2pBroadcastReceiverForeignActivity receiver;
     private String mMsg;
     private String mDestIp;
 
@@ -86,7 +85,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
             _appDir.mkdir();
 
         registerSimWifiP2pBcastReceiver();
-        _peersStr = new ArrayList<String>();
+        mDevicesInNetwork = new ArrayList<String>();
         setupFilesList();
     }
 
@@ -98,16 +97,15 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
         filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
         //TODO meter bem o broadcastreceiver para esta
-        //receiver = new SimWifiP2pBroadcastReceiverForeign(this);
-        //registerReceiver(receiver, filter);
+        receiver = new SimWifiP2pBroadcastReceiverForeignActivity(this, mAppContext);
+        registerReceiver(receiver, filter);
     }
 
     @Override
     public void onGroupInfoAvailable(SimWifiP2pDeviceList devices,
                                      SimWifiP2pInfo groupInfo) {
 
-
-        _peersStr.clear();
+        mDevicesInNetwork.clear();
         if (mAppContext.isBound()) {
             // compile list of network members
             if (mAppContext.getVirtualIp() == null) {
@@ -122,7 +120,7 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
             for (String deviceName : groupInfo.getDevicesInNetwork()) {
                 SimWifiP2pDevice device = devices.getByName(deviceName);
                 String peer = device.getVirtIp();
-                _peersStr.add(peer);
+                mDevicesInNetwork.add(peer);
                 mMsg = msg_files;
                 mDestIp = peer;
                 this.runOnUiThread(new Runnable() {
@@ -296,19 +294,22 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
         dialog.show();
     }
 
-    public void isOwnerGone() {
+    public void isOwnerGone(Set<String> devicesInNetwork) {
         String wsName = WORKSPACE_NAME;
         String owner;
         Hashtable<String, String> owners = mAppContext.getWsOwners();
+        Log.w("ForeignActivity","isOwnerGone; wsName: " + wsName);
         if (owners.containsKey(wsName)) {
             owner = owners.get(wsName);
+            Log.w("ForeignActivity", "Owner: " + owner + " exists");
 
             //check peers and see if owner is still there
-            if (!_peersStr.contains(owner.toString())) {
+            if (!devicesInNetwork.contains(owner.toString())) {
                 //go back to foreignactivitylist
                 Intent intent = new Intent(getApplicationContext(), ForeignWorkspacesListActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
+                finish();
             }
 
         }

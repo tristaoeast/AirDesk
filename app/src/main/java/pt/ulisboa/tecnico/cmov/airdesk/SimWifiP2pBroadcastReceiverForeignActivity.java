@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
+import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 
 public class SimWifiP2pBroadcastReceiverForeignActivity extends SimWifiP2pBroadcastReceiver {
 
@@ -21,7 +22,10 @@ public class SimWifiP2pBroadcastReceiverForeignActivity extends SimWifiP2pBroadc
         if (SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION.equals(action)) {
             //check if the owner of the ws I'm in has left! If so, get back to the foreign activity list,
             //if not let it be
-            mActivity.isOwnerGone();
+
+            SimWifiP2pInfo ginfo = (SimWifiP2pInfo) intent.getSerializableExtra(
+                    SimWifiP2pBroadcast.EXTRA_GROUP_INFO);
+            mActivity.isOwnerGone(ginfo.getDevicesInNetwork());
         }
     }
 }
