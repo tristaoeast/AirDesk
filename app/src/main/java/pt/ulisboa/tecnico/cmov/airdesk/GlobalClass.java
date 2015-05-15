@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.os.Messenger;
 import android.support.v7.app.ActionBarActivity;
 
+import org.apache.commons.logging.Log;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -44,6 +46,7 @@ public class GlobalClass extends Application {
     public Hashtable<String, Long> getForeignWorkspaces() {
         return mForeignWorkspaces;
     }
+    private Hashtable<String, ArrayList<String>> mOwnersWsFiles = new Hashtable<String, ArrayList<String>>();
 
     public void setForeignWorkspaces(Hashtable<String, Long> mForeignWorkspaces) {
         this.mForeignWorkspaces = mForeignWorkspaces;
@@ -60,8 +63,6 @@ public class GlobalClass extends Application {
         mForeignWorkspaces = new Hashtable<String, Long>();
     }
 
-    private Hashtable<String, ArrayList<String>> mOwnersWsFiles = new Hashtable<String, ArrayList<String>>();
-
     public ArrayList<String> getWsNameFiles(String wsName) {
         return mOwnersWsFiles.get(wsName);
     }
@@ -70,11 +71,13 @@ public class GlobalClass extends Application {
         if (!mOwnersWsFiles.containsKey(wsName)) {
             ArrayList<String> values = new ArrayList<String>();
             values.add(fileName);
+            android.util.Log.w("GLOBAL CLASS", "ADD to WS: " + wsName + "filename: " + fileName);
             this.mOwnersWsFiles.put(wsName, values);
         } else {
             ArrayList<String> moreValues = mOwnersWsFiles.get(wsName);
             if (!moreValues.contains(fileName)) {
                 moreValues.add(fileName);
+                android.util.Log.w("GLOBAL CLASS", "ADD to WS: " + wsName + "filename: " + fileName);
                 this.mOwnersWsFiles.put(wsName, moreValues);
             }
         }
