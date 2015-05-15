@@ -12,15 +12,30 @@
         android:id="@+id/tv_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bt_edit_file"
         android:maxLines="100000"
-        android:scrollbars="vertical"/>
+        android:scrollbars="vertical" />
 
-    <Button
-        android:id="@+id/bt_edit_file"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Edit File"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/bt_edit_file"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Edit File"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/bt_delete_file"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete File"
+            android:layout_weight="1"
+            android:onClick="deleteFile"
+             />
+    </LinearLayout>
 
 </RelativeLayout>
