@@ -137,7 +137,7 @@ public class GlobalClass extends Application {
     }
 
     public void addWsOwners(String mWs, Long mOwnerIp) {
-        this.mWsOwners.put(mWs, mOwnerIp);
+            this.mWsOwners.put(mWs, mOwnerIp);
     }
 
     public void removeWsOwners(Long mOwnerIp) {
@@ -149,7 +149,13 @@ public class GlobalClass extends Application {
     }
 
     public void addOwnersWs(Long mOwnerIp, String mWs) {
-        this.mOwnersWs.put(mOwnerIp, mWs);
+        if(!mWsOwners.containsKey(mOwnerIp))
+            this.mOwnersWs.put(mOwnerIp, mWs);
+        else {
+            String values = mOwnersWs.get(mOwnerIp);
+            values += mWs;
+            this.mOwnersWs.put(mOwnerIp, mWs);
+        }
     }
 
     public void removeOwnersWs(String mWs) {
