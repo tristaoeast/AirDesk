@@ -37,8 +37,8 @@ public class GlobalClass extends Application {
     private Hashtable<String, Long> mSubscribedWorkspaces = new Hashtable<String, Long>();
     private Hashtable<String, Long> mInvitedWorkspaces = new Hashtable<String, Long>();
 
-    private Hashtable<String, Long> mWsOwners = new Hashtable<String, Long>();
-    private Hashtable<Long, ArrayList<String>> mOwnersWs = new Hashtable<Long, ArrayList<String>>();
+    private Hashtable<String, String> mWsOwners = new Hashtable<String, String>();
+    private Hashtable<String, ArrayList<String>> mOwnersWs = new Hashtable<String, ArrayList<String>>();
 
     public void clearSubscribedWorkspaces() {
         mSubscribedWorkspaces = new Hashtable<String, Long>();
@@ -140,11 +140,11 @@ public class GlobalClass extends Application {
         this.mLocalEmail = mLocalEmail;
     }
 
-    public Hashtable<String, Long> getWsOwners() {
+    public Hashtable<String, String> getWsOwners() {
         return mWsOwners;
     }
 
-    public void addWsOwners(String mWs, Long mOwnerIp) {
+    public void addWsOwners(String mWs, String mOwnerIp) {
             this.mWsOwners.put(mWs, mOwnerIp);
     }
 
@@ -152,11 +152,11 @@ public class GlobalClass extends Application {
         this.mWsOwners.remove(mOwnerIp);
     }
 
-    public Hashtable<Long, ArrayList<String>> getOwnersWs() {
+    public Hashtable<String, ArrayList<String>> getOwnersWs() {
         return mOwnersWs;
     }
 
-    public void addOwnersWs(Long mOwnerIp, String mWs) {
+    public void addOwnersWs(String mOwnerIp, String mWs) {
         if(!mWsOwners.containsKey(mOwnerIp)){
             ArrayList<String> values = new ArrayList<String>();
             values.add(mWs);

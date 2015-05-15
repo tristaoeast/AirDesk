@@ -281,8 +281,8 @@ public class ForeignWorkspaceActivity extends ActionBarActivity implements SimWi
 
     public void isOwnerGone(){
         String wsName = WORKSPACE_NAME;
-        Long owner;
-        Hashtable<String, Long> owners = mAppContext.getWsOwners();
+        String owner;
+        Hashtable<String, String> owners = mAppContext.getWsOwners();
         if(owners.containsKey(wsName)) {
             owner = owners.get(wsName);
 

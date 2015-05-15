@@ -33,7 +33,10 @@ public class IncomingCommTask extends AsyncTask<Void, SimWifiP2pSocket, Void> {
             try {
                 SimWifiP2pSocket sock = mSrvSocket.accept();
                 Log.w("InCommTask", "Socket accepted");
-                publishProgress(sock);
+//                publishProgress(sock);
+                ReceiveCommTask recCommTask = new ReceiveCommTask(mAppContext);
+                recCommTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, sock);
+                Log.w("InCommTask","Started new RecCommTask");
             } catch (IOException e) {
                 Log.w("InCommTask","Error accepting socket:"+ e.getMessage());
                 break;
@@ -45,8 +48,8 @@ public class IncomingCommTask extends AsyncTask<Void, SimWifiP2pSocket, Void> {
 
     @Override
     protected void onProgressUpdate(SimWifiP2pSocket... values) {
-        ReceiveCommTask recCommTask = new ReceiveCommTask(mAppContext);
-        recCommTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, values[0]);
-        Log.w("InCommTask","Started new RecCommTask");
+//        ReceiveCommTask recCommTask = new ReceiveCommTask(mAppContext);
+//        recCommTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, values[0]);
+//        Log.w("InCommTask","Started new RecCommTask");
     }
 }
